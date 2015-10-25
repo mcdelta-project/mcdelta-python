@@ -1,35 +1,27 @@
-import urllib.request, shutil, os, glob, shutil, tarfile, json
+import urllib.request, shutil, os, glob, json
 
 
 print("You are running " + os.name)
-if (os.path.exists("Archive") == False):   //cleaning out Archive directory
-  os.mkdir("Archive")
-os.chdir("Archive/")
+if (os.path.exists("Data") == False):				#cleaning out Data directory
+  os.mkdir("Data")
+os.chdir("Data")
 for file in glob.glob("*"):
   os.remove(file)
 
 modname = input("Enter the mod that you wish to download.")
 
 print("Downloading archive...")
-url = "http://html.williambl.com/CMAN/CMAN.tar.gz" //Archive Download
-file_name = "CMAN.tar.gz"
+url = "http://modlist.mcf.li/api/v3/1.8.json"		#JSON link
+file_name = "CMAN.json"
 
-//Download the file from `url` and save it locally under `file_name`:
+													#Download it.
 with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
   shutil.copyfileobj(response, out_file)
-print("Extracting Archive...")
-
-tar = tarfile.open("CMAN.tar.gz")     //untar
-tar.extractall()
-tarlist = tar.getnames()
-
 print("Done.")
 
-if(os.path.exists(modname + ".json")):              //Telling user that file exists
-  for file in glob.glob(modname + ".json"):
-      print(file)
-else:
-  print("Mod not found.")
+with open("CMAN.json") as json_file:				#JSON parsing
+    json_data = json.load(json_file)
+    pass											#I need help getting the download link from the JSON...
 
 
-pass //Add code to download file and move to mods directory
+pass 												#Add code to download file and move to mods directory
