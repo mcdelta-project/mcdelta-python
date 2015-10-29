@@ -6,7 +6,7 @@ Licenced under the GPL v3
 
 Have a mod on the CMAN? Add one of these to your forum page so that everyone knows!
 
-![Badge](https://img.shields.io/badge/CMAN-Indexed-green.svg?style=flat-square)
+![Badge](https://puu.sh/l1MBW/6ba19a987c.svg)
 
 ![Badge](https://img.shields.io/badge/CMAN-Indexed-green.svg)
 
