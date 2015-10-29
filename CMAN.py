@@ -3,6 +3,7 @@ import shutil
 import os
 import glob
 import json
+import sys
 
 
 print("You are running " + os.name)
@@ -46,6 +47,7 @@ def find_mod:
 		print(file + " found.")
 	else:
 		print("Mod not found.")
+		sys.exit()
 
 	# JSON parsing, to get download link
 	with open(modname + ".json") as json_file:
