@@ -25,18 +25,30 @@ if(command == "remove"):
 
 
 def update_archive:
-	print("Downloading archive...")
-	url = "http://modlist.mcf.li/api/v3/1.8.json"  # JSON link
-	file_name = "CMAN.json"
+	url = "http://html.williambl.com/CMAN/CMAN.tar.gz"  # Archive Download
+	file_name = "CMAN.tar.gz"
 	# Download it.
 	with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
 	    shutil.copyfileobj(response, out_file)
 	print("Done.")
 
+	print("Extracting Archive...")
+	tar = tarfile.open("CMAN.tar.gz") // untar
+	tar.extractall()
+	tarlist = tar.getnames()
+	print(tarlist)
+
 
 def find_mod:
 	mod = input("Enter mod name.")
-	with open("CMAN.json") as json_file:  # JSON parsing
+	if(os.path.exists(modname + ".json")):  # Telling user that file exists
+		for file in glob.glob(modname + ".json"):
+		print(file + " found.")
+	else:
+		print("Mod not found.")
+
+	# JSON parsing, to get download link
+	with open(modname + ".json") as json_file:
     json_data = json.load(json_file)
     pass  # I need help getting the download link from the JSON...
 
