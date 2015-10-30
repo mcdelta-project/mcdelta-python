@@ -5,7 +5,6 @@ import glob
 import json
 import sys
 import tarfile
-from tkinter.filedialog import askdirectory
 
 
 def update_archive():
@@ -24,7 +23,7 @@ def update_archive():
 	print(tarlist)
 
 
-def find_and_install_mod():
+def install_mod():
 	modname = input("Enter mod name.")
 	if(os.path.exists(modname + ".json")):  # Telling user that file exists
 		for file in glob.glob(modname + ".json"):
@@ -45,7 +44,7 @@ def find_and_install_mod():
 		url = json_data["Link"]
 		version = json_data["Version"]
 		print(modname + " is at version " + version)
-		file_name = modname + ".jar"
+		file_name = modname + "-" + version + ".jar"
 		os.chdir(modfolder)
 		print("Downloading " + url + " as " + file_name)
 		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
@@ -66,7 +65,7 @@ os.chdir("Data")
 for file in glob.glob("*"):
 	os.remove(file)
 
-modfolder = askdirectory(message="Please select your mods folder.")
+modfolder = input("Where is your mods folder?")
 
 command = input("What do you want to do? update (the archive), install (a mod) or remove (a mod)?")
 
@@ -74,6 +73,6 @@ if(command == "update"):
 	update_archive()
 if(command == "install"):
 	update_archive()
-	find_and_install_mod()
+	install_mod()
 if(command == "remove"):
 	remove_mod()
