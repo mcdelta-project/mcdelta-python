@@ -8,7 +8,8 @@ import tarfile
 
 
 def update_archive():
-	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master"  # Archive Download
+	# Archive Download
+	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master"
 	file_name = "CMAN.tar.gz"
 	print("Downloading Archive...")
 	# Download it.
@@ -38,23 +39,42 @@ def install_mod():
 
 	# Install
 	modtype = json_data["Type"]
-	if (modtype == BaseMod):
+	if (modtype == Basemod):
 		pass
-	elif (modtype == ModsFolder):
-		os.chdir()
-		if ():
-			pass	
-		url = json_data["Link"]
-		version = json_data["Version"]
-		print(modname + " is at version " + version)
-		file_name = modname + "-" + version + ".jar"
-		os.chdir(modfolder)
-		print("Downloading " + url + " as " + file_name)
-		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-		   shutil.copyfileobj(response, out_file)
-		print("Done.")
+	elif (modtype == Forge):
+		os.chdir(execdir + "/LocalData")
+		if (os.path.exists(Forge.json) == False):
+			print("You must install Forge first!")
+			sys.exit()
+		else:
+			url = json_data["Link"]
+			version = json_data["Version"]
+			print(modname + " is at version " + version)
+			file_name = modname + "-" + version + ".jar"
+			os.chdir(modfolder)
+			print("Downloading " + url + " as " + file_name)
+			with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+				shutil.copyfileobj(response, out_file)
+			print("Done.")
+
+	elif (modtype == Liteloader):
+		os.chdir(execdir + "/LocalData")
+		if (os.path.exists(Liteloader.json) == False):
+			print("You must install Liteloader first!")
+			sys.exit()
+		else:
+			url = json_data["Link"]
+			version = json_data["Version"]
+			print(modname + " is at version " + version)
+			file_name = modname + "-" + version + ".litemod"
+			os.chdir(modfolder)
+			print("Downloading " + url + " as " + file_name)
+			with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+				shutil.copyfileobj(response, out_file)
+			print("Done.")
+
 	elif (modtype == Installer):
-		pass
+		os.chdir(execdir)
 
 
 def remove_mod():
@@ -62,13 +82,15 @@ def remove_mod():
 	pass
 
 print("You are running " + sys.platform)
-if (os.path.exists("Data") == False):  # cleaning out Data directory
+if (os.path.exists("Data") == False):
 	os.mkdir("Data")
 if (os.path.exists("LocalData") == False):
 	os.mkdir("LocalData")
+execdir = os.getcwd()
+print(execdir)
 os.chdir("Data")
 for file in glob.glob("*"):
-	os.remove(file)
+	os.remove(file)  # cleaning out Data directory
 
 
 os.chdir("../LocalData/")
@@ -80,9 +102,10 @@ if (os.path.exists("config.json") == True):
 else:
 	modfolder = input("Where is your mods folder? (absolute paths)")
 	f = open('config.json', 'w+')
-	f.write('{"modfolder":"' + modfolder +'"}')
+	f.write('{"modfolder":"' + modfolder + '"}')
 
-command = input("What do you want to do? update (the archive), install (a mod) or remove (a mod)?")
+command = input(
+	"What do you want to do? update (the archive), install (a mod) or remove (a mod)?")
 if(command == "update"):
 	update_archive()
 if(command == "install"):
