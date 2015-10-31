@@ -41,6 +41,9 @@ def install_mod():
 	if (modtype == BaseMod):
 		pass
 	elif (modtype == ModsFolder):
+		os.chdir()
+		if ():
+			pass	
 		url = json_data["Link"]
 		version = json_data["Version"]
 		print(modname + " is at version " + version)
@@ -61,14 +64,25 @@ def remove_mod():
 print("You are running " + sys.platform)
 if (os.path.exists("Data") == False):  # cleaning out Data directory
 	os.mkdir("Data")
+if (os.path.exists("LocalData") == False):
+	os.mkdir("LocalData")
 os.chdir("Data")
 for file in glob.glob("*"):
 	os.remove(file)
 
-modfolder = input("Where is your mods folder?")
+
+os.chdir("../LocalData/")
+if (os.path.exists("config.json") == True):
+	with open("config.json") as json_file:
+		json_data = json.load(json_file)
+	modfolder = json_data["modfolder"]
+	print(modfolder)
+else:
+	modfolder = input("Where is your mods folder? (absolute paths)")
+	f = open('config.json', 'w+')
+	f.write('{"modfolder":"' + modfolder +'"}')
 
 command = input("What do you want to do? update (the archive), install (a mod) or remove (a mod)?")
-
 if(command == "update"):
 	update_archive()
 if(command == "install"):
