@@ -57,11 +57,22 @@ def install_mod():
 	newfile = open(newfilename, 'w+')
 	shutil.copyfile(originalfile, newfilename)
 
+	requirements = json_data["Requirements"]
+	for requirement in requirements:
+		if (os.path.exists(requirement + ".json") == False):
+			print("You must install " + requirement + " first!")
+			sys.exit()
+	incompatibilities = json_data["Incompatibilities"]
+	for incompatibility in incompatibilities:
+		if (os.path.exists(incompatibility + ".json") == True):
+			print("You cannot have " + requirement + " and " + modname + " installed at the same time!")
+			sys.exit()
+
 	if (modtype == "Basemod"):
 		pass
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
-		if (os.path.exists(MinecraftForge.json) == False):
+		if (os.path.exists("MinecraftForge.json") == False):
 			print("You must install Forge first!")
 			sys.exit()
 		else:
@@ -78,7 +89,7 @@ def install_mod():
 
 	elif (modtype == "Liteloader"):
 		os.chdir(execdir + "/LocalData")
-		if (os.path.exists(Liteloader.json) == False):
+		if (os.path.exists("Liteloader.json") == False):
 			print("You must install Liteloader first!")
 			sys.exit()
 		else:
