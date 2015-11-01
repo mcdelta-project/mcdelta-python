@@ -250,9 +250,11 @@ while(True):
 			print("Invalid command syntax.")
 	elif(command.split(" ")[0] == "version"):
 		print("CMAN v"+version)
-	elif(command.split(" ")[0] == "help"):
+	elif(command.split(" ")[0] == "help" or command.split(" ")[0] == "?"):
 		print_help()
 	elif(command.split(" ")[0] == "exit"):
 		sys.exit()
+	elif(command == ""):
+		pass #don't print "Invalid command." for empty line
 	else:
 		print("Invalid command.")
