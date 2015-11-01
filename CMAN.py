@@ -6,13 +6,13 @@ import json
 import sys
 import tarfile
 
-
+version = "0.0.1"
 
 def get_json(mod):
 	if(os.path.exists(execdir + "/LocalData/CMAN-Archive")):
 		os.chdir(execdir + "/LocalData/CMAN-Archive")
 	else:
-		print("Archive not found. Please update archive.")
+		print("CMAN archive not found. Please update archive.")
 		return(-1)
 	if(os.path.exists(mod + ".json")):
 		# JSON parsing
@@ -30,7 +30,8 @@ def mod_installed(mod):
 
 def update_archive():
 	#Delete old archive
-	shutil.rmtree("CMAN-Archive")
+	if(os.path.exists(execdir + "/LocalData/CMAN-Archive")):
+		shutil.rmtree("CMAN-Archive")
 	# Archive Download
 	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master"
 	file_name = "CMAN.tar.gz"
@@ -44,12 +45,14 @@ def update_archive():
 	tar = tarfile.open("CMAN.tar.gz")  # untar
 	tar.extractall()
 	tarlist = tar.getnames()
-	print(tarlist)
 	os.rename(tarlist[0], "CMAN-Archive")
+	print("Done.")
 
-def install_mod():
+def install_mod(modname):
 	os.chdir(execdir + "/LocalData/CMAN-Archive")
-	modname = input("Enter mod name.")
+	if(modname == None):
+		modname = input("Enter mod name: ")
+
 	if(os.path.exists(modname + ".json")):  # Telling user that file exists
 		for file in glob.glob(modname + ".json"):
 			print(file + " found.")
@@ -63,11 +66,13 @@ def install_mod():
 	modtype = json_data["Type"]
 	IsUnstable = json.loads(json_data["Unstable"])
 	if (IsUnstable == True):
-		if (input("This mod may be unstable. Type OK to install, or anything else to cancel.") == "OK"):
+		if (input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"):
 			pass
 		else:
+			print("Install canceled.")
 			return
 	if (modtype == "Basemod"):
+		print("Not Implemented.")
 		pass
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
@@ -122,8 +127,10 @@ def install_mod():
 		print("Done. Please run the installer.")
 
 
-def remove_mod():
-	mod = input("Enter mod name.")
+def remove_mod(modname):
+	if(modname == None):
+		modname = input("Enter mod name: ")
+
 	os.chdir(modfolder)
 	#find file(s) with name
 	#if one file, delete it
@@ -156,8 +163,10 @@ def print_info(mod, json_data):
 
 
 
-def get_info():
-	modname = input("Enter mod name.")
+def get_info(modname):
+	if(modname == None):
+		modname = input("Enter mod name: ")
+
 	json_data = get_json(modname)
 	if(json_data == -1):
 		return
@@ -188,22 +197,62 @@ if (os.path.exists("config.json") == True):
 	modfolder = json_data["modfolder"]
 	print(modfolder)
 else:
-	modfolder = input("Where is your mods folder? (absolute paths)")
+	modfolder = input("Enter mod folder location (absolute path): ")
 	f = open('config.json', 'w+')
 	f.write('{"modfolder":"' + modfolder + '"}')
 
+
+def print_help():
+	print("Commands:")
+	print(" install 'mod': install the mod 'mod'")
+	print(" info 'mod': get info for the mod 'mod'")
+	print(" remove 'mod': remove the mod 'mod'")
+	print(" update: update the CMAN archive")
+	print(" help: display this help message")
+	print(" version: display the CMAN version number")
+	print(" exit: exit CMAN")
+
+print("CMAN v"+version)
+print_help()
 while(True):
-	command = input(
-		"What do you want to do? update (the archive), install (a mod) or remove (a mod), (get) info (about a mod), or exit?")
-	if(command == "update"):
-		#update_archive()
-		pass
-	if(command == "install"):
-		#update_archive()
-		install_mod()
-	if(command == "remove"):
-		remove_mod()
-	if(command == "info"):
-		get_info()
-	if(command == "exit"):
+	os.chdir(execdir + "/LocalData/") #reset current working dir
+	command = input("> ")
+	if(command.split(" ")[0] == "update"):
+		update_archive()
+	elif(command.split(" ")[0] == "install"):
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			mod = command.split(" ")[1]
+			update_archive()
+			install_mod(mod)
+		elif(len(command.split(" ")) == 1):
+			mod = None
+			update_archive()
+			install_mod(mod)
+		else:
+			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "remove"):
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			mod = command.split(" ")[1]
+			remove_mod(mod)
+		elif(len(command.split(" ")) == 1):
+			mod = None
+			remove_mod(mod)
+		else:
+			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "info"):
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			mod = command.split(" ")[1]
+			get_info(mod)
+		elif(len(command.split(" ")) == 1):
+			mod = None
+			get_info(mod)
+		else:
+			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "version"):
+		print("CMAN v"+version)
+	elif(command.split(" ")[0] == "help"):
+		print_help()
+	elif(command.split(" ")[0] == "exit"):
 		sys.exit()
+	else:
+		print("Invalid command.")
