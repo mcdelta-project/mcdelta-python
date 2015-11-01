@@ -39,11 +39,17 @@ def install_mod():
 
 	# Install
 	modtype = json_data["Type"]
+	IsUnstable = json.loads(json_data["Unstable"])
+	if (IsUnstable == True):
+		if (input("This mod may be unstable. Type OK to install, or anything else to cancel.") == "OK"):
+			pass
+		else:
+			sys.exit()
 	if (modtype == Basemod):
 		pass
 	elif (modtype == Forge):
 		os.chdir(execdir + "/LocalData")
-		if (os.path.exists(Forge.json) == False):
+		if (os.path.exists(MinecraftForge.json) == False):
 			print("You must install Forge first!")
 			sys.exit()
 		else:
@@ -75,6 +81,15 @@ def install_mod():
 
 	elif (modtype == Installer):
 		os.chdir(execdir)
+		url = json_data["Link"]
+		version = json_data["Version"]
+		print(modname + " is at version " + version)
+		file_name = json_data["InstallerName"]
+		os.chdir(execdir)
+		print("Downloading " + url + " as " + file_name)
+		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+			shutil.copyfileobj(response, out_file)
+		print("Done. Please run the installer.")
 
 
 def remove_mod():
