@@ -8,27 +8,29 @@ import tarfile
 
 version = "0.0.1"
 
-def get_json(mod):
+def get_json(modname):
 	if(os.path.exists(execdir + "/LocalData/CMAN-Archive")):
 		os.chdir(execdir + "/LocalData/CMAN-Archive")
 	else:
 		print("CMAN archive not found. Please update archive.")
 		return(-1)
-	if(os.path.exists(mod + ".json")):
+	if(os.path.exists(modname + ".json")):
 		# JSON parsing
-		with open(mod + ".json") as json_file:
+		with open(modname + ".json") as json_file:
 			json_data = json.load(json_file)
 			return(json_data)
 	else:
 		return(None)
 
-def mod_installed(mod):
-	os.chdir(execdir + "/LocalData")
-	return(os.path.exists(modname + ".json"))
+def mod_installed(modname):
+	os.chdir(modfolder)
+	files = glob.glob(modname + "-*.jar")
+	return(len(files)>0)
 
 
 
 def update_archive():
+	return #blocks updating for debug
 	#Delete old archive
 	if(os.path.exists(execdir + "/LocalData/CMAN-Archive")):
 		shutil.rmtree("CMAN-Archive")
@@ -76,7 +78,7 @@ def install_mod(modname):
 		pass
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
-		if (os.path.exists("MinecraftForge.json") == False):
+		if (os.path.exists("MinecraftForge.installed") == False):
 			print("You must install Forge first!")
 			return
 		else:
@@ -84,8 +86,6 @@ def install_mod(modname):
 			version = json_data["Version"]
 			print(modname + " is at version " + version)
 			file_name = modname + "-" + version + ".jar"
-			f = open(modname+".installed", "w") #adding file as "installed" flag
-			f.close()
 			os.chdir(modfolder)
 			print("Downloading " + url + " as " + file_name)
 			with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
@@ -94,7 +94,7 @@ def install_mod(modname):
 
 	elif (modtype == "Liteloader"):
 		os.chdir(execdir + "/LocalData")
-		if (os.path.exists("Liteloader.json") == False):
+		if (os.path.exists("Liteloader.installed") == False):
 			print("You must install Liteloader first!")
 			return
 		else:
@@ -102,8 +102,6 @@ def install_mod(modname):
 			version = json_data["Version"]
 			print(modname + " is at version " + version)
 			file_name = modname + "-" + version + ".litemod"
-			f = open(modname+".installed", "w") #adding file as "installed" flag
-			f.close()
 			os.chdir(modfolder)
 			print("Downloading " + url + " as " + file_name)
 			with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
@@ -116,7 +114,7 @@ def install_mod(modname):
 		version = json_data["Version"]
 		print(modname + " is at version " + version)
 		file_name = json_data["InstallerName"]
-		f = open(modname+".installed", "w") #adding file as "installed" flag
+		f = open(modname+".installed", "w") #adding file as "installed" flag, temporary way to detect installer mods
 		f.close()
 		os.chdir(execdir)
 		files = os.listdir(execdir)
@@ -127,41 +125,33 @@ def install_mod(modname):
 		print("Done. Please run the installer.")
 
 
-def remove_mod(modname):
+def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
 	if(modname == None):
 		modname = input("Enter mod name: ")
+		print(mod_installed(modname))
+	if(mod_installed(modname)):
+		os.chdir(modfolder)
+		files = glob.glob(modname + "-*.jar")
+		for file in files:
+			if(input("Delete \""+file+"\"? Type OK to delete, or anything else to skip: ") == "OK"):
+				os.remove(file)
+				print("Deleted \""+file+"\".")
+			else:
+				print("Skipped \""+file+"\".")
+	else:
+		print("Mod not installed.")
 
-	os.chdir(modfolder)
-	#find file(s) with name
-	#if one file, delete it
-	#if more than one, list names and ask which one or all to delete
 
-def get_deps(mod):
+def get_deps(modname):
+	json_data = get_json(modname)
 	deps = json_data["Requirements"]
 	return(deps)
 
-def install_deps(mod):
-	deps = get_deps(mod, json_data)
+def install_deps(modname):
+	deps = get_deps(modname)
 	for dep in deps:
 		if(not mod_installed(dep)):
 			install_mod(dep)
-
-def print_info(mod, json_data):
-	if(json_data["Unstable"] == "false"):
-		stable = "Stable" 
-	else:
-		stable = "Unstable" 
-	print(json_data["Name"]+":")
-	print("\tVersion: "+json_data["Version"]+" ("+stable+")")
-	print("\tAuthor(s): "+json_data["Author"])
-	print("\tDescription: "+json_data["Desc"])
-	print("\tRequirements: "+str(json_data["Requirements"]))
-	print("\tKnown Incompatibilities: "+str(json_data["Incompatibilities"]))
-	print("\tDownload Link: "+str(json_data["Link"]))
-	print("\tLicense: "+json_data["License"])
-
-
-
 
 def get_info(modname):
 	if(modname == None):
@@ -172,7 +162,18 @@ def get_info(modname):
 		return
 	else:
 		if (json_data != None):
-			print_info(modname, json_data)
+			if(json_data["Unstable"] == "false"):
+				stable = "Stable" 
+			else:
+				stable = "Unstable" 
+			print(json_data["Name"]+":")
+			print("\tVersion: "+json_data["Version"]+" ("+stable+")")
+			print("\tAuthor(s): "+json_data["Author"])
+			print("\tDescription: "+json_data["Desc"])
+			print("\tRequirements: "+str(json_data["Requirements"]))
+			print("\tKnown Incompatibilities: "+str(json_data["Incompatibilities"]))
+			print("\tDownload Link: "+str(json_data["Link"]))
+			print("\tLicense: "+json_data["License"])
 		else:
 			print("Mod not found.")
 
