@@ -36,8 +36,8 @@ def get_installed_json(modname):
 		return(None)
 
 def mod_installed(modname):
-	os.chdir(modfolder)
-	files = glob.glob(modname + "-*.jar")
+	os.chdir(execdir + "/LocalData/ModsDownloaded/")
+	files = glob.glob(modname + "-*.installed")
 	return(len(files)>0)
 
 
@@ -105,18 +105,18 @@ def install_mod(modname):
  
 	originalfile = execdir + "/Data/CMAN-Archive/" + modname + ".json"  # Saving Modname.json for future reference
 	os.chdir(execdir + "/LocalData/ModsDownloaded/")
-	newfilename = modname + ".json_data"
+	newfilename = modname + ".installed"
 	newfile = open(newfilename, 'w+')
 	shutil.copyfile(originalfile, newfilename)
  
 	requirements = json_data["Requirements"]
 	for requirement in requirements:
-		if (os.path.exists(requirement + ".json_data") == False):
+		if (os.path.exists(requirement + ".installed") == False):
 			print("You must install " + requirement + " first!")
 			return
 	incompatibilities = json_data["Incompatibilities"]
 	for incompatibility in incompatibilities:
-		if (os.path.exists(incompatibility + ".json_data") == True):
+		if (os.path.exists(incompatibility + ".installed") == True):
 			print("You cannot have " + incompatibility + " and " + modname + " installed at the same time!")
 			return
 	if (modtype == "Basemod"):
@@ -166,7 +166,11 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 		modname = input("Enter mod name: ")
 		print(mod_installed(modname))
 	print("Removing file for mod in ModsDownloaded")
-	os.remove(execdir + "/LocalData/ModsDownloaded/"+modname+".json") #removing json in ModsDownloaded dir
+	try:
+		os.remove(execdir + "/LocalData/ModsDownloaded/"+modname+".installed") #removing json in ModsDownloaded dir
+	except FileNotFoundError:
+		print("Either " + modname + " is not installed, or something went horribly wrong.")
+		return
 	if(mod_installed(modname)):
 		os.chdir(modfolder)
 		files = glob.glob(modname + "-*.jar") #get all versions of mod
@@ -177,16 +181,16 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 			else:
 				print("Skipped \""+file+"\".")
 	else:
-		print("Mod not installed.")
+		print("I cannot install installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
 
 
-def update_mod(modname):
+def upgrade_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")
 	if(modname == None):
 		modname = input("Enter mod name: ")
 	update = [get_installed_json(modname),get_json(modname)]
-	if(os.path.exists(modname + ".json")):  # Telling user that file exists
-		for file in glob.glob(modname + ".json"):
+	if(os.path.exists(modname + ".installed")):  # Telling user that file exists
+		for file in glob.glob(modname + ".installed"):
 			print(file + " found.")
 	else:
 		print("Mod not found.")
@@ -272,15 +276,15 @@ def print_help():
 	print(" install 'mod': install the mod 'mod'")
 	print(" info 'mod': get info for the mod 'mod'")
 	print(" remove 'mod': remove the mod 'mod'")
-	print(" update 'mod': update the mod 'mod'")
-	print(" updateall: update all outdated mods")
-	print(" updates: list available mod updates")
-	print(" updatearc: update the CMAN archive")
+	print(" upgrade 'mod': upgrade the mod 'mod'")
+	print(" upgradeall: upgrade all outdated mods")
+	print(" upgrades: list available mod upgrades")
+	print(" update: update the CMAN archive")
 	print(" help: display this help message")
 	print(" version: display the CMAN version number")
 	print(" exit: exit CMAN")
 
-def get_updates():
+def get_upgrades():
 	updates = []
 	mods = get_installed_jsons()
 	for mod in mods:
@@ -291,8 +295,8 @@ def get_updates():
 	return(updates)
 
 
-def check_updates(full): #full is a flag for whether to print full list of updates or just updates available message
-	updates = get_updates()
+def check_upgrades(full): #full is a flag for whether to print full list of updates or just updates available message
+	updates = get_upgrades()
 	if(len(updates)>0):
 		if(not full):
 			print("\nMod updates available!")
@@ -308,31 +312,31 @@ def check_updates(full): #full is a flag for whether to print full list of updat
 update_archive()
 print("CMAN v"+version)
 print_help()
-check_updates(False)
+check_upgrades(False)
 while(True):
 	os.chdir(execdir + "/LocalData/") #reset current working dir
 	command = input("> ")
-	if(command.split(" ")[0] == "updatearc"):
+	if(command.split(" ")[0] == "update"):
 		update_archive()
-	elif(command.split(" ")[0] == "updates"):
+	elif(command.split(" ")[0] == "upgrades"):
 		update_archive()
-		check_updates(True)
-	elif(command.split(" ")[0] == "update"):
+		check_upgrades(True)
+	elif(command.split(" ")[0] == "upgrade"):
 		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
 			mod = command.split(" ")[1]
 			update_archive()
-			updates = get_updates()
+			upgrades = get_upgrades()
 			update_mod(mod)
 		elif(len(command.split(" ")) == 1):
 			mod = None
 			update_archive()
-			updates = get_updates()
-			update_mod(mod)
+			upgrades = get_upgrades()
+			upgrade_mod(mod)
 		else:
 			print("Invalid command syntax.")
-	elif(command.split(" ")[0] == "updateall"):
+	elif(command.split(" ")[0] == "upgradeall"):
 		update_archive()
-		updates = get_updates()
+		updates = get_upgrades()
 		if(len(updates) == 0):
 			print("All mods up to date.")
 		else:
