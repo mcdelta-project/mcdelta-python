@@ -247,7 +247,10 @@ if (os.path.exists("LocalData/ModsDownloaded") == False):
 	os.mkdir("LocalData/ModsDownloaded")
 execdir = os.getcwd()
 print(execdir)
-shutil.rmtree("Data") #deleting Data dir
+try:
+	shutil.rmtree("Data") #deleting Data dir
+except(FileNotFoundError): #Data dir not present
+	pass
 os.mkdir("Data") #creating new Data dir
 
 
