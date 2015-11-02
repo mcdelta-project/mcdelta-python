@@ -312,7 +312,11 @@ def check_upgrades(full): #full is a flag for whether to print full list of upda
 update_archive()
 print("CMAN v"+version)
 print_help()
-check_upgrades(False)
+upgradesavailible = get_upgrades()
+if (upgradesavailible == []):
+	pass
+else:
+	print("The following upgrades are availible:" + str(upgradesavailible))
 while(True):
 	os.chdir(execdir + "/LocalData/") #reset current working dir
 	command = input("> ")
