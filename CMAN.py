@@ -18,6 +18,7 @@ def get_json(modname):
 		# JSON parsing
 		with open(modname + ".json") as json_file:
 			json_data = json.load(json_file)
+			json_file.close()
 			return(json_data)
 	else:
 		return(None)
@@ -26,17 +27,21 @@ def get_installed_json(modname):
 	if(os.path.exists(execdir + "/LocalData/ModsDownloaded")):
 		os.chdir(execdir + "/LocalData/ModsDownloaded")
 	else:
-		return(False) #no mods installed, so obviously modname isn't installed
-	if(os.path.exists(modname + ".json")):
+		return(None) #no mods installed, so obviously modname isn't installed
+	if(os.path.exists(modname + ".installed")):
 		# JSON parsing
-		with open(modname + ".json") as json_file:
+		with open(modname + ".installed") as json_file:
 			json_data = json.load(json_file)
+			json_file.close()
 			return(json_data)
 	else:
 		return(None)
 
 def mod_installed(modname):
-	os.chdir(execdir + "/LocalData/ModsDownloaded/")
+	if(os.path.exists(execdir + "/LocalData/ModsDownloaded")):
+		os.chdir(execdir + "/LocalData/ModsDownloaded")
+	else:
+		return(False) #no mods installed, so obviously modname isn't installed
 	files = glob.glob(modname + "-*.installed")
 	return(len(files)>0)
 
@@ -47,7 +52,7 @@ def get_installed_jsons():
 		mods = os.listdir(execdir + "/LocalData/ModsDownloaded")
 		os.chdir(execdir + "/LocalData/ModsDownloaded")
 		for mod in mods:
-			json_data = get_installed_json(mod[:-5])
+			json_data = get_installed_json(mod[:-10]) #[:-10] cuts off the .installed extension
 			jsons.append(json_data)
 		return jsons
 	else:
@@ -56,6 +61,7 @@ def get_installed_jsons():
 
 
 def update_archive():
+	return
 	#Delete old archive
 	os.chdir(execdir + "/Data")
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
@@ -73,7 +79,7 @@ def update_archive():
 	tar = tarfile.open("CMAN.tar.gz")  # untar
 	tar.extractall()
 	tarlist = tar.getnames()
-	os.rename(tarlist[0], "CMAN-Archive")
+	os.rename(tarlist[0], "CMAN-Archive") #remane the resulting folder to CMAN-Archive
 	print("Done.")
 
 def install_mod(modname):
@@ -121,7 +127,6 @@ def install_mod(modname):
 			return
 	if (modtype == "Basemod"):
 		print("Not Implemented.")
-		pass
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
 		url = json_data["Link"]
@@ -164,14 +169,13 @@ def install_mod(modname):
 def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
 	if(modname == None):
 		modname = input("Enter mod name: ")
-		print(mod_installed(modname))
 	print("Removing file for mod in ModsDownloaded")
 	try:
 		os.remove(execdir + "/LocalData/ModsDownloaded/"+modname+".installed") #removing json in ModsDownloaded dir
 	except FileNotFoundError:
 		print("Either " + modname + " is not installed, or something went horribly wrong.")
 		return
-	if(mod_installed(modname)):
+	if(get_json(modname)["Type"] == "Forge" or get_json(modname)["Type"] == "Liteloader"):
 		os.chdir(modfolder)
 		files = glob.glob(modname + "-*.jar") #get all versions of mod
 		for file in files:
@@ -181,7 +185,7 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 			else:
 				print("Skipped \""+file+"\".")
 	else:
-		print("I cannot install installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
+		print("I cannot uninstall installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
 
 
 def upgrade_mod(modname):
@@ -251,11 +255,11 @@ if (os.path.exists("LocalData/ModsDownloaded") == False):
 	os.mkdir("LocalData/ModsDownloaded")
 execdir = os.getcwd()
 print(execdir)
-try:
+'''try:
 	shutil.rmtree("Data") #deleting Data dir
 except(FileNotFoundError): #Data dir not present
 	pass
-os.mkdir("Data") #creating new Data dir
+os.mkdir("Data") #creating new Data dir'''
 
 
 
@@ -263,12 +267,14 @@ os.chdir("LocalData")
 if (os.path.exists("config.json") == True):
 	with open("config.json") as json_file:
 		json_data = json.load(json_file)
+		json_file.close()
 	modfolder = json_data["modfolder"] # If config exists, get modfolder from that. Else, ask for it.
 	print(modfolder)
 else:
 	modfolder = input("Enter mod folder location (absolute path): ")
 	f = open('config.json', 'w+')
 	f.write('{"modfolder":"' + modfolder + '"}')
+	f.close()
 
 
 def print_help():
@@ -383,6 +389,6 @@ while(True):
 	elif(command.split(" ")[0] == "exit"):
 		sys.exit()
 	elif(command == ""):
-		pass #don't print "Invalid command." for empty line
+		pass #don't print "Unknown command." for empty line
 	else:
 		print("Unknown command.")
