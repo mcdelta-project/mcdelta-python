@@ -294,7 +294,6 @@ def get_upgrades():
 				updates.append([mod,json_data]) #append list of jsons for installed version and newest version 
 	return(updates)
 
-
 def check_upgrades(full): #full is a flag for whether to print full list of updates or just updates available message
 	updates = get_upgrades()
 	if(len(updates)>0):
@@ -316,7 +315,9 @@ upgradesavailible = get_upgrades()
 if (upgradesavailible == []):
 	pass
 else:
-	print("The following upgrades are availible:" + str(upgradesavailible))
+	print("The following upgrades are availible:")
+	for upgrade in upgradesavailible:
+		print(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
 while(True):
 	os.chdir(execdir + "/LocalData/") #reset current working dir
 	command = input("> ")
