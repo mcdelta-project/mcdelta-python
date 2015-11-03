@@ -266,14 +266,35 @@ os.mkdir("Data") #creating new Data dir'''
 os.chdir("LocalData")
 if (os.path.exists("config.json") == True):
 	with open("config.json") as json_file:
-		json_data = json.load(json_file)
+		try:
+			json_data = json.load(json_file)
+		except(KeyError):#json.decoder.JSONDecodeError):
+			print("The config JSON appears to be invalid. Delete it and run CMAN again.")
+			json_file.close()
+			sys.exit()
 		json_file.close()
-	modfolder = json_data["modfolder"] # If config exists, get modfolder from that. Else, ask for it.
+	modfolder = "@#ERROR#@" #starting values
+	versionsfolder = "@#ERROR#@"
+	try:
+		modfolder = json_data["modfolder"] # If config exists, get modfolder and versions folder from that. Else, ask for it.
+	except(KeyError): #modfolder data missing
+		f = open("config.json", "w")
+		modfolder = input("Enter mod folder location (absolute path): ")
+		f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
+		f.close()
+	try:
+		versionsfolder = json_data["versionsfolder"]
+	except(KeyError): #versionsfolder data missing
+		f = open("config.json", "w")
+		versionsfolder = input("Enter versions folder location (absolute path): ")
+		f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
+		f.close()
 	print(modfolder)
 else:
 	modfolder = input("Enter mod folder location (absolute path): ")
-	f = open('config.json', 'w+')
-	f.write('{"modfolder":"' + modfolder + '"}')
+	versionsfolder = input("Enter versions folder location (absolute path): ")
+	f = open('config.json', 'w')
+	f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
 	f.close()
 
 
