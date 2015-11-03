@@ -181,7 +181,7 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 			else:
 				print("Skipped \""+file+"\".")
 	else:
-		print("I cannot install installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
+		print("I cannot remove installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
 
 
 def upgrade_mod(modname):
