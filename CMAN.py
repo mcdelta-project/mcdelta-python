@@ -40,7 +40,7 @@ def get_installed_json(modname):
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
-				print("The JSON file \""+modname+".installed\" appears to be invalid. Using data from CMAN arhcive.")
+				print("The JSON file \""+modname+".installed\" appears to be invalid. Using data from CMAN archive.")
 				json_data = (get_json(modname))
 			finally:
 				json_file.close()
