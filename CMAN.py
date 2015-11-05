@@ -5,6 +5,7 @@ import glob
 import json
 import sys
 import tarfile
+import zipfile
 
 version = "0.0.1"
 
@@ -58,7 +59,29 @@ def get_installed_jsons():
 	else:
 		return([])
 
+def switch_path_dir(path, dir): #switches root of path to dir given
+	pathsplit = path.split(os.sep)
+	pathsplit[0] = dir.split(os.sep)[-1] #just in case it ends with os.sep
+	return(os.sep.join(pathsplit))
 
+def mergedirs(dir1, dir2):
+	files1 = []
+	files2 = []
+	for tuple1 in os.walk(dir1):
+		files1.append(tuple1[0])
+		for file1 in tuple1[2]:
+			files1.append(os.path.join(tuple1[0], file1))
+	for file_ in files1: #file_ because file() is a builtin function
+		if(os.path.split(file_)[0] == ''): #if file_ == dir1
+			continue #skip it
+		if(not os.path.exists(os.path.split(switch_path_dir(file_, dir2))[0])): #if parent dir does not exist in dir2 
+			print(file_)
+			os.makedirs(os.path.split(switch_path_dir(file_, dir2))[0]) #make parent dir in dir2
+		if(os.path.isfile(file_)):
+			shutil.copy(file_, switch_path_dir(file_, dir2))
+		else: #if it is a dir, because it can only be either a file or a dir
+			if(not os.path.exists(switch_path_dir(file_, dir2))):
+				os.mkdir(switch_path_dir(file_, dir2))
 
 def update_archive():
 	return
@@ -81,6 +104,28 @@ def update_archive():
 	tarlist = tar.getnames()
 	os.rename(tarlist[0], "CMAN-Archive") #remane the resulting folder to CMAN-Archive
 	print("Done.")
+
+
+def fix_names(path, oldname, name):
+	old_cwd = os.getcwd() #to reset cwd afterwards
+	os.chdir(path)
+	os.rename(oldname+".jar", name+".jar")
+	os.rename(oldname+".json", name+".json")
+	with open(name+".json") as f:
+		data = json.load(f)
+		f.close()
+	data["id"] = name
+	with open(name+".json", "w") as f:
+		json.dump(data, f)
+		f.close()
+	os.chdir(old_cwd) #restoring cwd
+
+def display_versions(versions): #just makes the version list into a nicer string for printing (minus the brackets and quotes)
+	versionstr = ""
+	for version in versions:
+		versionstr = versionstr + version +", "
+	return(versionstr[:-2]) #cuts off the extra ", " at the end
+
 
 def install_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")
@@ -126,7 +171,49 @@ def install_mod(modname):
 			print("You cannot have " + incompatibility + " and " + modname + " installed at the same time!")
 			return
 	if (modtype == "Basemod"):
-		print("Not Implemented.")
+		os.chdir(execdir + "/LocalData/temp")
+		url = json_data["Link"]
+		version = json_data["Version"]
+		mcversions = json_data["MCVersion"]
+		print(modname + " is at version " + version)
+		file_name = modname + "-" + version + "-CMANtemp.zip"
+		print("Downloading " + url)
+		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+			shutil.copyfileobj(response, out_file)
+		zipfile.ZipFile(file_name).extractall(path="./"+modname)
+		vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+		#cannot check for compatibility because you may be installing into a modded jar with a nonstandard name
+		vpath = os.path.join(versionsfolder, vname)
+		while(not os.path.exists(vpath)):
+			print("The instance you selected was not found. Select another instance.")
+			vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+			vpath = os.path.join(versionsfolder, vname)
+		jarname = vname+".jar"
+		jarpath = os.path.join(vpath, jarname)
+		foldername =  modname + "-" + version #the default version folder name
+		foldernamefinal = input("Enter install folder name or leave blank for default (default: "+foldername+"): ")
+		if(foldername == ""):
+			foldernamefinal = foldername
+		newjarname = foldername+".jar"
+		print("Installing on version "+vname+" as "+foldernamefinal+".")
+		if(os.path.exists(os.path.join(versionsfolder, foldernamefinal))):
+			if(input("The folder "+foldernamefinal+" already exists. Type OK to overwrite, or anything else to choose a new name: ") == "OK"):
+				shutil.rmtree(os.path.join(versionsfolder, foldernamefinal))
+			else:
+				foldernamefinal = input("Enter new install folder name (current name: "+foldernamefinal+"): ")
+		folderpath = os.path.join(versionsfolder, foldernamefinal)
+		shutil.copytree(vpath, folderpath)
+		fix_names(folderpath, vname, foldernamefinal)
+		zipfile.ZipFile(os.path.join(versionsfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"CMANtemp")
+		mergedirs(modname, file_name+"CMANtemp")
+		os.chdir(file_name+"CMANtemp")
+		shutil.rmtree("META-INF") #delete META-INF
+		print("Making jar (this might take a while).")
+		shutil.make_archive("../"+foldername, "zip")
+		shutil.move("../"+foldername+".zip", folderpath+"/"+foldernamefinal+".jar")
+		os.chdir("..") #get back do LocalData
+		print("Done.")
+
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
 		url = json_data["Link"]
@@ -185,7 +272,7 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 			else:
 				print("Skipped \""+file+"\".")
 	else:
-		print("I cannot uninstall installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
+		print("I cannot remove installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
 
 
 def upgrade_mod(modname):
@@ -253,8 +340,9 @@ if (os.path.exists("LocalData") == False):
 	os.mkdir("LocalData")
 if (os.path.exists("LocalData/ModsDownloaded") == False):
 	os.mkdir("LocalData/ModsDownloaded")
+if (os.path.exists("LocalData/temp") == False):
+	os.mkdir("LocalData/temp")
 execdir = os.getcwd()
-print(execdir)
 '''try:
 	shutil.rmtree("Data") #deleting Data dir
 except(FileNotFoundError): #Data dir not present
@@ -289,7 +377,6 @@ if (os.path.exists("config.json") == True):
 		versionsfolder = input("Enter versions folder location (absolute path): ")
 		f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
 		f.close()
-	print(modfolder)
 else:
 	modfolder = input("Enter mod folder location (absolute path): ")
 	versionsfolder = input("Enter versions folder location (absolute path): ")
@@ -311,7 +398,7 @@ def print_help():
 	print(" version: display the CMAN version number")
 	print(" exit: exit CMAN")
 
-def get_upgrades():
+def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
 	updates = []
 	mods = get_installed_jsons()
 	for mod in mods:
