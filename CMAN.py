@@ -74,6 +74,11 @@ def switch_path_dir(path, dir): #switches root of path to dir given
 	pathsplit[0] = dir.split(os.sep)[-1] #just in case it ends with os.sep
 	return(os.sep.join(pathsplit))
 
+def listmods():
+	modsinstalled = get_installed_jsons()
+	print("Installed mods:")
+	print(str(modsinstalled))
+
 def mergedirs(dir1, dir2):
 	files1 = []
 	files2 = []
@@ -404,6 +409,7 @@ def print_help():
 	print(" update: update the CMAN archive")
 	print(" help: display this help message")
 	print(" version: display the CMAN version number")
+	print(" list: list installed mods")
 	print(" exit: exit CMAN")
 
 def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
@@ -496,8 +502,8 @@ while(True):
 		elif(len(command.split(" ")) == 1):
 			mod = None
 			get_info(mod)
-		else:
-			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "list"):
+		listmods()
 	elif(command.split(" ")[0] == "version"):
 		print("CMAN v"+version)
 	elif(command.split(" ")[0] == "help" or command.split(" ")[0] == "?"):
