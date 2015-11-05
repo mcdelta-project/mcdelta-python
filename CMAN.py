@@ -84,7 +84,6 @@ def mergedirs(dir1, dir2):
 				os.mkdir(switch_path_dir(file_, dir2))
 
 def update_archive():
-	return
 	#Delete old archive
 	os.chdir(execdir + "/Data")
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
@@ -211,7 +210,7 @@ def install_mod(modname):
 		print("Making jar (this might take a while).")
 		shutil.make_archive("../"+foldername, "zip")
 		shutil.move("../"+foldername+".zip", folderpath+"/"+foldernamefinal+".jar")
-		os.chdir("..") #get back do LocalData
+		os.chdir("..") #get back to LocalData
 		print("Done.")
 
 	elif (modtype == "Forge"):
@@ -340,14 +339,18 @@ if (os.path.exists("LocalData") == False):
 	os.mkdir("LocalData")
 if (os.path.exists("LocalData/ModsDownloaded") == False):
 	os.mkdir("LocalData/ModsDownloaded")
-if (os.path.exists("LocalData/temp") == False):
-	os.mkdir("LocalData/temp")
+#not making temp dir here because it is done later
 execdir = os.getcwd()
-'''try:
+try:
 	shutil.rmtree("Data") #deleting Data dir
 except(FileNotFoundError): #Data dir not present
 	pass
-os.mkdir("Data") #creating new Data dir'''
+os.mkdir("Data") #creating new Data dir
+try:
+	shutil.rmtree("LocalData/temp") #deleting temp dir
+except(FileNotFoundError): #temp dir not present
+	pass
+os.mkdir("LocalData/temp") #creating new temp dir
 
 
 
