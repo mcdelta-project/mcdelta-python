@@ -170,7 +170,7 @@ def install_mod(modname):
 			print("You cannot have " + incompatibility + " and " + modname + " installed at the same time!")
 			return
 	if (modtype == "Basemod"):
-		os.chdir(execdir + "/LocalData/temp")
+		os.chdir(execdir + "/Data/temp")
 		url = json_data["Link"]
 		version = json_data["Version"]
 		mcversions = json_data["MCVersion"]
@@ -210,7 +210,7 @@ def install_mod(modname):
 		print("Making jar (this might take a while).")
 		shutil.make_archive("../"+foldername, "zip")
 		shutil.move("../"+foldername+".zip", folderpath+"/"+foldernamefinal+".jar")
-		os.chdir("..") #get back to LocalData
+		os.chdir("../../LocalData") #get back to LocalData
 		print("Done.")
 
 	elif (modtype == "Forge"):
@@ -346,11 +346,6 @@ try:
 except(FileNotFoundError): #Data dir not present
 	pass
 os.mkdir("Data") #creating new Data dir
-try:
-	shutil.rmtree("LocalData/temp") #deleting temp dir
-except(FileNotFoundError): #temp dir not present
-	pass
-os.mkdir("LocalData/temp") #creating new temp dir
 
 
 
@@ -407,7 +402,7 @@ def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 
 	for mod in mods:
 		if(mod != None):
 			json_data = get_json(mod["Name"])
-			if(json_data["Version"] != mod["Version"]):
+			if(json_data != None and json_data["Version"] != mod["Version"]):
 				updates.append([mod,json_data]) #append list of jsons for installed version and newest version 
 	return(updates)
 
