@@ -5,6 +5,7 @@ import glob
 import json
 import sys
 import tarfile
+import zipfile
 
 version = "0.0.1"
 
@@ -12,13 +13,19 @@ def get_json(modname):
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
 		os.chdir(execdir + "/Data/CMAN-Archive")
 	else:
-		print("CMAN archive not found. Please update archive.")
+		print("CMAN archive not found. Please update the CMAN archive.")
 		return(-1)
 	if(os.path.exists(modname + ".json")):
 		# JSON parsing
 		with open(modname + ".json") as json_file:
-			json_data = json.load(json_file)
-			return(json_data)
+			try:
+				json_data = json.load(json_file)
+				json_file.close()
+			except(json.decoder.JSONDecodeError):
+				print("The JSON file \""+modname+".json\" appears to be invalid. Please update the CMAN archive.")
+				json_file.close()
+				return
+		return(json_data)
 	else:
 		return(None)
 
@@ -26,17 +33,26 @@ def get_installed_json(modname):
 	if(os.path.exists(execdir + "/LocalData/ModsDownloaded")):
 		os.chdir(execdir + "/LocalData/ModsDownloaded")
 	else:
-		return(False) #no mods installed, so obviously modname isn't installed
-	if(os.path.exists(modname + ".json")):
+		return(None) #no mods installed, so obviously modname isn't installed
+	if(os.path.exists(modname + ".installed")):
 		# JSON parsing
-		with open(modname + ".json") as json_file:
-			json_data = json.load(json_file)
-			return(json_data)
+		with open(modname + ".installed") as json_file:
+			try:
+				json_data = json.load(json_file)
+			except(json.decoder.JSONDecodeError):
+				print("The JSON file \""+modname+".installed\" appears to be invalid. Using data from CMAN archive.")
+				json_data = (get_json(modname))
+			finally:
+				json_file.close()
+		return(json_data)
 	else:
 		return(None)
 
 def mod_installed(modname):
-	os.chdir(execdir + "/LocalData/ModsDownloaded/")
+	if(os.path.exists(execdir + "/LocalData/ModsDownloaded")):
+		os.chdir(execdir + "/LocalData/ModsDownloaded")
+	else:
+		return(False) #no mods installed, so obviously modname isn't installed
 	files = glob.glob(modname + "-*.installed")
 	return(len(files)>0)
 
@@ -47,13 +63,35 @@ def get_installed_jsons():
 		mods = os.listdir(execdir + "/LocalData/ModsDownloaded")
 		os.chdir(execdir + "/LocalData/ModsDownloaded")
 		for mod in mods:
-			json_data = get_installed_json(mod[:-5])
+			json_data = get_installed_json(mod[:-10]) #[:-10] cuts off the .installed extension
 			jsons.append(json_data)
 		return jsons
 	else:
 		return([])
 
+def switch_path_dir(path, dir): #switches root of path to dir given
+	pathsplit = path.split(os.sep)
+	pathsplit[0] = dir.split(os.sep)[-1] #just in case it ends with os.sep
+	return(os.sep.join(pathsplit))
 
+def mergedirs(dir1, dir2):
+	files1 = []
+	files2 = []
+	for tuple1 in os.walk(dir1):
+		files1.append(tuple1[0])
+		for file1 in tuple1[2]:
+			files1.append(os.path.join(tuple1[0], file1))
+	for file_ in files1: #file_ because file() is a builtin function
+		if(os.path.split(file_)[0] == ''): #if file_ == dir1
+			continue #skip it
+		if(not os.path.exists(os.path.split(switch_path_dir(file_, dir2))[0])): #if parent dir does not exist in dir2 
+			print(file_)
+			os.makedirs(os.path.split(switch_path_dir(file_, dir2))[0]) #make parent dir in dir2
+		if(os.path.isfile(file_)):
+			shutil.copy(file_, switch_path_dir(file_, dir2))
+		else: #if it is a dir, because it can only be either a file or a dir
+			if(not os.path.exists(switch_path_dir(file_, dir2))):
+				os.mkdir(switch_path_dir(file_, dir2))
 
 def update_archive():
 	#Delete old archive
@@ -73,8 +111,30 @@ def update_archive():
 	tar = tarfile.open("CMAN.tar.gz")  # untar
 	tar.extractall()
 	tarlist = tar.getnames()
-	os.rename(tarlist[0], "CMAN-Archive")
+	os.rename(tarlist[0], "CMAN-Archive") #remane the resulting folder to CMAN-Archive
 	print("Done.")
+
+
+def fix_names(path, oldname, name):
+	old_cwd = os.getcwd() #to reset cwd afterwards
+	os.chdir(path)
+	os.rename(oldname+".jar", name+".jar")
+	os.rename(oldname+".json", name+".json")
+	with open(name+".json") as f:
+		data = json.load(f)
+		f.close()
+	data["id"] = name
+	with open(name+".json", "w") as f:
+		json.dump(data, f)
+		f.close()
+	os.chdir(old_cwd) #restoring cwd
+
+def display_versions(versions): #just makes the version list into a nicer string for printing (minus the brackets and quotes)
+	versionstr = ""
+	for version in versions:
+		versionstr = versionstr + version +", "
+	return(versionstr[:-2]) #cuts off the extra ", " at the end
+
 
 def install_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")
@@ -120,8 +180,49 @@ def install_mod(modname):
 			print("You cannot have " + incompatibility + " and " + modname + " installed at the same time!")
 			return
 	if (modtype == "Basemod"):
-		print("Not Implemented.")
-		pass
+		os.chdir(execdir + "/Data/temp")
+		url = json_data["Link"]
+		version = json_data["Version"]
+		mcversions = json_data["MCVersion"]
+		print(modname + " is at version " + version)
+		file_name = modname + "-" + version + "-CMANtemp.zip"
+		print("Downloading " + url)
+		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+			shutil.copyfileobj(response, out_file)
+		zipfile.ZipFile(file_name).extractall(path="./"+modname)
+		vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+		#cannot check for compatibility because you may be installing into a modded jar with a nonstandard name
+		vpath = os.path.join(versionsfolder, vname)
+		while(not os.path.exists(vpath)):
+			print("The instance you selected was not found. Select another instance.")
+			vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+			vpath = os.path.join(versionsfolder, vname)
+		jarname = vname+".jar"
+		jarpath = os.path.join(vpath, jarname)
+		foldername =  modname + "-" + version #the default version folder name
+		foldernamefinal = input("Enter install folder name or leave blank for default (default: "+foldername+"): ")
+		if(foldername == ""):
+			foldernamefinal = foldername
+		newjarname = foldername+".jar"
+		print("Installing on version "+vname+" as "+foldernamefinal+".")
+		if(os.path.exists(os.path.join(versionsfolder, foldernamefinal))):
+			if(input("The folder "+foldernamefinal+" already exists. Type OK to overwrite, or anything else to choose a new name: ") == "OK"):
+				shutil.rmtree(os.path.join(versionsfolder, foldernamefinal))
+			else:
+				foldernamefinal = input("Enter new install folder name (current name: "+foldernamefinal+"): ")
+		folderpath = os.path.join(versionsfolder, foldernamefinal)
+		shutil.copytree(vpath, folderpath)
+		fix_names(folderpath, vname, foldernamefinal)
+		zipfile.ZipFile(os.path.join(versionsfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"CMANtemp")
+		mergedirs(modname, file_name+"CMANtemp")
+		os.chdir(file_name+"CMANtemp")
+		shutil.rmtree("META-INF") #delete META-INF
+		print("Making jar (this might take a while).")
+		shutil.make_archive("../"+foldername, "zip")
+		shutil.move("../"+foldername+".zip", folderpath+"/"+foldernamefinal+".jar")
+		os.chdir("../../LocalData") #get back to LocalData
+		print("Done.")
+
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
 		url = json_data["Link"]
@@ -164,14 +265,13 @@ def install_mod(modname):
 def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
 	if(modname == None):
 		modname = input("Enter mod name: ")
-		print(mod_installed(modname))
 	print("Removing file for mod in ModsDownloaded")
 	try:
 		os.remove(execdir + "/LocalData/ModsDownloaded/"+modname+".installed") #removing json in ModsDownloaded dir
 	except FileNotFoundError:
 		print("Either " + modname + " is not installed, or something went horribly wrong.")
 		return
-	if(mod_installed(modname)):
+	if(get_json(modname)["Type"] == "Forge" or get_json(modname)["Type"] == "Liteloader"):
 		os.chdir(modfolder)
 		files = glob.glob(modname + "-*.jar") #get all versions of mod
 		for file in files:
@@ -249,8 +349,8 @@ if (os.path.exists("LocalData") == False):
 	os.mkdir("LocalData")
 if (os.path.exists("LocalData/ModsDownloaded") == False):
 	os.mkdir("LocalData/ModsDownloaded")
+#not making temp dir here because it is done later
 execdir = os.getcwd()
-print(execdir)
 try:
 	shutil.rmtree("Data") #deleting Data dir
 except(FileNotFoundError): #Data dir not present
@@ -262,13 +362,35 @@ os.mkdir("Data") #creating new Data dir
 os.chdir("LocalData")
 if (os.path.exists("config.json") == True):
 	with open("config.json") as json_file:
-		json_data = json.load(json_file)
-	modfolder = json_data["modfolder"] # If config exists, get modfolder from that. Else, ask for it.
-	print(modfolder)
+		try:
+			json_data = json.load(json_file)
+		except(json.decoder.JSONDecodeError):
+			print("The config JSON appears to be invalid. Delete it and run CMAN again.")
+			json_file.close()
+			sys.exit()
+		json_file.close()
+	modfolder = "@#ERROR#@" #starting values
+	versionsfolder = "@#ERROR#@"
+	try:
+		modfolder = json_data["modfolder"] # If config exists, get modfolder and versions folder from that. Else, ask for it.
+	except(KeyError): #modfolder data missing
+		f = open("config.json", "w")
+		modfolder = input("Enter mod folder location (absolute path): ")
+		f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
+		f.close()
+	try:
+		versionsfolder = json_data["versionsfolder"]
+	except(KeyError): #versionsfolder data missing
+		f = open("config.json", "w")
+		versionsfolder = input("Enter versions folder location (absolute path): ")
+		f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
+		f.close()
 else:
 	modfolder = input("Enter mod folder location (absolute path): ")
-	f = open('config.json', 'w+')
-	f.write('{"modfolder":"' + modfolder + '"}')
+	versionsfolder = input("Enter versions folder location (absolute path): ")
+	f = open('config.json', 'w')
+	f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
+	f.close()
 
 
 def print_help():
@@ -284,16 +406,15 @@ def print_help():
 	print(" version: display the CMAN version number")
 	print(" exit: exit CMAN")
 
-def get_upgrades():
+def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
 	updates = []
 	mods = get_installed_jsons()
 	for mod in mods:
 		if(mod != None):
 			json_data = get_json(mod["Name"])
-			if(json_data["Version"] != mod["Version"]):
+			if(json_data != None and json_data["Version"] != mod["Version"]):
 				updates.append([mod,json_data]) #append list of jsons for installed version and newest version 
 	return(updates)
-
 
 def check_upgrades(full): #full is a flag for whether to print full list of updates or just updates available message
 	updates = get_upgrades()
@@ -316,7 +437,9 @@ upgradesavailible = get_upgrades()
 if (upgradesavailible == []):
 	pass
 else:
-	print("The following upgrades are availible:" + str(upgradesavailible))
+	print("The following upgrades are availible:")
+	for upgrade in upgradesavailible:
+		print(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
 while(True):
 	os.chdir(execdir + "/LocalData/") #reset current working dir
 	command = input("> ")
@@ -382,6 +505,6 @@ while(True):
 	elif(command.split(" ")[0] == "exit"):
 		sys.exit()
 	elif(command == ""):
-		pass #don't print "Invalid command." for empty line
+		pass #don't print "Unknown command." for empty line
 	else:
 		print("Unknown command.")
