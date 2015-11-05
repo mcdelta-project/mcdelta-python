@@ -13,14 +13,19 @@ def get_json(modname):
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
 		os.chdir(execdir + "/Data/CMAN-Archive")
 	else:
-		print("CMAN archive not found. Please update archive.")
+		print("CMAN archive not found. Please update the CMAN archive.")
 		return(-1)
 	if(os.path.exists(modname + ".json")):
 		# JSON parsing
 		with open(modname + ".json") as json_file:
-			json_data = json.load(json_file)
-			json_file.close()
-			return(json_data)
+			try:
+				json_data = json.load(json_file)
+				json_file.close()
+			except(json.decoder.JSONDecodeError):
+				print("The JSON file \""+modname+".json\" appears to be invalid. Please update the CMAN archive.")
+				json_file.close()
+				return
+		return(json_data)
 	else:
 		return(None)
 
@@ -32,9 +37,14 @@ def get_installed_json(modname):
 	if(os.path.exists(modname + ".installed")):
 		# JSON parsing
 		with open(modname + ".installed") as json_file:
-			json_data = json.load(json_file)
-			json_file.close()
-			return(json_data)
+			try:
+				json_data = json.load(json_file)
+			except(json.decoder.JSONDecodeError):
+				print("The JSON file \""+modname+".installed\" appears to be invalid. Using data from CMAN arhcive.")
+				json_data = (get_json(modname))
+			finally:
+				json_file.close()
+		return(json_data)
 	else:
 		return(None)
 
@@ -354,7 +364,7 @@ if (os.path.exists("config.json") == True):
 	with open("config.json") as json_file:
 		try:
 			json_data = json.load(json_file)
-		except(KeyError):#json.decoder.JSONDecodeError):
+		except(json.decoder.JSONDecodeError):
 			print("The config JSON appears to be invalid. Delete it and run CMAN again.")
 			json_file.close()
 			sys.exit()
