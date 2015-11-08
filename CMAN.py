@@ -7,7 +7,7 @@ import sys
 import tarfile
 import zipfile
 
-version = "0.0.1"
+version = "1.0.0"
 
 def get_json(modname):
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
