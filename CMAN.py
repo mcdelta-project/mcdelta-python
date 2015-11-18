@@ -178,7 +178,22 @@ def install_mod(modname):
 	for requirement in requirements:
 		if (os.path.exists(requirement + ".installed") == False):
 			print("You must install " + requirement + " first!")
-			return
+			wanttoinstall = input("Do you want to install it? Y or n?")
+			if(wanttoinstall == "Y"):
+				install_mod(requirement)
+				return
+			elif(wanttoinstall == "n"):
+				return
+	recommendations = json_data["Recommendations:"]
+	for recommendation in recommendations:
+		if (os.path.exists(recommendation + ".installed") == False):
+			print("This mod recommends " + recommendation + "!")
+			wanttoinstall = input("Do you want to install it? Y or n?")
+			if(wanttoinstall == "Y"):
+				install_mod(recommendation)
+				return
+			elif(wanttoinstall == "n"):
+				pass
 	incompatibilities = json_data["Incompatibilities"]
 	for incompatibility in incompatibilities:
 		if (os.path.exists(incompatibility + ".installed") == True):
