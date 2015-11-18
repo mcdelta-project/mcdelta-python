@@ -181,7 +181,6 @@ def install_mod(modname):
 			wanttoinstall = input("Do you want to install it? Y or n?")
 			if(wanttoinstall == "Y"):
 				install_mod(requirement)
-				return
 			elif(wanttoinstall == "n"):
 				return
 	recommendations = json_data["Recommendations:"]
