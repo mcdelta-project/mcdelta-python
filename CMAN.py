@@ -189,7 +189,7 @@ def install_mod(modname):
 				install_mod(requirement)
 			elif(wanttoinstall == "n"):
 				return
-	recommendations = json_data["Recommendations:"]
+	recommendations = json_data["Recommended"]
 	for recommendation in recommendations:
 		if (os.path.exists(recommendation + ".installed") == False):
 			print("This mod recommends " + recommendation + "!")
