@@ -59,7 +59,7 @@ def mod_installed(modname):
 		os.chdir(execdir + "/LocalData/ModsDownloaded")
 	else:
 		return(False) #no mods installed, so obviously modname isn't installed
-	files = glob.glob(modname + "-*.installed")
+	files = glob.glob(modname + ".installed")
 	return(len(files)>0)
 
 
@@ -314,7 +314,7 @@ def upgrade_mod(modname):
 	if(modname == None):
 		modname = input("Enter mod name: ")
 	update = [get_installed_json(modname),get_json(modname)]
-	if(os.path.exists(modname + ".installed")):  # Telling user that file exists
+	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded", modname + ".installed"))):  # Telling user that file exists
 		for file in glob.glob(modname + ".installed"):
 			print(file + " found.")
 	else:
@@ -424,7 +424,9 @@ def print_help():
 	print(" installm: install multiple mods")
 	print(" info 'mod': get info for the mod 'mod'")
 	print(" remove 'mod': remove the mod 'mod'")
+	print(" removem: remove multiple mods")
 	print(" upgrade 'mod': upgrade the mod 'mod'")
+	print(" upgradem: upgrade multiple mods")
 	print(" upgradeall: upgrade all outdated mods")
 	print(" upgrades: list available mod upgrades")
 	print(" update: update the CMAN archive")
@@ -481,7 +483,7 @@ while(True):
 			mod = command.split(" ")[1]
 			update_archive()
 			upgrades = get_upgrades()
-			update_mod(mod)
+			upgrade_mod(mod)
 		elif(len(command.split(" ")) == 1):
 			mod = None
 			update_archive()
@@ -524,15 +526,42 @@ while(True):
 		elif(len(command.split(" ")) == 1):
 			mod = None
 			get_info(mod)
-	elif(command.split(" ")[0] == "installm" or command.split(" ")[0] == "installmany"): #installm is short for installmany
-		modslist = command.split(" ")[1:] #separate mod names with spaces
-		update_archive()
-		string = "Attempting to install: "
-		for item in modslist:
-			string = string + item+", "
-		print(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
-		for item in modslist:
-			install_mod(item)
+	elif(command.split(" ")[0] == "installm" or command.split(" ")[0] == "installmany"):
+		if(len(command.split(" ")) >= 2):
+			modslist = command.split(" ")[1:] #separate mod names with spaces
+			update_archive()
+			string = "Attempting to install: "
+			for item in modslist:
+				string = string + item+", "
+			print(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
+			for item in modslist:
+				install_mod(item)
+		else:
+			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "removem" or command.split(" ")[0] == "removemany"):
+		if(len(command.split(" ")) >= 2):
+			modslist = command.split(" ")[1:] #separate mod names with spaces
+			update_archive()
+			string = "Attempting to remove: "
+			for item in modslist:
+				string = string + item+", "
+			print(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
+			for item in modslist:
+				remove_mod(item)
+		else:
+			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "upgradem" or command.split(" ")[0] == "upgrademany"):
+		if(len(command.split(" ")) >= 2):
+			modslist = command.split(" ")[1:] #separate mod names with spaces
+			update_archive()
+			string = "Attempting to upgrade: "
+			for item in modslist:
+				string = string + item+", "
+			print(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
+			for item in modslist:
+				upgrade_mod(item)
+		else:
+			print("Invalid command syntax.")
 	elif(command.split(" ")[0] == "list"):
 		listmods()
 	elif(command.split(" ")[0] == "version"):
