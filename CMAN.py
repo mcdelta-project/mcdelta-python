@@ -156,7 +156,7 @@ def install_mod(modname):
 		for file in glob.glob(modname + ".json"):
 			print(file + " found.")
 	else:
-		print("Mod not found.")
+		print("Mod "+modname+" not found.")
 		return
 
 	json_data = get_json(modname)
@@ -318,7 +318,7 @@ def upgrade_mod(modname):
 		for file in glob.glob(modname + ".installed"):
 			print(file + " found.")
 	else:
-		print("Mod not found.")
+		print("Mod "+modname+" not found.")
 		return
 	os.chdir(execdir + "/LocalData") #restoring current working dir
 	if(update[1]["Version"] != update[0]["Version"] and mod_installed(modname)):
@@ -364,7 +364,7 @@ def get_info(modname):
 			print("\tDownload Link: "+str(json_data["Link"]))
 			print("\tLicense: "+json_data["License"])
 		else:
-			print("Mod not found.")
+			print("Mod "+modname+" not found.")
 
 
 # Start Program Here:
@@ -421,6 +421,7 @@ else:
 def print_help():
 	print("Commands:")
 	print(" install 'mod': install the mod 'mod'")
+	print(" installm: install multiple mods")
 	print(" info 'mod': get info for the mod 'mod'")
 	print(" remove 'mod': remove the mod 'mod'")
 	print(" upgrade 'mod': upgrade the mod 'mod'")
