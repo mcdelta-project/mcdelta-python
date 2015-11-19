@@ -7,7 +7,13 @@ import sys
 import tarfile
 import zipfile
 
-version = "1.0.0"
+version = "1.1.0"
+
+def check_for_updates():
+	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
+		latestversion = response.read()
+		if (version != str(latestversion)):
+			print("WARNING! YOU ARE USING OLD VERSION " + version + "! NEWEST VERSION IS " + str(latestversion) + "!")
 
 def get_json(modname):
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
@@ -104,7 +110,7 @@ def update_archive():
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
 		shutil.rmtree("CMAN-Archive")
 	# Archive Download
-	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master/Archive.tar.gz"
+	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master"
 	file_name = "CMAN.tar.gz"
 	print("Downloading Archive...")
 	# Download it.
@@ -453,6 +459,7 @@ def check_upgrades(full): #full is a flag for whether to print full list of upda
 update_archive()
 print("CMAN v"+version)
 print_help()
+check_for_updates()
 upgradesavailible = get_upgrades()
 if (upgradesavailible == []):
 	pass
