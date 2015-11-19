@@ -523,6 +523,15 @@ while(True):
 		elif(len(command.split(" ")) == 1):
 			mod = None
 			get_info(mod)
+	elif(command.split(" ")[0] == "installm" or command.split(" ")[0] == "installmany"): #installm is short for installmany
+		modslist = command.split(" ")[1:] #separate mod names with spaces
+		update_archive()
+		string = "Attempting to install: "
+		for item in modslist:
+			string = string + item+", "
+		print(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
+		for item in modslist:
+			install_mod(item)
 	elif(command.split(" ")[0] == "list"):
 		listmods()
 	elif(command.split(" ")[0] == "version"):
