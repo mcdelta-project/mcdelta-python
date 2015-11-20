@@ -12,6 +12,7 @@ version = "1.1.0"
 def check_for_updates():
 	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
 		latestversion = response.read()
+		latestversion = latestversion.decode("utf-8").strip() #it is using a bytes sting and printing the b prefix and newline
 		if (version != str(latestversion)):
 			print("WARNING! YOU ARE USING OLD VERSION " + version + "! NEWEST VERSION IS " + str(latestversion) + "!")
 
