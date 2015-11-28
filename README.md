@@ -1,5 +1,7 @@
 # CMAN
 
+![Badge](https://img.shields.io/github/downloads/comprehensive-minecraft-archive-network/CMAN-Python/total.svg)
+
 Comprehensive Minecraft Archive Network
 
 Licenced under the GPL v3
