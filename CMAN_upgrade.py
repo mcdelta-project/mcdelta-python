@@ -31,8 +31,8 @@ def upgrade_mod(modname):
 		return
 	os.chdir(execdir + "/LocalData") #restoring current working dir
 	if(update[1]["Version"] != update[0]["Version"] and mod_installed(modname)):
-		remove_mod(modname)
-		install_mod(modname)
+		CMAN_remove.remove_mod(modname)
+		CMAN_install.install_mod(modname)
 	elif(not mod_installed(modname)):
 		print(modname+" is not installed.")
 	else:
