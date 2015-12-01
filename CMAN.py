@@ -12,7 +12,7 @@ import CMAN_install
 import CMAN_importexport
 from CMAN_util import *
 
-version = "1.1.0"
+version = "1.2.0"
 
 def check_for_updates():
 	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
@@ -106,6 +106,8 @@ def print_help():
 	print(" help: display this help message")
 	print(" version: display the CMAN version number")
 	print(" list: list installed mods")
+	print(" export 'name': export a modlist with the name 'name' , which can be imported later")
+	print(" import 'pathtomodlist': import the modlist 'pathtomodlist'")
 	print(" exit: exit CMAN")
 
 update_archive()
@@ -212,9 +214,27 @@ while(True):
 		else:
 			print("Invalid command syntax.")
 	elif(command.split(" ")[0] == "export"):
-		CMAN_importexport.export_mods()
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			name = command.split(" ")[1]
+			update_archive()
+			CMAN_importexport.export_mods(name)
+		elif(len(command.split(" ")) == 1):
+			path = None
+			update_archive()
+			CMAN_importexport.export_mods(name)
+		else:
+			print("Invalid command syntax.")
 	elif(command.split(" ")[0] == "import"):
-		CMAN_importexport.import_mods()
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			path = command.split(" ")[1]
+			update_archive()
+			CMAN_importexport.import_mods(path)
+		elif(len(command.split(" ")) == 1):
+			path = None
+			update_archive()
+			CMAN_importexport.import_mods(path)
+		else:
+			print("Invalid command syntax.")
 	elif(command.split(" ")[0] == "list"):
 		listmods()
 	elif(command.split(" ")[0] == "version"):

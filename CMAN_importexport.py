@@ -16,8 +16,8 @@ def init_config_importexport(data): #data is a 3-tuple
 	global modfolder, versionsfolder, execdir #makes it edit the global vars rather than create new ones
 	modfolder, versionsfolder, execdir = data
 
-def export_mods(path):
-	if (path == None):
+def export_mods(filename):
+	if (filename == None):
 		filename = input("What would you like your new modlist to be called?")
 	os.chdir(execdir)
 	os.chdir("LocalData/Modlists")
@@ -46,7 +46,7 @@ def import_mods(path):
 		path = input("Please enter the path to the modlist.")
 
 	if(os.path.exists(path)):  # Telling user that file exists
-			print(path + " found.")
+		print(path + " found.")
 	else:
 		print(path + " not found.")
 		return
