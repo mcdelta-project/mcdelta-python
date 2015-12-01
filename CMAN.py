@@ -6,6 +6,7 @@ import json
 import sys
 import tarfile
 import zipfile
+import argparse
 import CMAN_remove
 import CMAN_upgrade
 import CMAN_install
@@ -68,6 +69,17 @@ def get_info(modname):
 
 
 # Start Program Here:
+
+parser = argparse.ArgumentParser(description="CMAN: the Comprehensive Minecraft Archive Network")
+
+parser.add_argument("-i", "--install", help="install mod", metavar="MOD", default="None")
+parser.add_argument("-r", "--remove", help="remove mod", metavar="MOD", default="None")
+parser.add_argument("-u", "--upgrade", help="upgrade mod", metavar="MOD", default="None")
+parser.add_argument("--info", help="give info about a mod", metavar="MOD", default="None")
+parser.add_argument("-e", "--export", help="export a modlist", metavar="FILENAME", default="None")
+parser.add_argument("--import", help="import a modlist", metavar="MODLIST", default="None", dest="importa") # importa because import is already taken  
+args = parser.parse_args()
+
 print("You are running " + sys.platform)
 #not making Data dir here because it is done later
 if (os.path.exists("LocalData") == False):
@@ -82,6 +94,7 @@ try:
 	shutil.rmtree("Data") #deleting Data dir
 except(FileNotFoundError): #Data dir not present
 	pass
+
 os.mkdir("Data") #creating new Data dir
 execdir = os.getcwd()
 modfolder, versionsfolder = read_config() #gets config stuff (and changes cwd to LocalData)
@@ -112,7 +125,6 @@ def print_help():
 
 update_archive()
 print("CMAN v"+version)
-print_help()
 check_for_updates()
 upgradesavailible = CMAN_upgrade.get_upgrades()
 if (upgradesavailible == []):
@@ -121,6 +133,22 @@ else:
 	print("The following upgrades are availible:")
 	for upgrade in upgradesavailible:
 		print(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
+
+if (args.install != "None"):
+	CMAN_install.install_mod(args.install)
+if (args.remove != "None"):
+	CMAN_remove.remove_mod(args.remove)
+if (args.upgrade != "None"):
+	CMAN_upgrade.upgrade_mod(args.upgrade)
+if (args.info != "None"):
+	get_info(args.info)
+if (args.export != "None"):
+	CMAN_importexport.export_mods(args.export)
+if (args.importa != "None"):
+	CMAN_importexport.import_mods(args.importa)
+
+print_help()
+
 while(True):
 	os.chdir(execdir + "/LocalData/") #reset current working dir
 	command = input("> ")
