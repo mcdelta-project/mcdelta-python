@@ -9,6 +9,7 @@ import zipfile
 import CMAN_remove
 import CMAN_upgrade
 import CMAN_install
+import CMAN_importexport
 from CMAN_util import *
 
 version = "1.1.0"
@@ -73,6 +74,8 @@ if (os.path.exists("LocalData") == False):
 	os.mkdir("LocalData")
 if (os.path.exists("LocalData/ModsDownloaded") == False):
 	os.mkdir("LocalData/ModsDownloaded")
+if (os.path.exists("LocalData/Modlists") == False):
+	os.mkdir("LocalData/Modlists")
 if (os.path.exists("Data/temp") == False):
 	os.mkdir("Data/temp")
 try:
@@ -86,6 +89,7 @@ init_config_util((modfolder, versionsfolder, execdir)) #transferring config data
 CMAN_install.init_config_install((modfolder, versionsfolder, execdir))
 CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir))
 CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir))
+CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir))
 
 def print_help():
 	print("Commands:")
@@ -207,6 +211,10 @@ while(True):
 				CMAN_upgrade.upgrade_mod(item)
 		else:
 			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "export"):
+		CMAN_importexport.export_mods()
+	elif(command.split(" ")[0] == "import"):
+		CMAN_importexport.import_mods()
 	elif(command.split(" ")[0] == "list"):
 		listmods()
 	elif(command.split(" ")[0] == "version"):
