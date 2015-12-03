@@ -15,3 +15,8 @@ Have a mod on the CMAN? Add one of these to your forum page so that everyone kno
 ![Badge](https://img.shields.io/badge/CMAN-Indexed-green.svg?style=plastic)
 
 Proudly supporting [#StopModReposts](http://www.stopmodreposts.org)!
+
+
+#Issue tracker
+
+[![Stories in Ready](https://badge.waffle.io/Comprehensive-Minecraft-Archive-Network/CMAN-Python.png?label=ready&title=Ready)](http://waffle.io/Comprehensive-Minecraft-Archive-Network/CMAN-Python)
