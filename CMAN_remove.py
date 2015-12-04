@@ -21,7 +21,7 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 		modname = input("Enter mod name: ")
 	print("Removing file for mod in ModsDownloaded")
 	try:
-		os.remove(execdir + "/LocalData/ModsDownloaded/"+modname+".installed") #removing json in ModsDownloaded dir
+		os.remove(execdir + "/LocalData/ModsDownloaded/"+instance+"/"+modname+".installed") #removing json in ModsDownloaded dir
 	except FileNotFoundError:
 		print("Either " + modname + " is not installed, or something went horribly wrong.")
 		return

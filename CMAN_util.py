@@ -90,6 +90,7 @@ def new_config(instance):
 			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
 			json.dump(json_data, f)
 			f.close()
+		print("Done.")
 		return(modfolder, versionsfolder)
 
 def rm_config(_instance):
@@ -104,13 +105,18 @@ def rm_config(_instance):
 				json_file.close()
 				sys.exit()
 			json_file.close()
-		if(instance in json_data.keys()):
-			del json_data[instance]
-			if(input("Delete installed mod listing for instance? Type OK to delete, or anything else to skip: ") == "OK"):
-				shutil.rmtree(os.path.join("ModsDownloaded", instance))
-				print("Deleted installed mod listing.")
-			else:
-				print("Skipped installed mod listing.")
+		if(_instance in json_data.keys()):
+			del json_data[_instance]
+			with open("config.json", "w") as f:
+				json.dump(json_data, f)
+			print("Removed config data for instance "+_instance+".")
+			if(os.path.exists(os.path.join("ModsDownloaded", _instance))):
+				if(input("Delete installed mod listing for instance "+_instance+"? Type OK to delete, or anything else to skip: ") == "OK"):
+					shutil.rmtree(os.path.join("ModsDownloaded", _instance))
+					print("Deleted installed mod listing.")
+				else:
+					print("Skipped installed mod listing.")
+	print("Done.")
 
 def get_json(modname):
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
@@ -133,7 +139,7 @@ def get_json(modname):
 		return(None)
 
 def get_installed_json(modname):
-	if(os.path.exists(execdir + "/LocalData/ModsDownloaded/")):
+	if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
 		os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	else:
 		return(None) #no mods installed, so obviously modname isn't installed

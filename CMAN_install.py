@@ -45,7 +45,7 @@ def install_mod(modname):
 		return
  
 	originalfile = execdir + "/Data/CMAN-Archive/" + modname + ".json"  # Saving Modname.json for future reference
-	os.chdir(execdir + "/LocalData/ModsDownloaded/")
+	os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	newfilename = modname + ".installed"
 	newfile = open(newfilename, 'w+')
 	shutil.copyfile(originalfile, newfilename)

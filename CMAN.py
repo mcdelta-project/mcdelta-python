@@ -15,6 +15,8 @@ from CMAN_util import *
 
 version = "1.2.0"
 
+execdir = os.getcwd() #needed for startup
+
 def check_for_updates():
 	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
 		latestversion = response.read()
@@ -68,6 +70,8 @@ def get_info(modname):
 			print("Mod "+modname+" not found.")
 
 def read_default_instance():
+	old_cwd = os.getcwd() #to reset cwd afterward
+	os.chdir(os.path.join(execdir, "LocalData")) #at this point in startup, old_cwd is execdir
 	try:
 		with open("default_instance.txt") as f:
 			default = f.read().strip() #don't want leading trailing whitespace/newlines
@@ -76,6 +80,7 @@ def read_default_instance():
 		with open("default_instance.txt", "w") as f:
 			f.write(default)
 
+	os.chdir(old_cwd) #restoring cwd
 	return default
 # Start Program Here:
 
@@ -110,8 +115,9 @@ except(FileNotFoundError): #Data dir not present
 os.mkdir("Data") #creating new Data dir
 execdir = os.getcwd()
 def setup_config(_instance):
-	global modfolder, versionsfolder 
+	global modfolder, versionsfolder, instance
 	os.chdir(os.path.join(execdir, "LocalData"))
+	instance = _instance
 	modfolder, versionsfolder = read_config(_instance) #gets config stuff (and changes cwd to LocalData)
 	os.chdir(execdir)
 	init_config_util((modfolder, versionsfolder, execdir, instance)) #transferring config data to all files
@@ -121,6 +127,13 @@ def setup_config(_instance):
 	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance))
 
 setup_config(instance)
+
+with open("config.json") as json_file:
+	json_data = json.load(json_file)
+	insts = json_data.keys()
+for inst in insts:
+	if(not os.path.exists(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))): #creating modsdownloaded subdirs for each instance
+		os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
 
 def print_help():
 	print("Commands:")
@@ -139,10 +152,11 @@ def print_help():
 	print(" list: list installed mods")
 	print(" export 'name': export a modlist with the name 'name' , which can be imported later")
 	print(" import 'pathtomodlist': import the modlist 'pathtomodlist'")
-	print(" setinstance 'instancename': switches to Minecraft instance'instancename'")
-	print(" addinstance 'instancename': adds the Minecraft instance 'instancename'")
-	print(" rminstance 'instancename': removes the Minecraft instance 'instancename'")
-	print(" lsinstances: lists all Minecraft instances")
+	print(" setinst 'instancename': switches to Minecraft instance 'instancename'")
+	print(" setdefaultinst 'instancename': sets default Minecraft instance to 'instancename'")
+	print(" addinst 'instancename': adds the Minecraft instance 'instancename'")
+	print(" rminst 'instancename': removes the Minecraft instance 'instancename'")
+	print(" lsinsts: lists all Minecraft instances")
 	print(" exit: exit CMAN")
 
 update_archive()
@@ -156,7 +170,8 @@ else:
 	print("The following upgrades are availible:")
 	for upgrade in upgradesavailible:
 		print(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
-
+if (args.instance != "None"):
+	instance = args.instance
 if (args.install != "None"):
 	CMAN_install.install_mod(args.install)
 if (args.remove != "None"):
@@ -286,55 +301,94 @@ while(True):
 			CMAN_importexport.import_mods(path)
 		else:
 			print("Invalid command syntax.")
-	elif(command.split(" ")[0] == "setinstance"):
+	elif(command.split(" ")[0] == "setinstance" or command.split(" ")[0] == "setinst"):
 		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
 			name = command.split(" ")[1]
 			if(instance_exists(name)):
-				setup_config(name)
+				if(name == instance):
+					print("Instance "+name+" already selected!")
+				else:
+					setup_config(name)
+					print("Switched to instance "+name+".")
+			else:
+				print("Instance "+name+" does not exist.")
+		elif(len(command.split(" ")) == 1):
+			name = input("Enter instance name: ")
+			if(instance_exists(name)):
+				if(name == instance):
+					print("Instance "+name+" already selected!")
+				else:
+					setup_config(name)
+					print("Switched to instance "+name+".")
+			else:
+				print("Instance "+name+" does not exist.")
+		else:
+			print("Invalid command syntax.")
+	elif(command.split(" ")[0] == "setdefaultinstance" or command.split(" ")[0] == "setdefaultinst"):
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			name = command.split(" ")[1]
+			if(instance_exists(name)):
+				if(name == read_default_instance()):
+					print("Instance "+name+" already set as default!")
+				else:
+					with open("default_instance.txt", "w") as f:
+						f.write(name)
+					print("Set default instance as "+name+".")
 			else:
 				print("Instance "+instance+" does not exist.")
 		elif(len(command.split(" ")) == 1):
 			name = input("Enter instance name: ")
 			if(instance_exists(name)):
-				setup_config(name)
+				if(name == read_default_instance()):
+					print("Instance "+instance+" already set as default!")
+				else:
+					with open("default_instance.txt", "w") as f:
+						f.write(name)
+					print("Set default instance as "+name+".")
 			else:
-				print("Instance "+instance+" does not exist.")
+				print("Instance "+name+" does not exist.")
 		else:
 			print("Invalid command syntax.")
-	elif(command.split(" ")[0] == "addinstance"):
+	elif(command.split(" ")[0] == "addinstance" or command.split(" ")[0] == "addinst"):
 		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
 			name = command.split(" ")[1]
 			if(instance_exists(name)):
-				print("Instance "+instance+" already exists.")
+				print("Instance "+name+" already exists.")
 			else:
 				new_config(name)
 		elif(len(command.split(" ")) == 1):
 			name = input("Enter instance name: ")
 			if(instance_exists(name)):
-				print("Instance "+instance+" already exists.")
+				print("Instance "+name+" already exists.")
 			else:
 				new_config(name)
 		else:
 			print("Invalid command syntax.")
-	elif(command.split(" ")[0] == "rminstance" or command.split(" ")[0] == "removeinstance"):
+	elif(command.split(" ")[0] == "rminstance" or command.split(" ")[0] == "removeinstance" or command.split(" ")[0] == "rminst"):
 		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
 			name = command.split(" ")[1]
 			if(instance_exists(name)):
 				rm_config(name)
 			else:
-				print("Instance "+instance+" does not exist.")
+				print("Instance "+name+" does not exist.")
 		elif(len(command.split(" ")) == 1):
 			name = input("Enter instance name: ")
 			if(instance_exists(name)):
 				rm_config(name)
 			else:
-				print("Instance "+instance+" does not exist.")
+				print("Instance "+name+" does not exist.")
 		else:
 			print("Invalid command syntax.")
-	elif(command.split(" ")[0] == "lsinstances" or command.split(" ")[0] == "listinstances"):
+	elif(command.split(" ")[0] == "lsinstances" or command.split(" ")[0] == "listinstances" or command.split(" ")[0] == "lsinsts"):
 		with open("config.json") as json_file:
 			json_data = json.load(json_file)
-			print(str(json_data.keys()))
+			insts = json_data.keys()
+			print("Instances:")
+			for inst in insts:
+				if(inst == instance):
+					print(inst+" (selected)")
+				else:
+					print(inst)
 	elif(command.split(" ")[0] == "list"):
 		listmods()
 	elif(command.split(" ")[0] == "version"):
