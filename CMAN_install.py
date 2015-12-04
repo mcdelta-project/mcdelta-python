@@ -11,10 +11,11 @@ from CMAN_util import *
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
+instance = "@ERROR@"
 
-def init_config_install(data): #data is a 3-tuple
-	global modfolder, versionsfolder, execdir #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir = data
+def init_config_install(data): #data is a 4-tuple
+	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance = data
 
 def install_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")

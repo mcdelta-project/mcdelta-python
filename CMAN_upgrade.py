@@ -13,17 +13,18 @@ import CMAN_remove
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
+instance = "@ERROR@"
 
-def init_config_upgrade(data): #data is a 3-tuple
-	global modfolder, versionsfolder, execdir #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir = data
+def init_config_upgrade(data): #data is a 4-tuple
+	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance = data
 
 def upgrade_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")
 	if(modname == None):
 		modname = input("Enter mod name: ")
 	update = [get_installed_json(modname),get_json(modname)]
-	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded", modname + ".installed"))):  # Telling user that file exists
+	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded/"+instance, modname + ".installed"))):  # Telling user that file exists
 		for file in glob.glob(modname + ".installed"):
 			print(file + " found.")
 	else:
