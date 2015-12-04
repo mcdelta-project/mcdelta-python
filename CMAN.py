@@ -118,7 +118,7 @@ def setup_config(_instance):
 	global modfolder, versionsfolder, instance
 	os.chdir(os.path.join(execdir, "LocalData"))
 	instance = _instance
-	modfolder, versionsfolder = read_config(_instance) #gets config stuff (and changes cwd to LocalData)
+	modfolder, versionsfolder = read_config(_instance) #gets config stuff
 	os.chdir(execdir)
 	init_config_util((modfolder, versionsfolder, execdir, instance)) #transferring config data to all files
 	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance))
@@ -128,7 +128,7 @@ def setup_config(_instance):
 
 setup_config(instance)
 
-with open("config.json") as json_file:
+with open("LocalData/config.json") as json_file:
 	json_data = json.load(json_file)
 	insts = json_data.keys()
 for inst in insts:
