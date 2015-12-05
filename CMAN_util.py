@@ -26,8 +26,6 @@ def instance_exists(instance):
 			sys.exit()
 	return(instance in json_data.keys())
 
-
-
 def read_config(instance):
 	if (os.path.exists("config.json")):
 		with open("config.json") as json_file:
@@ -72,18 +70,12 @@ def read_config(instance):
 	return(modfolder, versionsfolder)
 
 def new_config(instance):
-		with open("config.json") as json_file: #can assume it exists, the program has loaded before this is called
-			try:
-				json_data = json.load(json_file)
-			except(json.decoder.JSONDecodeError):
-				print("The config JSON appears to be invalid. Delete it and run CMAN again.")
-				json_file.close()
-				sys.exit()
+		with open("config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
+			json_data = json.load(json_file)
 			json_file.close()
 		if(instance in json_data.keys()):
 			print("Instance "+instance+" already exists, cannot add it.")
 		else:
-			print("Config for instance "+instance+" is missing. Setting up config.")
 			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 			f = open("config.json", 'w')
@@ -166,17 +158,23 @@ def mod_installed(modname):
 	return(len(files)>0)
 
 
-def get_installed_jsons():
+def get_installed_jsons(inst = None):
 	jsons = []
-	if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
-		mods = os.listdir(execdir + "/LocalData/ModsDownloaded/"+instance)
-		os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
-		for mod in mods:
-			json_data = get_installed_json(mod[:-10]) #[:-10] cuts off the .installed extension
-			jsons.append(json_data)
-		return jsons
+	if(inst == None):
+		with open(execdir + "/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
+			json_data = json.load(json_file)
+			json_file.close()
+		insts = json_data.keys()
 	else:
-		return([])
+		insts = [inst]
+	for inst in insts:
+		if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+inst)):
+			mods = os.listdir(execdir + "/LocalData/ModsDownloaded/"+inst)
+			os.chdir(execdir + "/LocalData/ModsDownloaded/"+inst)
+			for mod in mods:
+				json_data = get_installed_json(mod[:-10]) #[:-10] cuts off the .installed extension
+				jsons.append(json_data)
+	return(jsons)
 
 def switch_path_dir(path, dir): #switches root of path to dir given
 	pathsplit = path.split(os.sep)

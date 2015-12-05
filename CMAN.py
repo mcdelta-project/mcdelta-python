@@ -161,7 +161,7 @@ def print_help():
 
 update_archive()
 print("CMAN v"+version)
-print("Instance: "+instance)
+print("Selected Instance: "+instance)
 check_for_updates()
 upgradesavailible = CMAN_upgrade.get_upgrades()
 if (upgradesavailible == []):
