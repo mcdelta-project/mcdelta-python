@@ -165,12 +165,12 @@ if (args.instance != "None"):
 	instance = args.instance
 print("Selected Instance: "+instance)
 check_for_updates()
-upgradesavailible = CMAN_upgrade.get_upgrades()
-if (upgradesavailible == []):
+upgradesavailable = CMAN_upgrade.get_upgrades(instance)
+if (upgradesavailable == []):
 	pass
 else:
-	print("The following upgrades are availible:")
-	for upgrade in upgradesavailible:
+	print("The following upgrades are available for instance "+instance+":")
+	for upgrade in upgradesavailable:
 		print(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
 if (args.install != "None"):
 	CMAN_install.install_mod(args.install)

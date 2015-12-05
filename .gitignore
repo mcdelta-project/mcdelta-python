@@ -2,3 +2,4 @@ Data/*
 LocalData/*
 CMAN.zip
 *.pyc
+__pycache__/*
