@@ -17,7 +17,7 @@ def init_config_util(data): #data is a 4-tuple
 	modfolder, versionsfolder, execdir, instance = data
 
 def instance_exists(instance):
-	with open("config.json") as json_file:
+	with open(execdir+ "/LocalData/config.json") as json_file:
 		try:
 			json_data = json.load(json_file)
 		except(json.decoder.JSONDecodeError):

@@ -145,22 +145,24 @@ def print_help():
 	print(" upgrade 'mod': upgrade the mod 'mod'")
 	print(" upgradem: upgrade multiple mods")
 	print(" upgradeall: upgrade all outdated mods")
-	print(" upgrades: list available mod upgrades")
+	print(" upgrades 'inst': list available mod upgrades for Minecraft instance 'inst', or use '*' to check all instances")
 	print(" update: update the CMAN archive")
 	print(" help: display this help message")
 	print(" version: display the CMAN version number")
 	print(" list: list installed mods")
 	print(" export 'name': export a modlist with the name 'name' , which can be imported later")
 	print(" import 'pathtomodlist': import the modlist 'pathtomodlist'")
-	print(" setinst 'instancename': switches to Minecraft instance 'instancename'")
-	print(" setdefaultinst 'instancename': sets default Minecraft instance to 'instancename'")
-	print(" addinst 'instancename': adds the Minecraft instance 'instancename'")
-	print(" rminst 'instancename': removes the Minecraft instance 'instancename'")
-	print(" lsinsts: lists all Minecraft instances")
+	print(" inst 'inst': switches to Minecraft instance 'inst'")
+	print(" defaultinst 'inst': sets default Minecraft instance to 'inst'")
+	print(" addinst 'inst': adds the Minecraft instance 'inst'")
+	print(" rminst 'inst': removes the Minecraft instance 'inst'")
+	print(" insts: lists all Minecraft instances")
 	print(" exit: exit CMAN")
 
 update_archive()
 print("CMAN v"+version)
+if (args.instance != "None"):
+	instance = args.instance
 print("Selected Instance: "+instance)
 check_for_updates()
 upgradesavailible = CMAN_upgrade.get_upgrades()
@@ -170,8 +172,6 @@ else:
 	print("The following upgrades are availible:")
 	for upgrade in upgradesavailible:
 		print(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
-if (args.instance != "None"):
-	instance = args.instance
 if (args.install != "None"):
 	CMAN_install.install_mod(args.install)
 if (args.remove != "None"):
@@ -193,8 +193,20 @@ while(True):
 	if(command.split(" ")[0] == "update"):
 		update_archive()
 	elif(command.split(" ")[0] == "upgrades"):
-		update_archive()
-		CMAN_upgrade.check_upgrades(True)
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			inst = command.split(" ")[1]
+			if(inst == "*"):
+				inst = None
+			update_archive()
+			CMAN_upgrade.check_upgrades(True, inst)
+		elif(len(command.split(" ")) == 1):
+			inst = input("Enter instance name: ")
+			if(inst == "*"):
+				inst = None
+			update_archive()
+			CMAN_upgrade.check_upgrades(True, inst)
+		else:
+			print("Invalid command syntax.")
 	elif(command.split(" ")[0] == "upgrade"):
 		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
 			mod = command.split(" ")[1]
@@ -301,7 +313,7 @@ while(True):
 			CMAN_importexport.import_mods(path)
 		else:
 			print("Invalid command syntax.")
-	elif(command.split(" ")[0] == "setinstance" or command.split(" ")[0] == "setinst"):
+	elif(command.split(" ")[0] == "instance" or command.split(" ")[0] == "inst"):
 		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
 			name = command.split(" ")[1]
 			if(instance_exists(name)):
@@ -379,7 +391,7 @@ while(True):
 				print("Instance "+name+" does not exist.")
 		else:
 			print("Invalid command syntax.")
-	elif(command.split(" ")[0] == "lsinstances" or command.split(" ")[0] == "listinstances" or command.split(" ")[0] == "lsinsts"):
+	elif(command.split(" ")[0] == "instances" or command.split(" ")[0] == "insts"):
 		with open("config.json") as json_file:
 			json_data = json.load(json_file)
 			insts = json_data.keys()

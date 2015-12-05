@@ -39,9 +39,9 @@ def upgrade_mod(modname):
 	else:
 		print(modname+" is already up to date.")
 
-def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
+def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
 	updates = []
-	mods = get_installed_jsons()
+	mods = get_installed_jsons(inst)
 	for mod in mods:
 		if(mod != None):
 			json_data = get_json(mod["Name"])
@@ -49,8 +49,11 @@ def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 
 				updates.append([mod,json_data]) #append list of jsons for installed version and newest version 
 	return(updates)
 
-def check_upgrades(full): #full is a flag for whether to print full list of updates or just updates available message
-	updates = get_upgrades()
+def check_upgrades(full, inst = None): #full is a flag for whether to print full list of updates or just updates available message
+	if(not instance_exists(inst) and inst != None):
+		print("Instance "+inst+" does not exist.")
+		return
+	updates = get_upgrades(inst)
 	if(len(updates)>0):
 		if(not full):
 			print("\nMod updates available!")
