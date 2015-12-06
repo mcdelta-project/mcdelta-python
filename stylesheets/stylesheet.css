@@ -1,3 +1,42 @@
+@font-face {
+  font-family: 'CMAN';
+  src:url('../fonts/CMAN.eot?wnx7k3');
+  src:url('../fonts/CMAN.eot?wnx7k3#iefix') format('embedded-opentype'),
+    url('../fonts/CMAN.ttf?wnx7k3') format('truetype'),
+    url('../fonts/CMAN.woff?wnx7k3') format('woff'),
+    url('../fonts/CMAN.svg?wnx7k3#CMAN') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="cman-"], [class*=" cman-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'CMAN' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.cman-cloud-download:before {
+  content: "\f00b";
+}
+.cman-file-code:before {
+  content: "\f010";
+}
+.cman-issue-opened:before {
+  content: "\f026";
+}
+.cman-mark-github:before {
+  content: "\f00a";
+}
+
 * {
   box-sizing: border-box; }
 
