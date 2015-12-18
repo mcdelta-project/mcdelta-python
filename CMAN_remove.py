@@ -10,17 +10,18 @@ from CMAN_util import *
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
+instance = "@ERROR@"
 
-def init_config_remove(data): #data is a 3-tuple
-	global modfolder, versionsfolder, execdir #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir = data
+def init_config_remove(data): #data is a 4-tuple
+	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance = data
 
 def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
 	if(modname == None):
 		modname = input("Enter mod name: ")
 	print("Removing file for mod in ModsDownloaded")
 	try:
-		os.remove(execdir + "/LocalData/ModsDownloaded/"+modname+".installed") #removing json in ModsDownloaded dir
+		os.remove(execdir + "/LocalData/ModsDownloaded/"+instance+"/"+modname+".installed") #removing json in ModsDownloaded dir
 	except FileNotFoundError:
 		print("Either " + modname + " is not installed, or something went horribly wrong.")
 		return

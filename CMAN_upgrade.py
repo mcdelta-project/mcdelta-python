@@ -13,17 +13,18 @@ import CMAN_remove
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
+instance = "@ERROR@"
 
-def init_config_upgrade(data): #data is a 3-tuple
-	global modfolder, versionsfolder, execdir #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir = data
+def init_config_upgrade(data): #data is a 4-tuple
+	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance = data
 
 def upgrade_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")
 	if(modname == None):
 		modname = input("Enter mod name: ")
 	update = [get_installed_json(modname),get_json(modname)]
-	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded", modname + ".installed"))):  # Telling user that file exists
+	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded/"+instance, modname + ".installed"))):  # Telling user that file exists
 		for file in glob.glob(modname + ".installed"):
 			print(file + " found.")
 	else:
@@ -38,9 +39,9 @@ def upgrade_mod(modname):
 	else:
 		print(modname+" is already up to date.")
 
-def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
+def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
 	updates = []
-	mods = get_installed_jsons()
+	mods = get_installed_jsons(inst)
 	for mod in mods:
 		if(mod != None):
 			json_data = get_json(mod["Name"])
@@ -48,15 +49,18 @@ def get_upgrades(): #returns a list of 2-element lists of jsons (in which index 
 				updates.append([mod,json_data]) #append list of jsons for installed version and newest version 
 	return(updates)
 
-def check_upgrades(full): #full is a flag for whether to print full list of updates or just updates available message
-	updates = get_upgrades()
+def check_upgrades(full, inst = None): #full is a flag for whether to print full list of updates or just updates available message
+	if(not instance_exists(inst) and inst != None):
+		print("Instance "+inst+" does not exist.")
+		return
+	updates = get_upgrades(inst)
 	if(len(updates)>0):
 		if(not full):
-			print("\nMod updates available!")
+			print("\nMod upgrades available!")
 		else:
 			for update in updates:
 				print("Available Updates:")
 				print(" "+update[0]["Name"]+" (current version: "+update[1]["Version"]+", you have: "+update[0]["Version"]+")")
 	else:
 		if(full): #don't print "no updates available" on startup
-			print("No updates available.")
+			print("No upgrades available.")

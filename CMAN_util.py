@@ -10,14 +10,24 @@ import zipfile
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
+instance = "@ERROR@"
 
-def init_config_util(data): #data is a 3-tuple
-	global modfolder, versionsfolder, execdir #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir = data
+def init_config_util(data): #data is a 4-tuple
+	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance = data
 
-def read_config():
-	os.chdir("LocalData")
-	if (os.path.exists("config.json") == True):
+def instance_exists(instance):
+	with open(execdir+ "/LocalData/config.json") as json_file:
+		try:
+			json_data = json.load(json_file)
+		except(json.decoder.JSONDecodeError):
+			print("The config JSON appears to be invalid. Delete it and run CMAN again.")
+			json_file.close()
+			sys.exit()
+	return(instance in json_data.keys())
+
+def read_config(instance):
+	if (os.path.exists("config.json")):
 		with open("config.json") as json_file:
 			try:
 				json_data = json.load(json_file)
@@ -26,27 +36,79 @@ def read_config():
 				json_file.close()
 				sys.exit()
 			json_file.close()
-		try:
-			modfolder = json_data["modfolder"] # If config exists, get modfolder and versions folder from that. Else, ask for it.
-		except(KeyError): #modfolder data missing
-			f = open("config.json", "w")
-			modfolder = input("Enter mod folder location (absolute path): ")
-			f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
-			f.close()
-		try:
-			versionsfolder = json_data["versionsfolder"]
-		except(KeyError): #versionsfolder data missing
-			f = open("config.json", "w")
-			versionsfolder = input("Enter versions folder location (absolute path): ")
-			f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
+		if(instance in json_data.keys()):
+			try:
+				modfolder = json_data[instance]["modfolder"] # If config exists, get modfolder and versions folder from that. Else, ask for it.
+			except(KeyError): #modfolder data missing
+				f = open("config.json", "w")
+				json_data[instance]["modfolder"] = input("Enter mod folder location for instance "+instance+" (absolute path): ")
+				json.dump(json_data, f)
+				f.close()
+			try:
+				versionsfolder = json_data[instance]["versionsfolder"]
+			except(KeyError): #versionsfolder data missing
+				f = open("config.json", "w")
+				son_data[instance]["versionsfolder"] = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+				json.dump(json_data, f)
+				f.close()
+		else:
+			print("Config for instance "+instance+" is missing. Setting up config.")
+			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
+			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+			f = open("config.json", 'w')
+			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
+			json.dump(json_data, f)
 			f.close()
 	else:
-		modfolder = input("Enter mod folder location (absolute path): ")
-		versionsfolder = input("Enter versions folder location (absolute path): ")
-		f = open('config.json', 'w')
-		f.write('{"modfolder":"' + modfolder + '","versionsfolder":"' + versionsfolder + '"}')
+		print("Config for instance "+instance+" is missing. Setting up config.")
+		modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
+		versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+		f = open("config.json", 'w')
+		json_data = {instance: {"modfolder": modfolder, "versionsfolder": versionsfolder}}
+		json.dump(json_data, f)
 		f.close()
 	return(modfolder, versionsfolder)
+
+def new_config(instance):
+		with open("config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
+			json_data = json.load(json_file)
+			json_file.close()
+		if(instance in json_data.keys()):
+			print("Instance "+instance+" already exists, cannot add it.")
+		else:
+			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
+			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+			f = open("config.json", 'w')
+			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
+			json.dump(json_data, f)
+			f.close()
+		print("Done.")
+		return(modfolder, versionsfolder)
+
+def rm_config(_instance):
+	if instance == _instance:
+		print("Cannot remove instance while it is active! Select another instance first.")
+	else:
+		with open("config.json") as json_file: #can assume it exists, the program has loaded before this is called
+			try:
+				json_data = json.load(json_file)
+			except(json.decoder.JSONDecodeError):
+				print("The config JSON appears to be invalid. Delete it and run CMAN again.")
+				json_file.close()
+				sys.exit()
+			json_file.close()
+		if(_instance in json_data.keys()):
+			del json_data[_instance]
+			with open("config.json", "w") as f:
+				json.dump(json_data, f)
+			print("Removed config data for instance "+_instance+".")
+			if(os.path.exists(os.path.join("ModsDownloaded", _instance))):
+				if(input("Delete installed mod listing for instance "+_instance+"? Type OK to delete, or anything else to skip: ") == "OK"):
+					shutil.rmtree(os.path.join("ModsDownloaded", _instance))
+					print("Deleted installed mod listing.")
+				else:
+					print("Skipped installed mod listing.")
+	print("Done.")
 
 def get_json(modname):
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
@@ -69,8 +131,8 @@ def get_json(modname):
 		return(None)
 
 def get_installed_json(modname):
-	if(os.path.exists(execdir + "/LocalData/ModsDownloaded")):
-		os.chdir(execdir + "/LocalData/ModsDownloaded")
+	if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
+		os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	else:
 		return(None) #no mods installed, so obviously modname isn't installed
 	if(os.path.exists(modname + ".installed")):
@@ -88,25 +150,31 @@ def get_installed_json(modname):
 		return(None)
 
 def mod_installed(modname):
-	if(os.path.exists(execdir + "/LocalData/ModsDownloaded")):
-		os.chdir(execdir + "/LocalData/ModsDownloaded")
+	if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
+		os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	else:
 		return(False) #no mods installed, so obviously modname isn't installed
 	files = glob.glob(modname + ".installed")
 	return(len(files)>0)
 
 
-def get_installed_jsons():
+def get_installed_jsons(inst = None):
 	jsons = []
-	if(os.path.exists(execdir + "/LocalData/ModsDownloaded")):
-		mods = os.listdir(execdir + "/LocalData/ModsDownloaded")
-		os.chdir(execdir + "/LocalData/ModsDownloaded")
-		for mod in mods:
-			json_data = get_installed_json(mod[:-10]) #[:-10] cuts off the .installed extension
-			jsons.append(json_data)
-		return jsons
+	if(inst == None):
+		with open(execdir + "/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
+			json_data = json.load(json_file)
+			json_file.close()
+		insts = json_data.keys()
 	else:
-		return([])
+		insts = [inst]
+	for inst in insts:
+		if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+inst)):
+			mods = os.listdir(execdir + "/LocalData/ModsDownloaded/"+inst)
+			os.chdir(execdir + "/LocalData/ModsDownloaded/"+inst)
+			for mod in mods:
+				json_data = get_installed_json(mod[:-10]) #[:-10] cuts off the .installed extension
+				jsons.append(json_data)
+	return(jsons)
 
 def switch_path_dir(path, dir): #switches root of path to dir given
 	pathsplit = path.split(os.sep)
