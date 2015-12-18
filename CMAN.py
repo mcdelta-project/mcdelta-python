@@ -144,7 +144,7 @@ def print_help():
 	print(" removem: remove multiple mods")
 	print(" upgrade 'mod': upgrade the mod 'mod'")
 	print(" upgradem: upgrade multiple mods")
-	print(" upgradeall: upgrade all outdated mods")
+	print(" upgradeall: upgrade all outdated mods for Minecraft instance 'inst', or use '*' to check all instances")
 	print(" upgrades 'inst': list available mod upgrades for Minecraft instance 'inst', or use '*' to check all instances")
 	print(" update: update the CMAN archive")
 	print(" help: display this help message")
@@ -197,12 +197,18 @@ while(True):
 			inst = command.split(" ")[1]
 			if(inst == "*"):
 				inst = None
+			if (not instance_exists(inst) and inst != None):
+				print("Instance "+inst+" does not exist.")
+				continue
 			update_archive()
 			CMAN_upgrade.check_upgrades(True, inst)
 		elif(len(command.split(" ")) == 1):
 			inst = input("Enter instance name: ")
 			if(inst == "*"):
 				inst = None
+			if (not instance_exists(inst) and inst != None):
+				print("Instance "+inst+" does not exist.")
+				continue
 			update_archive()
 			CMAN_upgrade.check_upgrades(True, inst)
 		else:
@@ -221,10 +227,26 @@ while(True):
 		else:
 			print("Invalid command syntax.")
 	elif(command.split(" ")[0] == "upgradeall"):
+		if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+			inst = command.split(" ")[1]
+			if(inst == "*"):
+				inst = None
+			if (not instance_exists(inst) and inst != None):
+				print("Instance "+inst+" does not exist.")
+				continue
+		elif(len(command.split(" ")) == 1):
+			inst = input("Enter instance name: ")
+			if(inst == "*"):
+				inst = None
+			if (not instance_exists(inst) and inst != None):
+				print("Instance "+inst+" does not exist.")
+				continue
+		else:
+			print("Invalid command syntax.")
 		update_archive()
-		updates = CMAN_upgrade.get_upgrades()
+		updates = CMAN_upgrade.get_upgrades(inst)
 		if(len(updates) == 0):
-			print("All mods up to date.")
+			print("No upgrades available.")
 		else:
 			for update in updates:
 				CMAN_upgrade.upgrade_mod(update[0]["Name"])
