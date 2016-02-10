@@ -12,16 +12,35 @@ versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 
-def init_config_util(data): #data is a 4-tuple
-	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance = data
+def init_config_util(data): #data is a 5-tuple
+	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance, gui = data
+
+def initialise_window():
+	root.title("CMAN v2.1.0")
+	root.geometry("300x300")
+
+	title = tk.Label(root, text = "Welcome to CMAN!")
+	title.pack()
+
+	output = tk.Label(root, text = "None")
+	output.pack(side = tk.BOTTOM)
+
+	button = tk.Button(root, text = "List installed mods", command =listmods, bg = "blue")
+	button.pack(pady=20, padx = 20)
+
+def cprint(text):
+	if (gui == True):
+		output.configure(text=text)
+	else:
+		print(text)
 
 def instance_exists(instance):
 	with open(execdir+ "/LocalData/config.json") as json_file:
 		try:
 			json_data = json.load(json_file)
 		except(json.decoder.JSONDecodeError):
-			print("The config JSON appears to be invalid. Delete it and run CMAN again.")
+			cprint("The config JSON appears to be invalid. Delete it and run CMAN again.")
 			json_file.close()
 			sys.exit()
 	return(instance in json_data.keys())
@@ -32,7 +51,7 @@ def read_config(instance):
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
-				print("The config JSON appears to be invalid. Delete it and run CMAN again.")
+				cprint("The config JSON appears to be invalid. Delete it and run CMAN again.")
 				json_file.close()
 				sys.exit()
 			json_file.close()
@@ -52,7 +71,7 @@ def read_config(instance):
 				json.dump(json_data, f)
 				f.close()
 		else:
-			print("Config for instance "+instance+" is missing. Setting up config.")
+			cprint("Config for instance "+instance+" is missing. Setting up config.")
 			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 			f = open("config.json", 'w')
@@ -60,7 +79,7 @@ def read_config(instance):
 			json.dump(json_data, f)
 			f.close()
 	else:
-		print("Config for instance "+instance+" is missing. Setting up config.")
+		cprint("Config for instance "+instance+" is missing. Setting up config.")
 		modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 		versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 		f = open("config.json", 'w')
@@ -74,7 +93,7 @@ def new_config(instance):
 			json_data = json.load(json_file)
 			json_file.close()
 		if(instance in json_data.keys()):
-			print("Instance "+instance+" already exists, cannot add it.")
+			cprint("Instance "+instance+" already exists, cannot add it.")
 		else:
 			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
@@ -82,18 +101,18 @@ def new_config(instance):
 			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
 			json.dump(json_data, f)
 			f.close()
-		print("Done.")
+		cprint("Done.")
 		return(modfolder, versionsfolder)
 
 def rm_config(_instance):
 	if instance == _instance:
-		print("Cannot remove instance while it is active! Select another instance first.")
+		cprint("Cannot remove instance while it is active! Select another instance first.")
 	else:
 		with open("config.json") as json_file: #can assume it exists, the program has loaded before this is called
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
-				print("The config JSON appears to be invalid. Delete it and run CMAN again.")
+				cprint("The config JSON appears to be invalid. Delete it and run CMAN again.")
 				json_file.close()
 				sys.exit()
 			json_file.close()
@@ -101,20 +120,20 @@ def rm_config(_instance):
 			del json_data[_instance]
 			with open("config.json", "w") as f:
 				json.dump(json_data, f)
-			print("Removed config data for instance "+_instance+".")
+			cprint("Removed config data for instance "+_instance+".")
 			if(os.path.exists(os.path.join("ModsDownloaded", _instance))):
 				if(input("Delete installed mod listing for instance "+_instance+"? Type OK to delete, or anything else to skip: ") == "OK"):
 					shutil.rmtree(os.path.join("ModsDownloaded", _instance))
-					print("Deleted installed mod listing.")
+					cprint("Deleted installed mod listing.")
 				else:
-					print("Skipped installed mod listing.")
-	print("Done.")
+					cprint("Skipped installed mod listing.")
+	cprint("Done.")
 
 def get_json(modname):
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
 		os.chdir(execdir + "/Data/CMAN-Archive")
 	else:
-		print("CMAN archive not found. Please update the CMAN archive.")
+		cprint("CMAN archive not found. Please update the CMAN archive.")
 		return(-1)
 	if(os.path.exists(modname + ".json")):
 		# JSON parsing
@@ -123,7 +142,7 @@ def get_json(modname):
 				json_data = json.load(json_file)
 				json_file.close()
 			except(json.decoder.JSONDecodeError):
-				print("The JSON file \""+modname+".json\" appears to be invalid. Please update the CMAN archive.")
+				cprint("The JSON file \""+modname+".json\" appears to be invalid. Please update the CMAN archive.")
 				json_file.close()
 				return
 		return(json_data)
@@ -141,7 +160,7 @@ def get_installed_json(modname):
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
-				print("The JSON file \""+modname+".installed\" appears to be invalid. Using data from CMAN archive.")
+				cprint("The JSON file \""+modname+".installed\" appears to be invalid. Using data from CMAN archive.")
 				json_data = (get_json(modname))
 			finally:
 				json_file.close()
@@ -183,8 +202,8 @@ def switch_path_dir(path, dir): #switches root of path to dir given
 
 def listmods():
 	modsinstalled = get_installed_jsons()
-	print("Installed mods:")
-	print(str(modsinstalled))
+	cprint("Installed mods:")
+	cprint(str(modsinstalled))
 
 def mergedirs(dir1, dir2):
 	files1 = []
@@ -197,7 +216,7 @@ def mergedirs(dir1, dir2):
 		if(os.path.split(file_)[0] == ''): #if file_ == dir1
 			continue #skip it
 		if(not os.path.exists(os.path.split(switch_path_dir(file_, dir2))[0])): #if parent dir does not exist in dir2 
-			print(file_)
+			cprint(file_)
 			os.makedirs(os.path.split(switch_path_dir(file_, dir2))[0]) #make parent dir in dir2
 		if(os.path.isfile(file_)):
 			shutil.copy(file_, switch_path_dir(file_, dir2))

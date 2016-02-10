@@ -15,9 +15,9 @@ versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 
-def init_config_upgrade(data): #data is a 4-tuple
-	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance = data
+def init_config_upgrade(data): #data is a 5-tuple
+	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance, gui = data
 
 def upgrade_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")
@@ -26,18 +26,18 @@ def upgrade_mod(modname):
 	update = [get_installed_json(modname),get_json(modname)]
 	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded/"+instance, modname + ".installed"))):  # Telling user that file exists
 		for file in glob.glob(modname + ".installed"):
-			print(file + " found.")
+			cprint(file + " found.")
 	else:
-		print("Mod "+modname+" not found.")
+		cprint("Mod "+modname+" not found.")
 		return
 	os.chdir(execdir + "/LocalData") #restoring current working dir
 	if(update[1]["Version"] != update[0]["Version"] and mod_installed(modname)):
 		CMAN_remove.remove_mod(modname)
 		CMAN_install.install_mod(modname)
 	elif(not mod_installed(modname)):
-		print(modname+" is not installed.")
+		cprint(modname+" is not installed.")
 	else:
-		print(modname+" is already up to date.")
+		cprint(modname+" is already up to date.")
 
 def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
 	updates = []
@@ -51,16 +51,16 @@ def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in w
 
 def check_upgrades(full, inst = None): #full is a flag for whether to print full list of updates or just updates available message
 	if(not instance_exists(inst) and inst != None):
-		print("Instance "+inst+" does not exist.")
+		cprint("Instance "+inst+" does not exist.")
 		return
 	updates = get_upgrades(inst)
 	if(len(updates)>0):
 		if(not full):
-			print("\nMod upgrades available!")
+			cprint("\nMod upgrades available!")
 		else:
 			for update in updates:
-				print("Available Updates:")
-				print(" "+update[0]["Name"]+" (current version: "+update[1]["Version"]+", you have: "+update[0]["Version"]+")")
+				cprint("Available Updates:")
+				cprint(" "+update[0]["Name"]+" (current version: "+update[1]["Version"]+", you have: "+update[0]["Version"]+")")
 	else:
 		if(full): #don't print "no updates available" on startup
-			print("No upgrades available.")
+			cprint("No upgrades available.")
