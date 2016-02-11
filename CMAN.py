@@ -35,10 +35,13 @@ def update_archive():
 	file_name = "CMAN.tar.gz"
 	print("Downloading Archive...")
 	# Download it.
-	with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-		shutil.copyfileobj(response, out_file)
-	print("Done.")
-
+	try:
+		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
+			shutil.copyfileobj(response, out_file)
+		print("Done.")
+	except:
+		print("Something went wrong while downloading the archive.")
+		sys.exit()
 	print("Extracting Archive...")
 	tar = tarfile.open("CMAN.tar.gz")  # untar
 	tar.extractall()
@@ -202,16 +205,22 @@ else:
 		cprint(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
 if (args.install != "None"):
 	CMAN_install.install_mod(args.install)
+	sys.exit()
 if (args.remove != "None"):
 	CMAN_remove.remove_mod(args.remove)
+	sys.exit()
 if (args.upgrade != "None"):
 	CMAN_upgrade.upgrade_mod(args.upgrade)
+	sys.exit()
 if (args.info != "None"):
 	get_info(args.info)
+	sys.exit()
 if (args.export != "None"):
 	CMAN_importexport.export_mods(args.export)
+	sys.exit()
 if (args.importa != "None"):
 	CMAN_importexport.import_mods(args.importa)
+	sys.exit()
 
 if (gui == False):
 	print_help()

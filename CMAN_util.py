@@ -71,7 +71,7 @@ def read_config(instance):
 				json.dump(json_data, f)
 				f.close()
 		else:
-			cprint("Config for instance "+instance+" is missing. Setting up config.")
+			print("Config for instance "+instance+" is missing. Setting up config.")
 			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 			f = open("config.json", 'w')
@@ -79,7 +79,7 @@ def read_config(instance):
 			json.dump(json_data, f)
 			f.close()
 	else:
-		cprint("Config for instance "+instance+" is missing. Setting up config.")
+		print("Config for instance "+instance+" is missing. Setting up config.")
 		modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 		versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 		f = open("config.json", 'w')
