@@ -46,7 +46,7 @@ def update_archive():
 	tar = tarfile.open("CMAN.tar.gz")  # untar
 	tar.extractall()
 	tarlist = tar.getnames()
-	os.rename(tarlist[0], "CMAN-Archive") #remane the resulting folder to CMAN-Archive
+	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
 	print("Done.")
 
 def get_info(modname):
@@ -117,29 +117,36 @@ def setup_config(_instance):
 	instance = _instance
 	modfolder, versionsfolder = read_config(_instance) #gets config stuff
 	os.chdir(execdir)
-	init_config_util((modfolder, versionsfolder, execdir, instance, gui)) #transferring config data to all files
-	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui))
-	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui))
-	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui))
-	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui))
+	init_config_util((modfolder, versionsfolder, execdir, instance, gui, tkinst)) #transferring config data (and Tkinter instance) to all files
+	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 
 
-def initialise_window():
-	root.title("CMAN v2.1.0")
-	root.geometry("300x300")
+class Gui(tk.Frame):
+	def __init__(self, master = None):
+		tk.Frame.__init__(self, master)
+		self.initialise_window()
+		self.pack()
+	def initialise_window(self):
+		root.title("CMAN v2.1.0")
+		root.geometry("300x300")
 
-	title = tk.Label(root, text = "Welcome to CMAN!")
-	title.pack()
+		self.title = tk.Label(self, text = "Welcome to CMAN!")
+		self.title.pack()
 
-	output = tk.Label(root, text = "None")
-	output.pack(side = tk.BOTTOM)
+		self.output = tk.Label(self, text = "None")
+		self.output.pack(side = tk.BOTTOM)
 
-	button = tk.Button(root, text = "List installed mods", command =listmods, bg = "blue")
-	button.pack(pady=20, padx = 20)
+		self.button = tk.Button(self, text = "List installed mods", command =listmods, bg = "blue")
+		self.button.pack(pady=20, padx = 20)
 
 # Start Program Here:
 
 root = tk.Tk()
+
+tkinst = None
 
 parser = argparse.ArgumentParser(description="CMAN: the Comprehensive Minecraft Archive Network")
 
@@ -150,11 +157,14 @@ parser.add_argument("--info", help="give info about a mod", metavar="MOD", defau
 parser.add_argument("-e", "--export", help="export a modlist", metavar="FILENAME", default="None")
 parser.add_argument("--import", help="import a modlist", metavar="MODLIST", default="None", dest="importa") # importa because import is already taken  
 parser.add_argument("-I", "--instance", help="sets the Minecraft instance to install into", metavar="INSTANCE", default=instance)
-parser.add_argument("-g", "--gui", help="enable modlist", action="store_true")
+parser.add_argument("-g", "--gui", help="enable GUI", action="store_true")
 args = parser.parse_args()
 gui = args.gui
 print(args.gui)
 print(gui)
+
+if (gui == True):
+	tkinst = Gui(root)
 
 print("You are running " + sys.platform)
 #not making Data dir here because it is done later
@@ -192,9 +202,6 @@ if (args.instance != "None"):
 	instance = args.instance
 print("Selected Instance: "+instance)
 
-if (gui == True):
-	initialise_window()
-
 check_for_updates()
 upgradesavailable = CMAN_upgrade.get_upgrades(instance)
 if (upgradesavailable == []):
@@ -226,7 +233,7 @@ if (gui == False):
 	print_help()
 
 if (gui == True):
-	root.mainloop()
+	tkinst.mainloop()
 else:
 	while(True):
 		os.chdir(execdir + "/LocalData/") #reset current working dir

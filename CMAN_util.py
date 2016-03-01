@@ -11,27 +11,15 @@ modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
+tkinst = None
 
-def init_config_util(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
-
-def initialise_window():
-	root.title("CMAN v2.1.0")
-	root.geometry("300x300")
-
-	title = tk.Label(root, text = "Welcome to CMAN!")
-	title.pack()
-
-	output = tk.Label(root, text = "None")
-	output.pack(side = tk.BOTTOM)
-
-	button = tk.Button(root, text = "List installed mods", command =listmods, bg = "blue")
-	button.pack(pady=20, padx = 20)
-
+def init_config_util(data): #data is a 6-tuple
+	global modfolder, versionsfolder, execdir, instance, gui, tkinst #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance, gui, tkinst = data
+	
 def cprint(text):
 	if (gui == True):
-		output.configure(text=text)
+		tkinst.output.configure(text=text)
 	else:
 		print(text)
 
@@ -195,7 +183,7 @@ def get_installed_jsons(inst = None):
 				jsons.append(json_data)
 	return(jsons)
 
-def switch_path_dir(path, dir): #switches root of path to dir given
+def switch_path_dir(path, dir): #switches tkinst of path to dir given
 	pathsplit = path.split(os.sep)
 	pathsplit[0] = dir.split(os.sep)[-1] #just in case it ends with os.sep
 	return(os.sep.join(pathsplit))

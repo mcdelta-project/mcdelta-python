@@ -11,10 +11,11 @@ modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
+tkinst = None
 
-def init_config_remove(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
+def init_config_remove(data): #data is a 6-tuple
+	global modfolder, versionsfolder, execdir, instance, gui, tkinst #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance, gui, tkinst = data
 
 def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
 	if(modname == None):
