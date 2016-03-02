@@ -6,6 +6,7 @@ import json
 import sys
 import tarfile
 import zipfile
+import tkinter as tk
 
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
@@ -17,9 +18,11 @@ def init_config_util(data): #data is a 6-tuple
 	global modfolder, versionsfolder, execdir, instance, gui, tkinst #makes it edit the global vars rather than create new ones
 	modfolder, versionsfolder, execdir, instance, gui, tkinst = data
 	
-def cprint(text):
+def cprint(text): #outputs text to console pane in GUI if gui enabled, otherwise prints it
 	if (gui == True):
-		tkinst.output.configure(text=text)
+		tkinst.console.config(state = tk.NORMAL)
+		tkinst.console.insert(tk.END, text+"\n")
+		tkinst.console.config(state = tk.DISABLED)
 	else:
 		print(text)
 
@@ -164,6 +167,13 @@ def mod_installed(modname):
 	files = glob.glob(modname + ".installed")
 	return(len(files)>0)
 
+def get_all_insts():
+	with open(execdir + "/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
+			json_data = json.load(json_file)
+			json_file.close()
+	insts = json_data.keys()
+	return insts
+
 
 def get_installed_jsons(inst = None):
 	jsons = []
@@ -183,15 +193,36 @@ def get_installed_jsons(inst = None):
 				jsons.append(json_data)
 	return(jsons)
 
+
+def get_all_jsons():
+	jsons = []
+	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
+		mods = os.listdir(execdir + "/Data/CMAN-Archive")
+		for mod in mods:
+			json_data = get_json(mod[:-5]) #[:-5] cuts off the .json extension
+			jsons.append(json_data)
+	return(jsons)
+
 def switch_path_dir(path, dir): #switches tkinst of path to dir given
 	pathsplit = path.split(os.sep)
 	pathsplit[0] = dir.split(os.sep)[-1] #just in case it ends with os.sep
 	return(os.sep.join(pathsplit))
 
-def listmods():
+def listmods(output=True):
 	modsinstalled = get_installed_jsons()
-	cprint("Installed mods:")
-	cprint(str(modsinstalled))
+	if output:
+		cprint("Installed mods:")
+		cprint(str(modsinstalled))
+	else:
+		return modsinstalled
+
+def listmods_all(output=True):
+	mods = get_all_jsons()
+	if output:
+		cprint("Mods:")
+		cprint(str(mods))
+	else:
+		return mods
 
 def mergedirs(dir1, dir2):
 	files1 = []

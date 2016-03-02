@@ -13,6 +13,7 @@ import CMAN_upgrade
 import CMAN_install
 import CMAN_importexport
 from CMAN_gui import *
+import CMAN_gui
 from CMAN_util import *
 
 version = "2.1.0"
@@ -123,6 +124,7 @@ def setup_config(_instance):
 	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_gui.init_config_gui((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 
 
 # Start Program Here:
@@ -145,9 +147,6 @@ args = parser.parse_args()
 gui = args.gui
 print(args.gui)
 print(gui)
-
-if (gui == True):
-	tkinst = Gui(root)
 
 print("You are running " + sys.platform)
 #not making Data dir here because it is done later
@@ -179,7 +178,14 @@ for inst in insts:
 	if(not os.path.exists(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))): #creating modsdownloaded subdirs for each instance
 		os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
 
+
 update_archive()
+
+if (gui == True):
+	tkinst = Gui(root)
+
+setup_config(instance)
+
 print("CMAN v"+version)
 if (args.instance != "None"):
 	instance = args.instance
