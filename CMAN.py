@@ -15,7 +15,7 @@ import CMAN_importexport
 from CMAN_gui import *
 from CMAN_util import *
 
-version = "2.0.0"
+version = "2.1.0"
 
 execdir = os.getcwd() #needed for startup
 
