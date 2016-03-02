@@ -53,7 +53,9 @@ def upgrmods():
 		upgrade_mod(tkinst.mods[int(_mod)]["Name"])
 
 def runcmd():
-	pass
+	cmd = tkinst.cmdin.get()
+	cprint(">"+cmd)
+	parsecmd(cmd)
 
 class Gui(tk.Frame):
 	def __init__(self, master = None):
@@ -86,7 +88,7 @@ class Gui(tk.Frame):
 		self.ccpane = tk.Frame(self.cpane)
 		self.ccpane.pack(side = tk.BOTTOM)
 
-		self.run = tk.Button(self.ccpane, text = "Run")
+		self.run = tk.Button(self.ccpane, text = "Run", command=runcmd)
 		self.run.pack(side = tk.RIGHT)	
 		self.cmdin = tk.Entry(self.ccpane, text = "", width = 750)
 		self.cmdin.pack(side = tk.RIGHT)		
@@ -94,10 +96,10 @@ class Gui(tk.Frame):
 		self.instmod = tk.Button(self.bpane, text = "Install Mod", command=instmods)
 		self.instmod.pack()
 
-		self.rmod = tk.Button(self.bpane, text = "Remove Mod")
+		self.rmod = tk.Button(self.bpane, text = "Remove Mod", command=removmods)
 		self.rmod.pack()
 
-		self.umod = tk.Button(self.bpane, text = "Upgrade Mod")
+		self.umod = tk.Button(self.bpane, text = "Upgrade Mod", command=upgrmods)
 		self.umod.pack()
 
 		insts = list(get_all_insts())
