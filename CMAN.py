@@ -71,6 +71,8 @@ def get_info(modname):
 
 def read_default_instance():
 	old_cwd = os.getcwd() #to reset cwd afterward
+	if (os.path.exists("LocalData") == False):
+		os.mkdir("LocalData")
 	os.chdir(os.path.join(execdir, "LocalData")) #at this point in startup, old_cwd is execdir
 	try:
 		with open("default_instance.txt") as f:
