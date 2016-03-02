@@ -12,6 +12,7 @@ import CMAN_remove
 import CMAN_upgrade
 import CMAN_install
 import CMAN_importexport
+from CMAN_gui import *
 from CMAN_util import *
 
 version = "2.0.0"
@@ -123,24 +124,6 @@ def setup_config(_instance):
 	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 
-
-class Gui(tk.Frame):
-	def __init__(self, master = None):
-		tk.Frame.__init__(self, master)
-		self.initialise_window()
-		self.pack()
-	def initialise_window(self):
-		root.title("CMAN v2.1.0")
-		root.geometry("300x300")
-
-		self.title = tk.Label(self, text = "Welcome to CMAN!")
-		self.title.pack()
-
-		self.output = tk.Label(self, text = "None")
-		self.output.pack(side = tk.BOTTOM)
-
-		self.button = tk.Button(self, text = "List installed mods", command =listmods, bg = "blue")
-		self.button.pack(pady=20, padx = 20)
 
 # Start Program Here:
 
