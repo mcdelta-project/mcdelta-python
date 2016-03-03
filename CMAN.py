@@ -106,7 +106,7 @@ setup_config(instance)
 
 cprint("You are running " + sys.platform)
 
-update_archive()
+update_archive(True)
 
 tkinst.update_modlist()
 

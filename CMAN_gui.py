@@ -28,6 +28,19 @@ def init_config_gui(data): #data is a 6-tuple
 	modfolder, versionsfolder, execdir, instance, gui, tkinst = data
 
 
+def setup_config(_instance): #copy of funcion in CMAN.java, in this file instead of CMAN_util because it crashes if used in CMAN_util
+	global modfolder, versionsfolder, instance, gui
+	os.chdir(os.path.join(execdir, "LocalData"))
+	instance = _instance
+	modfolder, versionsfolder = read_config(_instance) #gets config stuff
+	os.chdir(execdir)
+	init_config_util((modfolder, versionsfolder, execdir, instance, gui, tkinst)) #transferring config data (and Tkinter instance) to all files
+	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	init_config_gui((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+
 
 #Callbacks
 
@@ -107,16 +120,27 @@ def removinst():
 	tkinst.ilist["menu"].delete(0, tk.END)
 	insts = list(get_all_insts())
 	for inst in insts:
-		self.ilist["menu"].add_command(label=inst, command = lambda n=inst: tkinst.isel.set(n))
+		tkinst.ilist["menu"].add_command(label=inst, command = lambda n=inst: tkinst.isel.set(n))
 
-def updateinst(*data):
-	setup_config(tkinst.isel.get())
+def updateinst():
+	name = tkinst.isel.get()
+	setup_config(name)
+	tkinst.ilabel.configure(text = "Current Instance: "+instance)
 	tkinst.mlisti.delete(0, tk.END)
-	self.modsi = listmods(False)
+	tkinst.modsi = listmods(False)
 
-	for mod in self.modsi:
+	for mod in tkinst.modsi:
 		if mod != None:
-			self.mlisti.insert(tk.END, mod["Name"])
+			tkinst.mlisti.insert(tk.END, mod["Name"])
+
+
+def importmlist():
+	fname = filedialogs.askopenfilename()
+	CMAN_importexport.import_mods(fname)
+
+def exportmlist():
+	fname = filedialogs.asksaveasfilename()
+	CMAN_importexport.export_mods(fname)
 
 
 class Gui(tk.Frame):
@@ -176,16 +200,18 @@ class Gui(tk.Frame):
 		insts = list(get_all_insts())
 		self.isel = tk.StringVar()
 		self.isel.set(instance)
-		self.isel.trace("w", updateinst)
 
 		self.lpane = tk.Frame(self.win)
 		self.win.add(self.lpane)
 
+		self.ilabel = tk.Label(self.lpane, text = "Current Instance: "+instance)
+		self.ilabel.pack()
+
 		self.instf = tk.Frame(self.lpane)
 		self.instf.pack()
 
-		self.ilabel = tk.Label(self.instf, text = "Instance:")
-		self.ilabel.pack(side=tk.LEFT)
+		self._ilabel = tk.Label(self.instf, text = "Instance:")
+		self._ilabel.pack(side=tk.LEFT)
 
 		self.ilist = tk.OptionMenu(self.instf, self.isel, *insts)
 		self.ilist.pack(side=tk.RIGHT)
@@ -193,8 +219,11 @@ class Gui(tk.Frame):
 		self.addinst = tk.Button(self.lpane, text = "Add Instance...", command=addinst)
 		self.addinst.pack()
 
-		self.reminst = tk.Button(self.lpane, text = "Remove Instance...")
+		self.reminst = tk.Button(self.lpane, text = "Remove Instance", command=removinst)
 		self.reminst.pack()
+
+		self.setinst = tk.Button(self.lpane, text = "Select Instance", command=updateinst)
+		self.setinst.pack()
 
 		self.definst = tk.Button(self.lpane, text = "Set as Default Instance", command=sdinst)
 		self.definst.pack()
@@ -205,10 +234,10 @@ class Gui(tk.Frame):
 		self.blankf = tk.Frame(self.lpane, height = 20)
 		self.blankf.pack(side = tk.BOTTOM)
 
-		self.explist = tk.Button(self.lpane, text = "Export Mod List...")
+		self.explist = tk.Button(self.lpane, text = "Export Mod List...", command=exportmlist)
 		self.explist.pack(side = tk.BOTTOM)
 
-		self.implist = tk.Button(self.lpane, text = "Import Mod List...")
+		self.implist = tk.Button(self.lpane, text = "Import Mod List...", command=importmlist)
 		self.implist.pack(side = tk.BOTTOM)
 
 		self.mpane = tk.Frame(self.win)

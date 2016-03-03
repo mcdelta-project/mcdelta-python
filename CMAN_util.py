@@ -20,20 +20,6 @@ tkinst = None
 
 version = "2.1.0"
 
-def setup_config(_instance):
-	global modfolder, versionsfolder, instance, gui
-	os.chdir(os.path.join(execdir, "LocalData"))
-	instance = _instance
-	modfolder, versionsfolder = read_config(_instance) #gets config stuff
-	os.chdir(execdir)
-	init_config_util((modfolder, versionsfolder, execdir, instance, gui, tkinst)) #transferring config data (and Tkinter instance) to all files
-	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_gui.init_config_gui((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-
-
 def read_default_instance():
 	old_cwd = os.getcwd() #to reset cwd afterward
 	os.chdir(os.path.join(execdir, "LocalData")) #at this point in startup, old_cwd is execdir
@@ -321,7 +307,7 @@ def get_deps(modname):
 	deps = json_data["Requirements"]
 	return(deps)
 
-def update_archive():
+def update_archive(start=False):
 	#Delete old archive
 	os.chdir(execdir + "/Data")
 	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
@@ -337,13 +323,21 @@ def update_archive():
 		cprint("Done.")
 	except:
 		cprint("Something went wrong while downloading the archive.")
-		sys.exit()
+		if(gui and not start):
+			msgbox.showerror("Archive download failed", "Something went wrong while downloading the archive.")
+		if(start):
+			print("CMAN: fatal: Something went wrong while downloading the archive.")
+			sys.exit()
+		else:
+			return -1
 	cprint("Extracting Archive...")
 	tar = tarfile.open("CMAN.tar.gz")  # untar
 	tar.extractall()
 	tarlist = tar.getnames()
 	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
 	cprint("Done.")
+	if(gui and not start):
+		msgbox.showinfo("Archive updated", "The CMAN archive has been successfully updated.")
 
 def get_info_console(modname, output=False):
 	istr = ""
