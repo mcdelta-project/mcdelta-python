@@ -59,14 +59,36 @@ def runcmd():
 	cprint(">"+cmd)
 	parsecmd(cmd)
 
+def updateinfo(event):
+	_mods = event.widget.curselection()
+	if len(_mods) == 0:
+		iprint("No mod selected.")
+	elif len(_mods) == 1:
+		_mod = _mods[0]
+		if event.widget == tkinst.mlist:
+			name = tkinst.mods[int(_mod)]["Name"]
+		elif event.widget == tkinst.mlisti:
+			name = tkinst.modsi[int(_mod)]["Name"]
+		iprint(get_info_console(name, output=False))
+	else:
+		iprint("Multiple mods selected.")	
+
+
 class Gui(tk.Frame):
 	def __init__(self, master = None):
 		tk.Frame.__init__(self, master)
 		self.initialise_window()
 		self.pack()
+	def update_modlist(self):
+		self.mods = listmods_all(False)
+		self.mlist.delete(0, tk.END)
+		for mod in self.mods:
+			#print(mod)
+			if mod != None:
+				self.mlist.insert(tk.END, mod["Name"])
 	def initialise_window(self):
 		self.master.title("CMAN v2.1.0")
-		self.master.geometry("600x400")
+		self.master.geometry("800x400")
 
 		self.winv = tk.PanedWindow(self, orient=tk.VERTICAL, sashrelief=tk.RAISED, height=400, width=800)
 		self.winv.pack()
@@ -77,8 +99,10 @@ class Gui(tk.Frame):
 		self.winl = tk.PanedWindow(self, orient=tk.HORIZONTAL, sashrelief=tk.RAISED, height=100, width=800)
 		self.winv.add(self.winl)
 
-		self.bpane = tk.Frame(self.winl)
+		self.bpane = tk.Frame(self.winl, width = 200)
 		self.winl.add(self.bpane)
+
+		#self.winl.paneconfigure(self.bpane)
 
 		self.cpane = tk.Frame(self.winl)
 		self.winl.add(self.cpane)
@@ -92,7 +116,7 @@ class Gui(tk.Frame):
 
 		self.run = tk.Button(self.ccpane, text = "Run", command=runcmd)
 		self.run.pack(side = tk.RIGHT)	
-		self.cmdin = tk.Entry(self.ccpane, text = "", width = 750)
+		self.cmdin = tk.Entry(self.ccpane, text = "", width = 150)
 		self.cmdin.pack(side = tk.RIGHT)		
 
 		self.instmod = tk.Button(self.bpane, text = "Install Mods", command=instmods)
@@ -146,7 +170,8 @@ class Gui(tk.Frame):
 
 		self.mods = listmods_all(False)
 		self.mlist = tk.Listbox(self.mpane, selectmode=tk.MULTIPLE)
-		self.mlist.pack()
+		self.mlist.bind("<<ListboxSelect>>", updateinfo)
+		self.mlist.pack(fill = tk.BOTH, expand = 1)
 
 		for mod in self.mods:
 			#print(mod)
@@ -158,7 +183,8 @@ class Gui(tk.Frame):
 
 		self.modsi = listmods(False)
 		self.mlisti = tk.Listbox(self.rpane, selectmode=tk.MULTIPLE)
-		self.mlisti.pack()
+		self.mlisti.bind("<<ListboxSelect>>", updateinfo)
+		self.mlisti.pack(fill = tk.BOTH, expand = 1)
 
 		for mod in self.modsi:
 			#print(mod)
@@ -168,8 +194,9 @@ class Gui(tk.Frame):
 
 		self.infopane = tk.Frame(self.win)
 		self.win.add(self.infopane)
-		self.info = tk.Text(self.infopane)
+		self.info = tk.Text(self.infopane, width = 250)
 		self.info.insert(tk.END, "No mod selected.")
 		self.info.config(state = tk.DISABLED)
-		self.info.pack()
+		self.info.pack(fill = tk.BOTH, expand = 1)
+
 

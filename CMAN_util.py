@@ -7,12 +7,27 @@ import sys
 import tarfile
 import zipfile
 import tkinter as tk
+import tkinter.messagebox as msgbox
+import tkinter.simpledialog as dialogs
+import textwrap
 
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
+
+version = "2.1.0"
+
+def check_for_updates():
+	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
+		latestversion = response.read()
+		latestversion = latestversion.decode("utf-8").strip() #it is using a bytes string and printing the b prefix and newline
+		if (version != str(latestversion)):
+			#if (gui):
+			#	msgbox.askyesno("Update available", "You are running CMAN " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
+			#else:
+			cprint("!!Update Available! You are running CMAN " + version + ". The newest version is " + str(latestversion) + "!!")
 
 def init_config_util(data): #data is a 6-tuple
 	global modfolder, versionsfolder, execdir, instance, gui, tkinst #makes it edit the global vars rather than create new ones
@@ -21,10 +36,19 @@ def init_config_util(data): #data is a 6-tuple
 def cprint(text): #outputs text to console pane in GUI if gui enabled, otherwise prints it
 	if (gui == True):
 		tkinst.console.config(state = tk.NORMAL)
-		tkinst.console.insert(tk.END, text+"\n")
+		tkinst.console.insert(tk.END, str(text)+"\n")
 		tkinst.console.config(state = tk.DISABLED)
 	else:
-		print(text)
+		cprint(text)
+
+def iprint(text): #outputs text to info pane in GUI if gui enabled, otherwise prints it
+	if (gui == True):
+		tkinst.info.config(state = tk.NORMAL)
+		tkinst.info.delete("1.0", tk.END)
+		tkinst.info.insert(tk.END, str(text))
+		tkinst.info.config(state = tk.DISABLED)
+	else:
+		cprint(text)
 
 def instance_exists(instance):
 	with open(execdir+ "/LocalData/config.json") as json_file:
@@ -62,7 +86,7 @@ def read_config(instance):
 				json.dump(json_data, f)
 				f.close()
 		else:
-			print("Config for instance "+instance+" is missing. Setting up config.")
+			cprint("Config for instance "+instance+" is missing. Setting up config.")
 			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 			f = open("config.json", 'w')
@@ -70,7 +94,7 @@ def read_config(instance):
 			json.dump(json_data, f)
 			f.close()
 	else:
-		print("Config for instance "+instance+" is missing. Setting up config.")
+		cprint("Config for instance "+instance+" is missing. Setting up config.")
 		modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 		versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 		f = open("config.json", 'w')
@@ -276,23 +300,24 @@ def update_archive():
 	# Archive Download
 	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master"
 	file_name = "CMAN.tar.gz"
-	print("Downloading Archive...")
+	cprint("Downloading Archive...")
 	# Download it.
 	try:
 		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
 			shutil.copyfileobj(response, out_file)
-		print("Done.")
+		cprint("Done.")
 	except:
-		print("Something went wrong while downloading the archive.")
+		cprint("Something went wrong while downloading the archive.")
 		sys.exit()
-	print("Extracting Archive...")
+	cprint("Extracting Archive...")
 	tar = tarfile.open("CMAN.tar.gz")  # untar
 	tar.extractall()
 	tarlist = tar.getnames()
 	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
-	print("Done.")
+	cprint("Done.")
 
-def get_info(modname):
+def get_info_console(modname, output=False):
+	istr = ""
 	if(modname == None):
 		modname = input("Enter mod name: ")
 
@@ -305,16 +330,51 @@ def get_info(modname):
 				stable = "Stable" 
 			else:
 				stable = "Unstable" 
-			cprint(json_data["Name"]+":")
-			cprint("\tVersion: "+json_data["Version"]+" ("+stable+")")
-			cprint("\tAuthor(s): "+json_data["Author"])
-			cprint("\tDescription: "+json_data["Desc"])
-			cprint("\tRequirements: "+str(json_data["Requirements"]))
-			cprint("\tKnown Incompatibilities: "+str(json_data["Incompatibilities"]))
-			cprint("\tDownload Link: "+str(json_data["Link"]))
-			cprint("\tLicense: "+json_data["License"])
+			istr = istr+json_data["Name"]+":"+"\n\n"
+			istr = istr+"Version: "+json_data["Version"]+" ("+stable+")"+"\n\n"
+			istr = istr+"Author(s): "+json_data["Author"]+"\n\n"
+			istr = istr+"Description: "+json_data["Desc"]+"\n\n"
+			istr = istr+"Requirements: "+str(json_data["Requirements"])+"\n\n"
+			istr = istr+"Known Incompatibilities: "+str(json_data["Incompatibilities"])+"\n\b"
+			istr = istr+"Download Link: "+str(json_data["Link"])+"\n\b"
+			istr = istr+"License: "+json_data["License"]
 		else:
-			cprint("Mod "+modname+" not found.")
+			istr = istr+"Mod "+modname+" not found."
+		if(output):
+			cprint(istr)
+		else:
+			return(textwrap.fill(istr, 46))
+
+
+def get_info(modname, output=True):
+	istr = ""
+	if(modname == None):
+		modname = input("Enter mod name: ")
+
+	json_data = get_json(modname)
+	if(json_data == -1):
+		return
+	else:
+		if (json_data != None):
+			if(json_data["Unstable"] == "false"):
+				stable = "Stable" 
+			else:
+				stable = "Unstable" 
+			istr = istr+json_data["Name"]+":"+"\n"
+			istr = istr+"\tVersion: "+json_data["Version"]+" ("+stable+")"+"\n"
+			istr = istr+"\tAuthor(s): "+json_data["Author"]+"\n"
+			istr = istr+"\tDescription: "+json_data["Desc"]+"\n"
+			istr = istr+"\tRequirements: "+str(json_data["Requirements"])+"\n"
+			istr = istr+"\tKnown Incompatibilities: "+str(json_data["Incompatibilities"])+"\n"
+			istr = istr+"\tDownload Link: "+str(json_data["Link"])+"\n"
+			istr = istr+"\tLicense: "+json_data["License"]
+		else:
+			istr = istr+"Mod "+modname+" not found."
+		if(output):
+			cprint(istr)
+		else:
+			return(istr)
+
 
 def print_help():
 	cprint("Commands:")

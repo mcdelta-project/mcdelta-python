@@ -15,17 +15,10 @@ import CMAN_importexport
 from CMAN_gui import *
 import CMAN_gui
 from CMAN_util import *
-
-version = "2.1.0"
+import tkinter.messagebox as msgbox
+import tkinter.simpledialog as dialogs
 
 execdir = os.getcwd() #needed for startup
-
-def check_for_updates():
-	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
-		latestversion = response.read()
-		latestversion = latestversion.decode("utf-8").strip() #it is using a bytes string and printing the b prefix and newline
-		if (version != str(latestversion)):
-			print("WARNING! YOU ARE USING OLD VERSION " + version + "! NEWEST VERSION IS " + str(latestversion) + "!")
 
 def read_default_instance():
 	old_cwd = os.getcwd() #to reset cwd afterward
@@ -73,10 +66,9 @@ parser.add_argument("-I", "--instance", help="sets the Minecraft instance to ins
 parser.add_argument("-g", "--gui", help="enable GUI", action="store_true")
 args = parser.parse_args()
 gui = args.gui
-print(args.gui)
-print(gui)
+#print(args.gui)
+#print(gui)
 
-print("You are running " + sys.platform)
 #not making Data dir here because it is done later
 if (os.path.exists("LocalData") == False):
 	os.mkdir("LocalData")
@@ -107,19 +99,24 @@ for inst in insts:
 		os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
 
 
-update_archive()
-
 if (gui == True):
 	tkinst = Gui(root)
 
 setup_config(instance)
 
-print("CMAN v"+version)
-if (args.instance != "None"):
-	instance = args.instance
-print("Selected Instance: "+instance)
+cprint("You are running " + sys.platform)
+
+update_archive()
+
+tkinst.update_modlist()
 
 check_for_updates()
+
+#print("CMAN v"+version)
+if (args.instance != "None"):
+	instance = args.instance
+cprint("Selected Instance: "+instance)
+
 upgradesavailable = CMAN_upgrade.get_upgrades(instance)
 if (upgradesavailable == []):
 	pass
@@ -149,9 +146,9 @@ if (args.importa != "None"):
 if (gui == False):
 	print_help()
 
+
 if (gui == True):
 	tkinst.mainloop()
-
 
 
 else:
