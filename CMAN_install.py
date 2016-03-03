@@ -7,6 +7,9 @@ import sys
 import tarfile
 import zipfile
 from CMAN_util import *
+import tkinter as tk
+import tkinter.messagebox as msgbox
+import tkinter.simpledialog as dialogs
 
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
@@ -36,7 +39,11 @@ def install_mod(modname):
 	modtype = json_data["Type"] # Work out which type of mod it is
 	IsUnstable = json.loads(json_data["Unstable"])
 	if (IsUnstable == True):
-		if (input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"):
+		if not gui:
+			a = input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"
+		else:
+			a = msgbox.askokcancel("Confirm Installation", "This mod may be unstable.\nClick OK to install.")
+		if (a):
 			pass
 		else:
 			cprint("Install canceled.")
@@ -55,20 +62,25 @@ def install_mod(modname):
 	for requirement in requirements:
 		if (os.path.exists(requirement + ".installed") == False):
 			cprint("You must install " + requirement + " first!")
-			wanttoinstall = input("Do you want to install it? Y or n?")
-			if(wanttoinstall == "Y"):
+			if not gui:
+				wanttoinstall = input("Do you want to install it? Y or n?") == "Y"
+			else:
+				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod requires " + requirement + ".\nInstall "+requirement+"?")
+			if(wanttoinstall):
 				install_mod(requirement)
-			elif(wanttoinstall == "n"):
+			elif(not wanttoinstall):
 				return
 	recommendations = json_data["Recommended"]
 	for recommendation in recommendations:
 		if (os.path.exists(recommendation + ".installed") == False):
 			cprint("This mod recommends " + recommendation + "!")
-			wanttoinstall = input("Do you want to install it? Y or n?")
-			if(wanttoinstall == "Y"):
+			if not gui:
+				wanttoinstall = input("Do you want to install it? Y or n?") == "Y"
+			else:
+				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod recommends " + recommendation + ".\nInstall "+recommendation+"?")
+			if(wanttoinstall):
 				install_mod(recommendation)
-				return
-			elif(wanttoinstall == "n"):
+			elif(not wanttoinstall):
 				pass
 	incompatibilities = json_data["Incompatibilities"]
 	for incompatibility in incompatibilities:

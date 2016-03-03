@@ -32,7 +32,6 @@ def init_config_gui(data): #data is a 6-tuple
 def instmods():
 
 	_mods = map(int, tkinst.mlist.curselection())
-	mods = []
 	for _mod in _mods:
 		CMAN_install.install_mod(tkinst.mods[int(_mod)]["Name"])
 		tkinst.mlisti.insert(tk.END, tkinst.mods[int(_mod)]["Name"])
@@ -41,16 +40,19 @@ def instmods():
 def removmods():
 
 	_mods = map(int, tkinst.mlisti.curselection())
-	mods = []
+	print(_mods)
 	for _mod in _mods:
-		remove_mod(tkinst.mods[int(_mod)]["Name"])
+		CMAN_remove.remove_mod(tkinst.modsi[int(_mod)]["Name"])
+	print(_mods)
+	for _mod in _mods:
+		print(_mod)
+		tkinst.mlisti.delete(int(_mod), int(_mod))
 
 def upgrmods():
 
 	_mods = map(int, tkinst.mlisti.curselection())
-	mods = []
 	for _mod in _mods:
-		upgrade_mod(tkinst.mods[int(_mod)]["Name"])
+		CMAN_upgrade.upgrade_mod(tkinst.modsi[int(_mod)]["Name"])
 
 def runcmd():
 	cmd = tkinst.cmdin.get()
@@ -93,13 +95,13 @@ class Gui(tk.Frame):
 		self.cmdin = tk.Entry(self.ccpane, text = "", width = 750)
 		self.cmdin.pack(side = tk.RIGHT)		
 
-		self.instmod = tk.Button(self.bpane, text = "Install Mod", command=instmods)
+		self.instmod = tk.Button(self.bpane, text = "Install Mods", command=instmods)
 		self.instmod.pack()
 
-		self.rmod = tk.Button(self.bpane, text = "Remove Mod", command=removmods)
+		self.rmod = tk.Button(self.bpane, text = "Remove Mods", command=removmods)
 		self.rmod.pack()
 
-		self.umod = tk.Button(self.bpane, text = "Upgrade Mod", command=upgrmods)
+		self.umod = tk.Button(self.bpane, text = "Upgrade Mods", command=upgrmods)
 		self.umod.pack()
 
 		insts = list(get_all_insts())
@@ -127,7 +129,7 @@ class Gui(tk.Frame):
 		self.definst = tk.Button(self.lpane, text = "Set as Default Instance")
 		self.definst.pack()
 
-		self.update = tk.Button(self.lpane, text = "Update CMAN Archive")
+		self.update = tk.Button(self.lpane, text = "Update CMAN Archive", command=update_archive)
 		self.update.pack(side = tk.BOTTOM)
 
 		self.blankf = tk.Frame(self.lpane, height = 20)
