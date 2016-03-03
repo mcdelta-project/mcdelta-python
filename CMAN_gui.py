@@ -12,6 +12,9 @@ import CMAN_remove
 import CMAN_upgrade
 import CMAN_install
 import CMAN_importexport
+import tkinter.messagebox as msgbox
+import tkinter.simpledialog as dialogs
+import tkinter.filedialog as filedialogs
 from CMAN_util import *
 
 modfolder = "@ERROR@"
@@ -71,7 +74,16 @@ def updateinfo(event):
 			name = tkinst.modsi[int(_mod)]["Name"]
 		iprint(get_info_console(name, output=False))
 	else:
-		iprint("Multiple mods selected.")	
+		iprint("Multiple mods selected.")
+
+def sdinst():
+	name = tkinst.isel.get()
+	if(name == read_default_instance()):
+		msgbox.showerror("Instance already default","Instance "+name+" is already set as default.")
+	else:
+		with open(execdir+"/LocalData/default_instance.txt", "w") as f:
+			f.write(name)
+		msgbox.showinfo("Default instance set", "Set default instance as "+name+".")
 
 
 class Gui(tk.Frame):
@@ -150,7 +162,7 @@ class Gui(tk.Frame):
 		self.reminst = tk.Button(self.lpane, text = "Remove Instance...")
 		self.reminst.pack()
 
-		self.definst = tk.Button(self.lpane, text = "Set as Default Instance")
+		self.definst = tk.Button(self.lpane, text = "Set as Default Instance", command=sdinst)
 		self.definst.pack()
 
 		self.update = tk.Button(self.lpane, text = "Update CMAN Archive", command=update_archive)
