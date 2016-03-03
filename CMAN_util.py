@@ -20,6 +20,20 @@ tkinst = None
 
 version = "2.1.0"
 
+def setup_config(_instance):
+	global modfolder, versionsfolder, instance, gui
+	os.chdir(os.path.join(execdir, "LocalData"))
+	instance = _instance
+	modfolder, versionsfolder = read_config(_instance) #gets config stuff
+	os.chdir(execdir)
+	init_config_util((modfolder, versionsfolder, execdir, instance, gui, tkinst)) #transferring config data (and Tkinter instance) to all files
+	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_gui.init_config_gui((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+
+
 def read_default_instance():
 	old_cwd = os.getcwd() #to reset cwd afterward
 	os.chdir(os.path.join(execdir, "LocalData")) #at this point in startup, old_cwd is execdir
