@@ -85,6 +85,39 @@ def sdinst():
 			f.write(name)
 		msgbox.showinfo("Default instance set", "Set default instance as "+name+".")
 
+def addinst():
+	name = dialogs.askstring("Instance Name", "Enter name for new instance:")
+	if(instance_exists(name)):
+		msgbox.showerror("Instance already exists","Instance "+name+" already exists.")
+	else:
+		new_config(name)
+		tkinst.ilist["menu"].add_command(label = name, command = lambda n=name: tkinst.isel.set(n))
+		msgbox.showinfo("Instance created", "Instance "+name+" created.")
+
+def removinst():
+	name = tkinst.isel.get()
+	if(not instance_exists(name)):
+		msgbox.showerror("Instance does not exist","Instance "+name+" does not exist. Cannot remove.")
+	elif(instance == name):
+		msgbox.showerror("Instance currently selected","Instance "+name+" is currently selected. Cannot remove.")
+	else:
+		rm_config(name)
+		msgbox.showinfo("Instance removed", "Instance "+name+" removed.")
+
+	tkinst.ilist["menu"].delete(0, tk.END)
+	insts = list(get_all_insts())
+	for inst in insts:
+		self.ilist["menu"].add_command(label=inst, command = lambda n=inst: tkinst.isel.set(n))
+
+def updateinst(*data):
+	setup_config(tkinst.isel.get())
+	tkinst.mlisti.delete(0, tk.END)
+	self.modsi = listmods(False)
+
+	for mod in self.modsi:
+		if mod != None:
+			self.mlisti.insert(tk.END, mod["Name"])
+
 
 class Gui(tk.Frame):
 	def __init__(self, master = None):
@@ -143,6 +176,7 @@ class Gui(tk.Frame):
 		insts = list(get_all_insts())
 		self.isel = tk.StringVar()
 		self.isel.set(instance)
+		self.isel.trace("w", updateinst)
 
 		self.lpane = tk.Frame(self.win)
 		self.win.add(self.lpane)
@@ -156,7 +190,7 @@ class Gui(tk.Frame):
 		self.ilist = tk.OptionMenu(self.instf, self.isel, *insts)
 		self.ilist.pack(side=tk.RIGHT)
 
-		self.addinst = tk.Button(self.lpane, text = "Add Instance...")
+		self.addinst = tk.Button(self.lpane, text = "Add Instance...", command=addinst)
 		self.addinst.pack()
 
 		self.reminst = tk.Button(self.lpane, text = "Remove Instance...")
