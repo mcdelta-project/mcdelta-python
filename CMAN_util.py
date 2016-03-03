@@ -119,7 +119,7 @@ def read_config(instance):
 	return(modfolder, versionsfolder)
 
 def new_config(instance):
-		with open("config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
+		with open(execdir+"/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
 			json_data = json.load(json_file)
 			json_file.close()
 		if(instance in json_data.keys()):
@@ -127,7 +127,7 @@ def new_config(instance):
 		else:
 			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
-			f = open("config.json", 'w')
+			f = open(execdir+"/LocalData/config.json", 'w')
 			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
 			json.dump(json_data, f)
 			f.close()
@@ -138,7 +138,7 @@ def rm_config(_instance):
 	if instance == _instance:
 		cprint("Cannot remove instance while it is active! Select another instance first.")
 	else:
-		with open("config.json") as json_file: #can assume it exists, the program has loaded before this is called
+		with open(execdir+"/LocalData/config.json") as json_file: #can assume it exists, the program has loaded before this is called
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
@@ -148,7 +148,7 @@ def rm_config(_instance):
 			json_file.close()
 		if(_instance in json_data.keys()):
 			del json_data[_instance]
-			with open("config.json", "w") as f:
+			with open(execdir+"/LocalData/config.json", "w") as f:
 				json.dump(json_data, f)
 			cprint("Removed config data for instance "+_instance+".")
 			if(os.path.exists(os.path.join("ModsDownloaded", _instance))):
