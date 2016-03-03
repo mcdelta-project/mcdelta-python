@@ -340,7 +340,8 @@ def update_archive(start=False):
 		msgbox.showinfo("Archive updated", "The CMAN archive has been successfully updated.")
 
 def get_info_console(modname, output=False):
-	istr = ""
+	istr = []
+	ostr = ""
 	if(modname == None):
 		modname = input("Enter mod name: ")
 
@@ -353,20 +354,24 @@ def get_info_console(modname, output=False):
 				stable = "Stable" 
 			else:
 				stable = "Unstable" 
-			istr = istr+json_data["Name"]+":"+"\n\n"
-			istr = istr+"Version: "+json_data["Version"]+" ("+stable+")"+"\n\n"
-			istr = istr+"Author(s): "+json_data["Author"]+"\n\n"
-			istr = istr+"Description: "+json_data["Desc"]+"\n\n"
-			istr = istr+"Requirements: "+str(json_data["Requirements"])+"\n\n"
-			istr = istr+"Known Incompatibilities: "+str(json_data["Incompatibilities"])+"\n\b"
-			istr = istr+"Download Link: "+str(json_data["Link"])+"\n\b"
-			istr = istr+"License: "+json_data["License"]
+			istr.append(json_data["Name"]+":"+"\n\n")
+			istr.append("Version: "+json_data["Version"]+" ("+stable+")"+"\n\n")
+			istr.append("Author(s): "+json_data["Author"]+"\n\n")
+			istr.append("Description: "+json_data["Desc"]+"\n\n")
+			istr.append("Requirements: "+str(json_data["Requirements"])+"\n\n")
+			istr.append("Known Incompatibilities: "+str(json_data["Incompatibilities"])+"\n\n")
+			istr.append("Download Link: "+str(json_data["Link"])+"\n\n")
+			istr.append("License: "+json_data["License"])
 		else:
 			istr = istr+"Mod "+modname+" not found."
 		if(output):
 			cprint(istr)
 		else:
-			return(textwrap.fill(istr, 46))
+			for _istr in istr:
+				_istr = textwrap.fill(_istr, 46)
+				ostr = ostr+_istr+"\n\n"
+			#print(textwrap.fill(istr, 46).replace("  *", "\n\n"))
+			return(ostr)
 
 
 def get_info(modname, output=True):

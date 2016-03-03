@@ -244,6 +244,8 @@ class Gui(tk.Frame):
 		self.win.add(self.mpane)
 
 		self.mods = listmods_all(False)
+		self.modslabel = tk.Label(self.mpane, text = "Available Mods: ")
+		self.modslabel.pack()
 		self.mlist = tk.Listbox(self.mpane, selectmode=tk.MULTIPLE)
 		self.mlist.bind("<<ListboxSelect>>", updateinfo)
 		self.mlist.pack(fill = tk.BOTH, expand = 1)
@@ -257,6 +259,8 @@ class Gui(tk.Frame):
 		self.win.add(self.rpane)
 
 		self.modsi = listmods(False)
+		self.imodslabel = tk.Label(self.rpane, text = "Installed Mods: ")
+		self.imodslabel.pack()
 		self.mlisti = tk.Listbox(self.rpane, selectmode=tk.MULTIPLE)
 		self.mlisti.bind("<<ListboxSelect>>", updateinfo)
 		self.mlisti.pack(fill = tk.BOTH, expand = 1)
