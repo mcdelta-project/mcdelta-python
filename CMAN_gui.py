@@ -178,9 +178,12 @@ class Gui(tk.Frame):
 		self.cpane = tk.Frame(self.winl)
 		self.winl.add(self.cpane)
 
-		self.console = tk.Text(self.cpane, height = 4)
+		self.consoles = tk.Scrollbar(self.cpane, orient=tk.VERTICAL)
+		self.consoles.pack(side=tk.RIGHT, fill=tk.Y)
+		self.console = tk.Text(self.cpane, height = 4, yscrollcommand=self.consoles.set)
 		self.console.config(state = tk.DISABLED)
 		self.console.pack()
+		self.consoles.config(command=self.console.yview)
 
 		self.ccpane = tk.Frame(self.cpane)
 		self.ccpane.pack(side = tk.BOTTOM)
@@ -290,3 +293,249 @@ class Gui(tk.Frame):
 		self.infos.config(command=self.info.yview)
 
 
+def parsecmd(command):
+		if(command.split(" ")[0] == "update"):
+			update_archive()
+		elif(command.split(" ")[0] == "upgrades"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				inst = command.split(" ")[1]
+				if(inst == "*"):
+					inst = None
+				if (not instance_exists(inst) and inst != None):
+					cprint("Instance "+inst+" does not exist.")
+					return
+				update_archive()
+				CMAN_upgrade.check_upgrades(True, inst)
+			elif(len(command.split(" ")) == 1):
+				inst = input("Enter instance name: ")
+				if(inst == "*"):
+					inst = None
+				if (not instance_exists(inst) and inst != None):
+					cprint("Instance "+inst+" does not exist.")
+					return
+				update_archive()
+				CMAN_upgrade.check_upgrades(True, inst)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "upgrade"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				mod = command.split(" ")[1]
+				update_archive()
+				upgrades = CMAN_upgrade.get_upgrades()
+				CMAN_upgrade.upgrade_mod(mod)
+			elif(len(command.split(" ")) == 1):
+				mod = None
+				update_archive()
+				upgrades = CMAN_upgrade.get_upgrades()
+				CMAN_upgrade.upgrade_mod(mod)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "upgradeall"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				inst = command.split(" ")[1]
+				if(inst == "*"):
+					inst = None
+				if (not instance_exists(inst) and inst != None):
+					cprint("Instance "+inst+" does not exist.")
+					return
+			elif(len(command.split(" ")) == 1):
+				inst = input("Enter instance name: ")
+				if(inst == "*"):
+					inst = None
+				if (not instance_exists(inst) and inst != None):
+					cprint("Instance "+inst+" does not exist.")
+					return
+			else:
+				cprint("Invalid command syntax.")
+			update_archive()
+			updates = CMAN_upgrade.get_upgrades(inst)
+			if(len(updates) == 0):
+				cprint("No upgrades available.")
+			else:
+				for update in updates:
+					CMAN_upgrade.upgrade_mod(update[0]["Name"])
+		elif(command.split(" ")[0] == "install"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				mod = command.split(" ")[1]
+				update_archive()
+				CMAN_install.install_mod(mod)
+			elif(len(command.split(" ")) == 1):
+				mod = None
+				update_archive()
+				CMAN_install.install_mod(mod)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "remove"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				mod = command.split(" ")[1]
+				CMAN_remove.remove_mod(mod)
+			elif(len(command.split(" ")) == 1):
+				mod = None
+				CMAN_remove.remove_mod(mod)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "info"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				mod = command.split(" ")[1]
+				get_info(mod)
+			elif(len(command.split(" ")) == 1):
+				mod = None
+				get_info(mod)
+		elif(command.split(" ")[0] == "installm" or command.split(" ")[0] == "installmany"):
+			if(len(command.split(" ")) >= 2):
+				modslist = command.split(" ")[1:] #separate mod names with spaces
+				update_archive()
+				string = "Attempting to install: "
+				for item in modslist:
+					string = string + item+", "
+				cprint(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
+				for item in modslist:
+					CMAN_install.install_mod(item)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "removem" or command.split(" ")[0] == "removemany"):
+			if(len(command.split(" ")) >= 2):
+				modslist = command.split(" ")[1:] #separate mod names with spaces
+				update_archive()
+				string = "Attempting to remove: "
+				for item in modslist:
+					string = string + item+", "
+				cprint(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
+				for item in modslist:
+					CMAN_remove.remove_mod(item)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "upgradem" or command.split(" ")[0] == "upgrademany"):
+			if(len(command.split(" ")) >= 2):
+				modslist = command.split(" ")[1:] #separate mod names with spaces
+				update_archive()
+				string = "Attempting to upgrade: "
+				for item in modslist:
+					string = string + item+", "
+				cprint(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
+				for item in modslist:
+					CMAN_upgrade.upgrade_mod(item)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "export"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				name = command.split(" ")[1]
+				update_archive()
+				CMAN_importexport.export_mods(name)
+			elif(len(command.split(" ")) == 1):
+				name = None
+				update_archive()
+				CMAN_importexport.export_mods(name)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "import"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				path = command.split(" ")[1]
+				update_archive()
+				CMAN_importexport.import_mods(path)
+			elif(len(command.split(" ")) == 1):
+				path = None
+				update_archive()
+				CMAN_importexport.import_mods(path)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "instance" or command.split(" ")[0] == "inst"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				name = command.split(" ")[1]
+				if(instance_exists(name)):
+					if(name == instance):
+						cprint("Instance "+name+" already selected!")
+					else:
+						setup_config(name)
+						cprint("Switched to instance "+name+".")
+				else:
+					cprint("Instance "+name+" does not exist.")
+			elif(len(command.split(" ")) == 1):
+				name = input("Enter instance name: ")
+				if(instance_exists(name)):
+					if(name == instance):
+						cprint("Instance "+name+" already selected!")
+					else:
+						setup_config(name)
+						cprint("Switched to instance "+name+".")
+				else:
+					cprint("Instance "+name+" does not exist.")
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "setdefaultinstance" or command.split(" ")[0] == "setdefaultinst"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				name = command.split(" ")[1]
+				if(instance_exists(name)):
+					if(name == read_default_instance()):
+						cprint("Instance "+name+" already set as default!")
+					else:
+						with open("default_instance.txt", "w") as f:
+							f.write(name)
+						cprint("Set default instance as "+name+".")
+				else:
+					cprint("Instance "+instance+" does not exist.")
+			elif(len(command.split(" ")) == 1):
+				name = input("Enter instance name: ")
+				if(instance_exists(name)):
+					if(name == read_default_instance()):
+						cprint("Instance "+instance+" already set as default!")
+					else:
+						with open("default_instance.txt", "w") as f:
+							f.write(name)
+						cprint("Set default instance as "+name+".")
+				else:
+					cprint("Instance "+name+" does not exist.")
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "addinstance" or command.split(" ")[0] == "addinst"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				name = command.split(" ")[1]
+				if(instance_exists(name)):
+					cprint("Instance "+name+" already exists.")
+				else:
+					new_config(name)
+			elif(len(command.split(" ")) == 1):
+				name = input("Enter instance name: ")
+				if(instance_exists(name)):
+					cprint("Instance "+name+" already exists.")
+				else:
+					new_config(name)
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "rminstance" or command.split(" ")[0] == "removeinstance" or command.split(" ")[0] == "rminst"):
+			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
+				name = command.split(" ")[1]
+				if(instance_exists(name)):
+					rm_config(name)
+				else:
+					cprint("Instance "+name+" does not exist.")
+			elif(len(command.split(" ")) == 1):
+				name = input("Enter instance name: ")
+				if(instance_exists(name)):
+					rm_config(name)
+				else:
+					cprint("Instance "+name+" does not exist.")
+			else:
+				cprint("Invalid command syntax.")
+		elif(command.split(" ")[0] == "instances" or command.split(" ")[0] == "insts"):
+			with open("config.json") as json_file:
+				json_data = json.load(json_file)
+				insts = json_data.keys()
+				cprint("Instances:")
+				for inst in insts:
+					if(inst == instance):
+						cprint(inst+" (selected)")
+					else:
+						cprint(inst)
+		elif(command.split(" ")[0] == "list"):
+			listmods()
+		elif(command.split(" ")[0] == "version"):
+			cprint("CMAN v"+version)
+		elif(command.split(" ")[0] == "help" or command.split(" ")[0] == "?"):
+			print_help()
+		elif(command.split(" ")[0] == "exit"):
+			sys.exit()
+		elif(command == ""):
+			pass #don't print "Unknown command." for empty line
+		else:
+			cprint("Unknown command.")
