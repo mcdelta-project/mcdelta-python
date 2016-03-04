@@ -307,14 +307,7 @@ def parsecmd(command):
 				update_archive()
 				CMAN_upgrade.check_upgrades(True, inst)
 			elif(len(command.split(" ")) == 1):
-				inst = input("Enter instance name: ")
-				if(inst == "*"):
-					inst = None
-				if (not instance_exists(inst) and inst != None):
-					cprint("Instance "+inst+" does not exist.")
-					return
-				update_archive()
-				CMAN_upgrade.check_upgrades(True, inst)
+				cprint("upgrades: not enough arguments")
 			else:
 				cprint("Invalid command syntax.")
 		elif(command.split(" ")[0] == "upgrade"):
@@ -339,12 +332,7 @@ def parsecmd(command):
 					cprint("Instance "+inst+" does not exist.")
 					return
 			elif(len(command.split(" ")) == 1):
-				inst = input("Enter instance name: ")
-				if(inst == "*"):
-					inst = None
-				if (not instance_exists(inst) and inst != None):
-					cprint("Instance "+inst+" does not exist.")
-					return
+				cprint("upgradeall: not enough arguments")
 			else:
 				cprint("Invalid command syntax.")
 			update_archive()
@@ -451,15 +439,7 @@ def parsecmd(command):
 				else:
 					cprint("Instance "+name+" does not exist.")
 			elif(len(command.split(" ")) == 1):
-				name = input("Enter instance name: ")
-				if(instance_exists(name)):
-					if(name == instance):
-						cprint("Instance "+name+" already selected!")
-					else:
-						setup_config(name)
-						cprint("Switched to instance "+name+".")
-				else:
-					cprint("Instance "+name+" does not exist.")
+				cprint("instance: not enough arguments")
 			else:
 				cprint("Invalid command syntax.")
 		elif(command.split(" ")[0] == "setdefaultinstance" or command.split(" ")[0] == "setdefaultinst"):
@@ -475,16 +455,7 @@ def parsecmd(command):
 				else:
 					cprint("Instance "+instance+" does not exist.")
 			elif(len(command.split(" ")) == 1):
-				name = input("Enter instance name: ")
-				if(instance_exists(name)):
-					if(name == read_default_instance()):
-						cprint("Instance "+instance+" already set as default!")
-					else:
-						with open("default_instance.txt", "w") as f:
-							f.write(name)
-						cprint("Set default instance as "+name+".")
-				else:
-					cprint("Instance "+name+" does not exist.")
+				cprint("setdefaultinstance: not enough arguments")
 			else:
 				cprint("Invalid command syntax.")
 		elif(command.split(" ")[0] == "addinstance" or command.split(" ")[0] == "addinst"):
@@ -495,11 +466,7 @@ def parsecmd(command):
 				else:
 					new_config(name)
 			elif(len(command.split(" ")) == 1):
-				name = input("Enter instance name: ")
-				if(instance_exists(name)):
-					cprint("Instance "+name+" already exists.")
-				else:
-					new_config(name)
+				cprint("addinstance: not enough arguments")
 			else:
 				cprint("Invalid command syntax.")
 		elif(command.split(" ")[0] == "rminstance" or command.split(" ")[0] == "removeinstance" or command.split(" ")[0] == "rminst"):
@@ -510,11 +477,7 @@ def parsecmd(command):
 				else:
 					cprint("Instance "+name+" does not exist.")
 			elif(len(command.split(" ")) == 1):
-				name = input("Enter instance name: ")
-				if(instance_exists(name)):
-					rm_config(name)
-				else:
-					cprint("Instance "+name+" does not exist.")
+				cprint("removeinstance: not enough arguments")
 			else:
 				cprint("Invalid command syntax.")
 		elif(command.split(" ")[0] == "instances" or command.split(" ")[0] == "insts"):
