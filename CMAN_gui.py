@@ -246,9 +246,12 @@ class Gui(tk.Frame):
 		self.mods = listmods_all(False)
 		self.modslabel = tk.Label(self.mpane, text = "Available Mods: ")
 		self.modslabel.pack()
-		self.mlist = tk.Listbox(self.mpane, selectmode=tk.MULTIPLE)
+		self.mlists = tk.Scrollbar(self.mpane, orient=tk.VERTICAL)
+		self.mlists.pack(side=tk.RIGHT, fill=tk.Y)
+		self.mlist = tk.Listbox(self.mpane, selectmode=tk.MULTIPLE, yscrollcommand=self.mlists.set)
 		self.mlist.bind("<<ListboxSelect>>", updateinfo)
 		self.mlist.pack(fill = tk.BOTH, expand = 1)
+		self.mlists.config(command=self.mlist.yview)
 
 		for mod in self.mods:
 			#print(mod)
@@ -261,9 +264,12 @@ class Gui(tk.Frame):
 		self.modsi = listmods(False)
 		self.imodslabel = tk.Label(self.rpane, text = "Installed Mods: ")
 		self.imodslabel.pack()
-		self.mlisti = tk.Listbox(self.rpane, selectmode=tk.MULTIPLE)
+		self.mlistsi = tk.Scrollbar(self.rpane, orient=tk.VERTICAL)
+		self.mlistsi.pack(side=tk.RIGHT, fill=tk.Y)
+		self.mlisti = tk.Listbox(self.rpane, selectmode=tk.MULTIPLE, yscrollcommand=self.mlistsi.set)
 		self.mlisti.bind("<<ListboxSelect>>", updateinfo)
 		self.mlisti.pack(fill = tk.BOTH, expand = 1)
+		self.mlistsi.config(command=self.mlisti.yview)
 
 		for mod in self.modsi:
 			#print(mod)
@@ -273,9 +279,12 @@ class Gui(tk.Frame):
 
 		self.infopane = tk.Frame(self.win)
 		self.win.add(self.infopane)
-		self.info = tk.Text(self.infopane, width = 250)
+		self.infos = tk.Scrollbar(self.infopane, orient=tk.VERTICAL)
+		self.infos.pack(side=tk.RIGHT, fill=tk.Y)
+		self.info = tk.Text(self.infopane, width = 250, yscrollcommand=self.infos.set)
 		self.info.insert(tk.END, "No mod selected.")
 		self.info.config(state = tk.DISABLED)
 		self.info.pack(fill = tk.BOTH, expand = 1)
+		self.infos.config(command=self.info.yview)
 
 
