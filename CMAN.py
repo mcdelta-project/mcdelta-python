@@ -50,7 +50,7 @@ def setup_config(_instance):
 
 # Start Program Here:
 
-root = tk.Tk()
+root = None
 
 tkinst = None
 
@@ -66,6 +66,10 @@ parser.add_argument("-I", "--instance", help="sets the Minecraft instance to ins
 parser.add_argument("-g", "--gui", help="enable GUI", action="store_true")
 args = parser.parse_args()
 gui = args.gui
+
+if (gui):
+	root = tk.Tk()
+	
 #print(args.gui)
 #print(gui)
 
@@ -99,7 +103,7 @@ for inst in insts:
 		os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
 
 
-if (gui == True):
+if (gui):
 	tkinst = Gui(root)
 
 setup_config(instance)
