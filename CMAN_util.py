@@ -247,7 +247,8 @@ def get_all_jsons():
 		mods = os.listdir(execdir + "/Data/CMAN-Archive")
 		for mod in mods:
 			json_data = get_json(mod[:-5]) #[:-5] cuts off the .json extension
-			jsons.append(json_data)
+			if json_data != None:
+				jsons.append(json_data)
 	return(jsons)
 
 def switch_path_dir(path, dir): #switches tkinst of path to dir given
@@ -371,7 +372,7 @@ def get_info_console(modname, output=False):
 			istr.append("Download Link: "+str(json_data["Link"])+"\n\n")
 			istr.append("License: "+json_data["License"])
 		else:
-			istr = istr+"Mod "+modname+" not found."
+			istr.append("Mod "+modname+" not found.")
 		if(output):
 			cprint(istr)
 		else:
