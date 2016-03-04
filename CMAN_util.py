@@ -125,8 +125,12 @@ def new_config(instance):
 		if(instance in json_data.keys()):
 			cprint("Instance "+instance+" already exists, cannot add it.")
 		else:
-			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
-			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+			if(gui):
+				modfolder = filedialogs.askdirectory(parent=tkinst, title="Select Mod Folder")
+				versionsfolder = filedialogs.askdirectory(parent=tkinst, title="Select Versions Folder")
+			else:	
+				modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
+				versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
 			f = open(execdir+"/LocalData/config.json", 'w')
 			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
 			json.dump(json_data, f)
@@ -152,7 +156,11 @@ def rm_config(_instance):
 				json.dump(json_data, f)
 			cprint("Removed config data for instance "+_instance+".")
 			if(os.path.exists(os.path.join("ModsDownloaded", _instance))):
-				if(input("Delete installed mod listing for instance "+_instance+"? Type OK to delete, or anything else to skip: ") == "OK"):
+				if(gui):
+					a = msgbox.askyesno("Delete installed mod listing", "Delete installed mod listing for instance "+_instance+"?\nType OK to delete.", parent=tkinst)
+				else:
+					a = input("Delete installed mod listing for instance "+_instance+"? Type OK to delete, or anything else to skip: ") == "OK"
+				if(a):
 					shutil.rmtree(os.path.join("ModsDownloaded", _instance))
 					cprint("Deleted installed mod listing.")
 				else:
@@ -324,7 +332,7 @@ def update_archive(start=False):
 	except:
 		cprint("Something went wrong while downloading the archive.")
 		if(gui and not start):
-			msgbox.showerror("Archive download failed", "Something went wrong while downloading the archive.")
+			msgbox.showerror("Archive download failed", "Something went wrong while downloading the archive.", parent=tkinst)
 		if(start):
 			print("CMAN: fatal: Something went wrong while downloading the archive.")
 			sys.exit()
@@ -337,7 +345,7 @@ def update_archive(start=False):
 	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
 	cprint("Done.")
 	if(gui and not start):
-		msgbox.showinfo("Archive updated", "The CMAN archive has been successfully updated.")
+		msgbox.showinfo("Archive updated", "The CMAN archive has been successfully updated.", parent=tkinst)
 
 def get_info_console(modname, output=False):
 	istr = []

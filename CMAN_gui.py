@@ -92,30 +92,30 @@ def updateinfo(event):
 def sdinst():
 	name = tkinst.isel.get()
 	if(name == read_default_instance()):
-		msgbox.showerror("Instance already default","Instance "+name+" is already set as default.")
+		msgbox.showerror("Instance already default","Instance "+name+" is already set as default.", parent=tkinst)
 	else:
 		with open(execdir+"/LocalData/default_instance.txt", "w") as f:
 			f.write(name)
-		msgbox.showinfo("Default instance set", "Set default instance as "+name+".")
+		msgbox.showinfo("Default instance set", "Set default instance as "+name+".", parent=tkinst)
 
 def addinst():
-	name = dialogs.askstring("Instance Name", "Enter name for new instance:")
+	name = dialogs.askstring("Instance Name", "Enter name for new instance:", parent=tkinst)
 	if(instance_exists(name)):
-		msgbox.showerror("Instance already exists","Instance "+name+" already exists.")
+		msgbox.showerror("Instance already exists","Instance "+name+" already exists.", parent=tkinst)
 	else:
 		new_config(name)
 		tkinst.ilist["menu"].add_command(label = name, command = lambda n=name: tkinst.isel.set(n))
-		msgbox.showinfo("Instance created", "Instance "+name+" created.")
+		msgbox.showinfo("Instance created", "Instance "+name+" created.", parent=tkinst)
 
 def removinst():
 	name = tkinst.isel.get()
 	if(not instance_exists(name)):
-		msgbox.showerror("Instance does not exist","Instance "+name+" does not exist. Cannot remove.")
+		msgbox.showerror("Instance does not exist","Instance "+name+" does not exist. Cannot remove.", parent=tkinst)
 	elif(instance == name):
-		msgbox.showerror("Instance currently selected","Instance "+name+" is currently selected. Cannot remove.")
+		msgbox.showerror("Instance currently selected","Instance "+name+" is currently selected. Cannot remove.", parent=tkinst)
 	else:
 		rm_config(name)
-		msgbox.showinfo("Instance removed", "Instance "+name+" removed.")
+		msgbox.showinfo("Instance removed", "Instance "+name+" removed.", parent=tkinst)
 
 	tkinst.ilist["menu"].delete(0, tk.END)
 	insts = list(get_all_insts())
@@ -135,11 +135,11 @@ def updateinst():
 
 
 def importmlist():
-	fname = filedialogs.askopenfilename()
+	fname = filedialogs.askopenfilename(parent=tkinst)
 	CMAN_importexport.import_mods(fname)
 
 def exportmlist():
-	fname = filedialogs.asksaveasfilename()
+	fname = filedialogs.asksaveasfilename(parent=tkinst)
 	CMAN_importexport.export_mods(fname)
 
 

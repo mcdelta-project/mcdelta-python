@@ -42,7 +42,7 @@ def install_mod(modname):
 		if not gui:
 			a = input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"
 		else:
-			a = msgbox.askokcancel("Confirm Installation", "This mod may be unstable.\nClick OK to install.")
+			a = msgbox.askokcancel("Confirm Installation", "This mod may be unstable.\nClick OK to install.", parent=tkinst)
 		if (a):
 			pass
 		else:
@@ -65,7 +65,7 @@ def install_mod(modname):
 			if not gui:
 				wanttoinstall = input("Do you want to install it? Y or n?") == "Y"
 			else:
-				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod requires " + requirement + ".\nInstall "+requirement+"?")
+				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod requires " + requirement + ".\nInstall "+requirement+"?", parent=tkinst)
 			if(wanttoinstall):
 				install_mod(requirement)
 			elif(not wanttoinstall):
@@ -77,7 +77,7 @@ def install_mod(modname):
 			if not gui:
 				wanttoinstall = input("Do you want to install it? Y or n?") == "Y"
 			else:
-				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod recommends " + recommendation + ".\nInstall "+recommendation+"?")
+				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod recommends " + recommendation + ".\nInstall "+recommendation+"?", parent=tkinst)
 			if(wanttoinstall):
 				install_mod(recommendation)
 			elif(not wanttoinstall):
