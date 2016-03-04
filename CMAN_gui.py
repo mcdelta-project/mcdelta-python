@@ -50,25 +50,22 @@ def instmods():
 	_mods = map(int, tkinst.mlist.curselection())
 	for _mod in _mods:
 		CMAN_install.install_mod(tkinst.mods[int(_mod)]["Name"])
-		tkinst.mlisti.insert(tk.END, tkinst.mods[int(_mod)]["Name"])
+	updateinst()
 
 
 def removmods():
 
 	_mods = map(int, tkinst.mlisti.curselection())
-	print(_mods)
 	for _mod in _mods:
 		CMAN_remove.remove_mod(tkinst.modsi[int(_mod)]["Name"])
-	print(_mods)
-	for _mod in _mods:
-		print(_mod)
-		tkinst.mlisti.delete(int(_mod), int(_mod))
+	updateinst()
 
 def upgrmods():
 
 	_mods = map(int, tkinst.mlisti.curselection())
 	for _mod in _mods:
 		CMAN_upgrade.upgrade_mod(tkinst.modsi[int(_mod)]["Name"])
+	updateinst()
 
 def runcmd():
 	cmd = tkinst.cmdin.get()
@@ -100,6 +97,8 @@ def sdinst():
 
 def addinst():
 	name = dialogs.askstring("Instance Name", "Enter name for new instance:", parent=tkinst)
+	if(name == None):
+		return -1
 	if(instance_exists(name)):
 		msgbox.showerror("Instance already exists","Instance "+name+" already exists.", parent=tkinst)
 	else:
@@ -127,11 +126,14 @@ def updateinst():
 	setup_config(name)
 	tkinst.ilabel.configure(text = "Current Instance: "+instance)
 	tkinst.mlisti.delete(0, tk.END)
-	tkinst.modsi = listmods(False)
-
+	tkinst.modsi = listmods(False, False)
+	upgrades = CMAN_upgrade.get_upgrade_names(instance)
 	for mod in tkinst.modsi:
 		if mod != None:
-			tkinst.mlisti.insert(tk.END, mod["Name"])
+			if mod in upgrades:
+				tkinst.mlisti.insert(tk.END, "! "+mod["Name"])
+			else:
+				tkinst.mlisti.insert(tk.END, mod["Name"])
 
 
 def importmlist():
@@ -261,7 +263,7 @@ class Gui(tk.Frame):
 		self.rpane = tk.Frame(self.win)
 		self.win.add(self.rpane)
 
-		self.modsi = listmods(False)
+		self.modsi = listmods(False, False)
 		self.imodslabel = tk.Label(self.rpane, text = "Installed Mods: ")
 		self.imodslabel.pack()
 		self.mlistsi = tk.Scrollbar(self.rpane, orient=tk.VERTICAL)

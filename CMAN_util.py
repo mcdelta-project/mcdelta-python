@@ -130,7 +130,11 @@ def new_config(instance):
 				versionsfolder = filedialogs.askdirectory(parent=tkinst, title="Select Versions Folder")
 			else:	
 				modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
+				if(modfolder == None):
+					return (-1, -1)
 				versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+			if(versionsfolder == None):
+				return (-1, -1)
 			f = open(execdir+"/LocalData/config.json", 'w')
 			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
 			json.dump(json_data, f)
@@ -222,13 +226,15 @@ def get_all_insts():
 	return insts
 
 
-def get_installed_jsons(inst = None):
+def get_installed_jsons(inst = None, allinst=True):
 	jsons = []
-	if(inst == None):
+	if(inst == None and allinst):
 		with open(execdir + "/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
 			json_data = json.load(json_file)
 			json_file.close()
 		insts = json_data.keys()
+	elif(inst == None and not allinst):
+		insts = [instance]
 	else:
 		insts = [inst]
 	for inst in insts:
@@ -256,8 +262,8 @@ def switch_path_dir(path, dir): #switches tkinst of path to dir given
 	pathsplit[0] = dir.split(os.sep)[-1] #just in case it ends with os.sep
 	return(os.sep.join(pathsplit))
 
-def listmods(output=True):
-	modsinstalled = get_installed_jsons()
+def listmods(output=True, allinst=True):
+	modsinstalled = get_installed_jsons(inst = None, allinst=allinst)
 	if output:
 		cprint("Installed mods:")
 		cprint(str(modsinstalled))

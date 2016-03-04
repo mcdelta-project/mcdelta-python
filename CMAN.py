@@ -108,6 +108,8 @@ cprint("You are running " + sys.platform)
 
 update_archive(True)
 
+CMAN_gui.updateinst()
+
 tkinst.update_modlist()
 
 check_for_updates()

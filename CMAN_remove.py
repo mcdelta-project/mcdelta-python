@@ -45,4 +45,6 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 			else:
 				cprint("Skipped \""+file+"\".")
 	else:
-		cprint("I cannot remove installer mods or basemods! (If your mod is not an installermod or basemod, then something went horribly wrong.)")
+		if(gui):
+			msgbox.showerror("Removal Failed", "CMAN cannot remove installer mods or base mods.\nRemoving mod from CMAN listing only.")
+		cprint("CMAN cannot remove installer mods or base mods! (If "+modname+" is not an installer mod or base mod, then something went wrong.)")

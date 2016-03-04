@@ -31,7 +31,7 @@ def install_mod(modname):
 			cprint(file + " found.")
 	else:
 		cprint("Mod "+modname+" not found.")
-		return
+		return -1
 
 	json_data = get_json(modname)
 
@@ -53,6 +53,8 @@ def install_mod(modname):
 		return
  
 	originalfile = execdir + "/Data/CMAN-Archive/" + modname + ".json"  # Saving Modname.json for future reference
+	if(not os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
+			os.mkdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	newfilename = modname + ".installed"
 	newfile = open(newfilename, 'w+')
@@ -69,7 +71,8 @@ def install_mod(modname):
 			if(wanttoinstall):
 				install_mod(requirement)
 			elif(not wanttoinstall):
-				return
+				msgbox.showerror("Installation Canceled", "The installation has been canceled due to required mod "+requirement+" not being installed.", parent=tkinst)
+				return -1
 	recommendations = json_data["Recommended"]
 	for recommendation in recommendations:
 		if (os.path.exists(recommendation + ".installed") == False):
@@ -85,8 +88,8 @@ def install_mod(modname):
 	incompatibilities = json_data["Incompatibilities"]
 	for incompatibility in incompatibilities:
 		if (os.path.exists(incompatibility + ".installed") == True):
-			cprint("You cannot have " + incompatibility + " and " + modname + " installed at the same time!")
-			return
+			msgbox.showerror("Installation Canceled", "The installation has been canceled due to incompatible mod "+incompatibility+" being installed.", parent=tkinst)
+			return -1
 	if (modtype == "Basemod"):
 		os.chdir(execdir + "/Data/temp")
 		url = json_data["Link"]
@@ -167,7 +170,11 @@ def install_mod(modname):
 		cprint("Downloading " + url + " as " + file_name)
 		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
 			shutil.copyfileobj(response, out_file)
+		if(gui):
+			msgbox.showinfo("Installer Downloaded", "The installer for "+modname+" has been downloaded.\nRun the installer, then click OK to continue.", parent=tkinst)
 		cprint("Done. Please run the installer.")
+	tkinst.mlisti.insert(tk.END, modname)
+	return 0
 
 def install_deps(modname):
 	deps = get_deps(modname)
