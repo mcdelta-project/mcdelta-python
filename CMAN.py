@@ -12,66 +12,13 @@ import CMAN_remove
 import CMAN_upgrade
 import CMAN_install
 import CMAN_importexport
+from CMAN_gui import *
+import CMAN_gui
 from CMAN_util import *
-
-version = "2.0.0"
+import tkinter.messagebox as msgbox
+import tkinter.simpledialog as dialogs
 
 execdir = os.getcwd() #needed for startup
-
-def check_for_updates():
-	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
-		latestversion = response.read()
-		latestversion = latestversion.decode("utf-8").strip() #it is using a bytes string and printing the b prefix and newline
-		if (version != str(latestversion)):
-			print("WARNING! YOU ARE USING OLD VERSION " + version + "! NEWEST VERSION IS " + str(latestversion) + "!")
-
-def update_archive():
-	#Delete old archive
-	os.chdir(execdir + "/Data")
-	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
-		shutil.rmtree("CMAN-Archive")
-	# Archive Download
-	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master"
-	file_name = "CMAN.tar.gz"
-	print("Downloading Archive...")
-	# Download it.
-	try:
-		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-			shutil.copyfileobj(response, out_file)
-		print("Done.")
-	except:
-		print("Something went wrong while downloading the archive.")
-		sys.exit()
-	print("Extracting Archive...")
-	tar = tarfile.open("CMAN.tar.gz")  # untar
-	tar.extractall()
-	tarlist = tar.getnames()
-	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
-	print("Done.")
-
-def get_info(modname):
-	if(modname == None):
-		modname = input("Enter mod name: ")
-
-	json_data = get_json(modname)
-	if(json_data == -1):
-		return
-	else:
-		if (json_data != None):
-			if(json_data["Unstable"] == "false"):
-				stable = "Stable" 
-			else:
-				stable = "Unstable" 
-			cprint(json_data["Name"]+":")
-			cprint("\tVersion: "+json_data["Version"]+" ("+stable+")")
-			cprint("\tAuthor(s): "+json_data["Author"])
-			cprint("\tDescription: "+json_data["Desc"])
-			cprint("\tRequirements: "+str(json_data["Requirements"]))
-			cprint("\tKnown Incompatibilities: "+str(json_data["Incompatibilities"]))
-			cprint("\tDownload Link: "+str(json_data["Link"]))
-			cprint("\tLicense: "+json_data["License"])
-		else:
-			cprint("Mod "+modname+" not found.")
 
 def read_default_instance():
 	old_cwd = os.getcwd() #to reset cwd afterward
@@ -87,30 +34,6 @@ def read_default_instance():
 	os.chdir(old_cwd) #restoring cwd
 	return default
 
-def print_help():
-	cprint("Commands:")
-	cprint(" install 'mod': install the mod 'mod'")
-	cprint(" installm: install multiple mods")
-	cprint(" info 'mod': get info for the mod 'mod'")
-	cprint(" remove 'mod': remove the mod 'mod'")
-	cprint(" removem: remove multiple mods")
-	cprint(" upgrade 'mod': upgrade the mod 'mod'")
-	cprint(" upgradem: upgrade multiple mods")
-	cprint(" upgradeall: upgrade all outdated mods for Minecraft instance 'inst', or use '*' to check all instances")
-	cprint(" upgrades 'inst': list available mod upgrades for Minecraft instance 'inst', or use '*' to check all instances")
-	cprint(" update: update the CMAN archive")
-	cprint(" help: display this help message")
-	cprint(" version: display the CMAN version number")
-	cprint(" list: list installed mods")
-	cprint(" export 'name': export a modlist with the name 'name' , which can be imported later")
-	cprint(" import 'pathtomodlist': import the modlist 'pathtomodlist'")
-	cprint(" inst 'inst': switches to Minecraft instance 'inst'")
-	cprint(" defaultinst 'inst': sets default Minecraft instance to 'inst'")
-	cprint(" addinst 'inst': adds the Minecraft instance 'inst'")
-	cprint(" rminst 'inst': removes the Minecraft instance 'inst'")
-	cprint(" insts: lists all Minecraft instances")
-	cprint(" exit: exit CMAN")
-
 def setup_config(_instance):
 	global modfolder, versionsfolder, instance, gui
 	os.chdir(os.path.join(execdir, "LocalData"))
@@ -122,29 +45,12 @@ def setup_config(_instance):
 	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	CMAN_gui.init_config_gui((modfolder, versionsfolder, execdir, instance, gui, tkinst))
 
-
-class Gui(tk.Frame):
-	def __init__(self, master = None):
-		tk.Frame.__init__(self, master)
-		self.initialise_window()
-		self.pack()
-	def initialise_window(self):
-		root.title("CMAN v2.1.0")
-		root.geometry("300x300")
-
-		self.title = tk.Label(self, text = "Welcome to CMAN!")
-		self.title.pack()
-
-		self.output = tk.Label(self, text = "None")
-		self.output.pack(side = tk.BOTTOM)
-
-		self.button = tk.Button(self, text = "List installed mods", command =listmods, bg = "blue")
-		self.button.pack(pady=20, padx = 20)
 
 # Start Program Here:
 
-root = tk.Tk()
+root = None
 
 tkinst = None
 
@@ -160,13 +66,13 @@ parser.add_argument("-I", "--instance", help="sets the Minecraft instance to ins
 parser.add_argument("-g", "--gui", help="enable GUI", action="store_true")
 args = parser.parse_args()
 gui = args.gui
-print(args.gui)
-print(gui)
 
-if (gui == True):
-	tkinst = Gui(root)
+if (gui):
+	root = tk.Tk()
+	
+#print(args.gui)
+#print(gui)
 
-print("You are running " + sys.platform)
 #not making Data dir here because it is done later
 if (os.path.exists("LocalData") == False):
 	os.mkdir("LocalData")
@@ -196,13 +102,31 @@ for inst in insts:
 	if(not os.path.exists(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))): #creating modsdownloaded subdirs for each instance
 		os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
 
-update_archive()
-print("CMAN v"+version)
-if (args.instance != "None"):
-	instance = args.instance
-print("Selected Instance: "+instance)
+
+if (gui):
+	tkinst = Gui(root)
+
+setup_config(instance)
+
+cprint("You are running " + sys.platform)
+
+update_archive(True)
+
+if(gui):
+	CMAN_gui.updateinst()
+
+	tkinst.update_modlist()
 
 check_for_updates()
+
+cprint("CMAN v"+version)
+instance = CMAN_gui.instance
+if (args.instance != "None"):
+	instance = args.instance
+if(instance == "@ERROR@"):
+	instance = CMAN_gui.instance
+cprint("Selected Instance: "+instance)
+
 upgradesavailable = CMAN_upgrade.get_upgrades(instance)
 if (upgradesavailable == []):
 	pass
@@ -232,12 +156,7 @@ if (args.importa != "None"):
 if (gui == False):
 	print_help()
 
-if (gui == True):
-	tkinst.mainloop()
-else:
-	while(True):
-		os.chdir(execdir + "/LocalData/") #reset current working dir
-		command = input("> ")
+def parsecmd(command):
 		if(command.split(" ")[0] == "update"):
 			update_archive()
 		elif(command.split(" ")[0] == "upgrades"):
@@ -247,7 +166,7 @@ else:
 					inst = None
 				if (not instance_exists(inst) and inst != None):
 					cprint("Instance "+inst+" does not exist.")
-					continue
+					return
 				update_archive()
 				CMAN_upgrade.check_upgrades(True, inst)
 			elif(len(command.split(" ")) == 1):
@@ -256,7 +175,7 @@ else:
 					inst = None
 				if (not instance_exists(inst) and inst != None):
 					cprint("Instance "+inst+" does not exist.")
-					continue
+					return
 				update_archive()
 				CMAN_upgrade.check_upgrades(True, inst)
 			else:
@@ -281,14 +200,14 @@ else:
 					inst = None
 				if (not instance_exists(inst) and inst != None):
 					cprint("Instance "+inst+" does not exist.")
-					continue
+					return
 			elif(len(command.split(" ")) == 1):
 				inst = input("Enter instance name: ")
 				if(inst == "*"):
 					inst = None
 				if (not instance_exists(inst) and inst != None):
 					cprint("Instance "+inst+" does not exist.")
-					continue
+					return
 			else:
 				cprint("Invalid command syntax.")
 			update_archive()
@@ -483,3 +402,14 @@ else:
 			pass #don't print "Unknown command." for empty line
 		else:
 			cprint("Unknown command.")
+
+
+
+if (gui == True):
+	tkinst.mainloop()
+
+else:
+	while(True):
+		os.chdir(execdir + "/LocalData/") #reset current working dir
+		command = input("> ")
+		parsecmd(command)

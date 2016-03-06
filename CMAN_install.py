@@ -7,6 +7,9 @@ import sys
 import tarfile
 import zipfile
 from CMAN_util import *
+import tkinter as tk
+import tkinter.messagebox as msgbox
+import tkinter.simpledialog as dialogs
 
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
@@ -28,7 +31,7 @@ def install_mod(modname):
 			cprint(file + " found.")
 	else:
 		cprint("Mod "+modname+" not found.")
-		return
+		return -1
 
 	json_data = get_json(modname)
 
@@ -36,7 +39,11 @@ def install_mod(modname):
 	modtype = json_data["Type"] # Work out which type of mod it is
 	IsUnstable = json.loads(json_data["Unstable"])
 	if (IsUnstable == True):
-		if (input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"):
+		if not gui:
+			a = input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"
+		else:
+			a = msgbox.askokcancel("Confirm Installation", "This mod may be unstable.\nClick OK to install.", parent=tkinst)
+		if (a):
 			pass
 		else:
 			cprint("Install canceled.")
@@ -46,6 +53,8 @@ def install_mod(modname):
 		return
  
 	originalfile = execdir + "/Data/CMAN-Archive/" + modname + ".json"  # Saving Modname.json for future reference
+	if(not os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
+			os.mkdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	newfilename = modname + ".installed"
 	newfile = open(newfilename, 'w+')
@@ -55,26 +64,32 @@ def install_mod(modname):
 	for requirement in requirements:
 		if (os.path.exists(requirement + ".installed") == False):
 			cprint("You must install " + requirement + " first!")
-			wanttoinstall = input("Do you want to install it? Y or n?")
-			if(wanttoinstall == "Y"):
+			if not gui:
+				wanttoinstall = input("Do you want to install it? Y or n?") == "Y"
+			else:
+				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod requires " + requirement + ".\nInstall "+requirement+"?", parent=tkinst)
+			if(wanttoinstall):
 				install_mod(requirement)
-			elif(wanttoinstall == "n"):
-				return
+			elif(not wanttoinstall):
+				msgbox.showerror("Installation Canceled", "The installation has been canceled due to required mod "+requirement+" not being installed.", parent=tkinst)
+				return -1
 	recommendations = json_data["Recommended"]
 	for recommendation in recommendations:
 		if (os.path.exists(recommendation + ".installed") == False):
 			cprint("This mod recommends " + recommendation + "!")
-			wanttoinstall = input("Do you want to install it? Y or n?")
-			if(wanttoinstall == "Y"):
+			if not gui:
+				wanttoinstall = input("Do you want to install it? Y or n?") == "Y"
+			else:
+				wanttoinstall = msgbox.askyesno("Confirm Installation", "This mod recommends " + recommendation + ".\nInstall "+recommendation+"?", parent=tkinst)
+			if(wanttoinstall):
 				install_mod(recommendation)
-				return
-			elif(wanttoinstall == "n"):
+			elif(not wanttoinstall):
 				pass
 	incompatibilities = json_data["Incompatibilities"]
 	for incompatibility in incompatibilities:
 		if (os.path.exists(incompatibility + ".installed") == True):
-			cprint("You cannot have " + incompatibility + " and " + modname + " installed at the same time!")
-			return
+			msgbox.showerror("Installation Canceled", "The installation has been canceled due to incompatible mod "+incompatibility+" being installed.", parent=tkinst)
+			return -1
 	if (modtype == "Basemod"):
 		os.chdir(execdir + "/Data/temp")
 		url = json_data["Link"]
@@ -155,7 +170,11 @@ def install_mod(modname):
 		cprint("Downloading " + url + " as " + file_name)
 		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
 			shutil.copyfileobj(response, out_file)
+		if(gui):
+			msgbox.showinfo("Installer Downloaded", "The installer for "+modname+" has been downloaded.\nRun the installer, then click OK to continue.", parent=tkinst)
 		cprint("Done. Please run the installer.")
+	tkinst.mlisti.insert(tk.END, modname)
+	return 0
 
 def install_deps(modname):
 	deps = get_deps(modname)

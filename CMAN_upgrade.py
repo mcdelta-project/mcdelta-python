@@ -50,6 +50,16 @@ def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in w
 				updates.append([mod,json_data]) #append list of jsons for installed version and newest version 
 	return(updates)
 
+def get_upgrade_names(inst = None): #returns a list of mod names
+	updates = []
+	mods = get_installed_jsons(inst)
+	for mod in mods:
+		if(mod != None):
+			json_data = get_json(mod["Name"])
+			if(json_data != None and json_data["Version"] != mod["Version"]):
+				updates.append(mod["Name"]) #append mod name
+	return(updates)
+
 def check_upgrades(full, inst = None): #full is a flag for whether to print full list of updates or just updates available message
 	if(not instance_exists(inst) and inst != None):
 		cprint("Instance "+inst+" does not exist.")

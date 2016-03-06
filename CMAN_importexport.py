@@ -52,7 +52,7 @@ def import_mods(path):
 		cprint(path + " not found.")
 		return
 
-	json_data = get_json(path)
+	json_data = json.load(path)
 
 	mods = []
 
