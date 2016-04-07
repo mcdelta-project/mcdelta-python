@@ -144,6 +144,8 @@ def exportmlist():
 	fname = filedialogs.asksaveasfilename(parent=tkinst)
 	CMAN_importexport.export_mods(fname)
 
+def exit():
+	sys.exit()
 
 class Gui(tk.Frame):
 	def __init__(self, master = None):
@@ -244,6 +246,9 @@ class Gui(tk.Frame):
 
 		self.implist = tk.Button(self.lpane, text = "Import Mod List...", command=importmlist)
 		self.implist.pack(side = tk.BOTTOM)
+
+		self.exit = tk.Button(self.lpane, text = "Exit CMAN", command=exit)
+		self.exit.pack(side = tk.BOTTOM)
 
 		self.mpane = tk.Frame(self.win)
 		self.win.add(self.mpane)
