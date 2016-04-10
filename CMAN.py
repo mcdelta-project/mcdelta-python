@@ -93,14 +93,15 @@ instance = read_default_instance()
 
 execdir = os.getcwd()
 
-setup_config(instance)
-
-with open("LocalData/config.json") as json_file:
-	json_data = json.load(json_file)
-	insts = json_data.keys()
-for inst in insts:
-	if(not os.path.exists(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))): #creating modsdownloaded subdirs for each instance
-		os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
+try:
+	with open("LocalData/config.json") as json_file:
+		json_data = json.load(json_file)
+		insts = json_data.keys()
+	for inst in insts:
+		if(not os.path.exists(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))): #creating modsdownloaded subdirs for each instance
+			os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
+except:
+	pass
 
 
 if (gui):
