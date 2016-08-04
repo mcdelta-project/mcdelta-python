@@ -40,12 +40,22 @@ def setup_config(_instance):
 	instance = _instance
 	modfolder, versionsfolder = read_config(_instance) #gets config stuff
 	os.chdir(execdir)
-	init_config_util((modfolder, versionsfolder, execdir, instance, gui, tkinst)) #transferring config data (and Tkinter instance) to all files
-	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui, tkinst))
-	CMAN_gui.init_config_gui((modfolder, versionsfolder, execdir, instance, gui, tkinst))
+	init_config_util((modfolder, versionsfolder, execdir, instance, gui)) #transferring config data (and Tkinter instance) to all files
+	CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui))
+	CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui))
+	CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui))
+	CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui))
+	init_config_gui((modfolder, versionsfolder, execdir, instance, gui))
+
+def transfer_tkinst():
+	global tkinst
+	recieve_tkinst_util(tkinst)
+	CMAN_install.recieve_tkinst_install(tkinst)
+	CMAN_remove.recieve_tkinst_remove(tkinst)
+	CMAN_upgrade.recieve_tkinst_upgrade(tkinst)
+	CMAN_importexport.recieve_tkinst_importexport(tkinst)
+	CMAN_gui.recieve_tkinst_gui(tkinst)
+
 
 
 # Start Program Here:
@@ -91,8 +101,6 @@ if (os.path.exists("Data/temp") == False):
 
 instance = read_default_instance()
 
-execdir = os.getcwd()
-
 try:
 	with open("LocalData/config.json") as json_file:
 		json_data = json.load(json_file)
@@ -103,11 +111,14 @@ try:
 except:
 	pass
 
+execdir = os.getcwd()
+
+setup_config(instance)
 
 if (gui):
 	tkinst = Gui(root)
 
-setup_config(instance)
+transfer_tkinst()
 
 cprint("You are running " + sys.platform)
 
