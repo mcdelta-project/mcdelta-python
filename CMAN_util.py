@@ -44,13 +44,9 @@ def check_for_updates():
 			#else:
 			cprint("!!Update Available! You are running CMAN " + version + ". The newest version is " + str(latestversion) + "!!")
 
-def init_config_util(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui  #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
-
-def recieve_tkinst_util(data):
-	global tkinst
-	tkinst = data
+def init_config_util(data): #data is a 6-tuple
+	global modfolder, versionsfolder, execdir, instance, gui, tkinst #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance, gui, tkinst = data
 	
 def cprint(text): #outputs text to console pane in GUI if gui enabled, otherwise prints it
 	if (gui == True):
