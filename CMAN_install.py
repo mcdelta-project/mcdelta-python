@@ -35,6 +35,7 @@ def install_mod(modname):
 		for file in glob.glob(modname + ".json"):
 			cprint(file + " found.")
 	else:
+		
 		cprint("Mod "+modname+" not found.")
 		return -1
 
