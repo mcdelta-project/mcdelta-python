@@ -21,19 +21,20 @@ execdir = os.getcwd()  # needed for startup
 
 
 def read_default_instance():
-    old_cwd = os.getcwd()  # to reset cwd afterward
-    os.chdir(os.path.join(execdir, "LocalData"))  # at this point in startup, old_cwd is execdir
-    try:
-        with open("default_instance.txt") as f:
-            default = f.read().strip()  # don't want leading trailing whitespace/newlines
-    except(FileNotFoundError):
-        default = "default"
-        with open("default_instance.txt", "w") as f:
-            f.write(default)
+	old_cwd = os.getcwd() #to reset cwd afterward
+	if (os.path.exists("LocalData") == False):
+		os.mkdir("LocalData")
+	os.chdir(os.path.join(execdir, "LocalData")) #at this point in startup, old_cwd is execdir
+	try:
+		with open("default_instance.txt") as f:
+			default = f.read().strip() #don't want leading trailing whitespace/newlines
+	except(FileNotFoundError):
+		default = "default"
+		with open("default_instance.txt", "w") as f:
+			f.write(default)
 
-    os.chdir(old_cwd)  # restoring cwd
-    return default
-
+	os.chdir(old_cwd) #restoring cwd
+	return default
 
 def setup_config(_instance):
     global modfolder, versionsfolder, instance, gui
