@@ -3,3 +3,4 @@ LocalData/*
 CMAN.zip
 *.pyc
 __pycache__/*
+*.jar

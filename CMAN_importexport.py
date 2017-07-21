@@ -1,4 +1,3 @@
-import urllib.request
 import shutil
 import os
 import glob
@@ -13,9 +12,13 @@ versionsfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 
-def init_config_importexport(data): #data is a 4-tuple
-	global modfolder, versionsfolder, execdir, instance #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance = data
+def init_config_importexport(data): #data is a 5-tuple
+	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, versionsfolder, execdir, instance, gui = data
+
+def recieve_tkinst_importexport(data):
+	global tkinst
+	tkinst = data
 
 def export_mods(filename):
 	if (filename == None):
@@ -27,17 +30,17 @@ def export_mods(filename):
 		mods = os.listdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 		i = 0
 		for modtmp in mods:
-			print(modtmp)
+			cprint(modtmp)
 			modtmp = modtmp[:-10]
 			modtmp = '"' + modtmp + '"'
-			print(modtmp)
+			cprint(modtmp)
 			mods[i] = modtmp
 			i += 1
-		print('{ "Mods":' + json.dumps(mods) + "}")
+		cprint('{ "Mods":' + json.dumps(mods) + "}")
 		f = open(filename + '.modlist', 'w')
 		f.write('{ "Mods":' + json.dumps(mods) + '}')
 		f.close()
-		print("Done! now in LocalData/Modlists.")
+		cprint("Done! now in LocalData/Modlists.")
 		os.chdir(execdir)
 	else:
 		return
@@ -47,16 +50,16 @@ def import_mods(path):
 		path = input("Please enter the path to the modlist.")
 
 	if(os.path.exists(path)):  # Telling user that file exists
-		print(path + " found.")
+		cprint(path + " found.")
 	else:
-		print(path + " not found.")
+		cprint(path + " not found.")
 		return
 
-	json_data = get_json(path)
+	json_data = json.load(path)
 
 	mods = []
 
 	mods = json_data["Mods"]
 	for mod in mods:
-			print(mod)
+			cprint(mod)
 			CMAN_install.install_mod(mod)
