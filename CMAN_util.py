@@ -343,7 +343,7 @@ def update_archive(start=False):
 		cprint("Done.")
 	except Exception as e:
 		cprint("Something went wrong while downloading the archive.")
-		cprint("Error: " + e)
+		cprint("Error: " + str(e))
 		if(gui and not start):
 			msgbox.showerror("Archive download failed", "Something went wrong while downloading the archive.", parent=tkinst)
 		if(start):
