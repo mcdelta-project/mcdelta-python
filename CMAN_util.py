@@ -1,4 +1,4 @@
-import urllib.request
+import requests
 import shutil
 import os
 import glob
@@ -35,14 +35,13 @@ def read_default_instance():
 	return default
 
 def check_for_updates():
-	with urllib.request.urlopen('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt') as response:
-		latestversion = response.read()
-		latestversion = latestversion.decode("utf-8").strip() #it is using a bytes string and printing the b prefix and newline
-		if (version != str(latestversion)):
-			#if (gui):
-			#	msgbox.askyesno("Update available", "You are running CMAN " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
-			#else:
-			cprint("!!Update Available! You are running CMAN " + version + ". The newest version is " + str(latestversion) + "!!")
+	response = requests.get('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt')
+	latestversion = response.text
+	if (version != str(latestversion)):
+		#if (gui):
+		#	msgbox.askyesno("Update available", "You are running CMAN " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
+		#else:
+		cprint("!!Update Available! You are running CMAN " + version + ". The newest version is " + str(latestversion) + "!!")
 
 def init_config_util(data): #data is a 5-tuple
 	global modfolder, versionsfolder, execdir, instance, gui  #makes it edit the global vars rather than create new ones
@@ -51,7 +50,7 @@ def init_config_util(data): #data is a 5-tuple
 def recieve_tkinst_util(data):
 	global tkinst
 	tkinst = data
-	
+
 def cprint(text): #outputs text to console pane in GUI if gui enabled, otherwise prints it
 	if (gui == True):
 		tkinst.console.config(state = tk.NORMAL)
@@ -133,7 +132,7 @@ def new_config(instance):
 			if(gui):
 				modfolder = filedialogs.askdirectory(parent=tkinst, title="Select Mod Folder")
 				versionsfolder = filedialogs.askdirectory(parent=tkinst, title="Select Versions Folder")
-			else:	
+			else:
 				modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 				if(modfolder == None):
 					return (-1, -1)
@@ -293,7 +292,7 @@ def mergedirs(dir1, dir2):
 	for file_ in files1: #file_ because file() is a builtin function
 		if(os.path.split(file_)[0] == ''): #if file_ == dir1
 			continue #skip it
-		if(not os.path.exists(os.path.split(switch_path_dir(file_, dir2))[0])): #if parent dir does not exist in dir2 
+		if(not os.path.exists(os.path.split(switch_path_dir(file_, dir2))[0])): #if parent dir does not exist in dir2
 			cprint(file_)
 			os.makedirs(os.path.split(switch_path_dir(file_, dir2))[0]) #make parent dir in dir2
 		if(os.path.isfile(file_)):
@@ -338,11 +337,13 @@ def update_archive(start=False):
 	cprint("Downloading Archive...")
 	# Download it.
 	try:
-		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-			shutil.copyfileobj(response, out_file)
+		with open(file_name, 'wb') as out_file:
+			response = requests.get('https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master')
+			out_file.write(response.content)
 		cprint("Done.")
-	except:
+	except Exception as e:
 		cprint("Something went wrong while downloading the archive.")
+		cprint("Error: " + e)
 		if(gui and not start):
 			msgbox.showerror("Archive download failed", "Something went wrong while downloading the archive.", parent=tkinst)
 		if(start):
@@ -371,9 +372,9 @@ def get_info_console(modname, output=False):
 	else:
 		if (json_data != None):
 			if(json_data["Unstable"] == "false"):
-				stable = "Stable" 
+				stable = "Stable"
 			else:
-				stable = "Unstable" 
+				stable = "Unstable"
 			istr.append(json_data["Name"]+":"+"\n\n")
 			istr.append("Version: "+json_data["Version"]+" ("+stable+")"+"\n\n")
 			istr.append("Author(s): "+json_data["Author"]+"\n\n")
@@ -405,9 +406,9 @@ def get_info(modname, output=True):
 	else:
 		if (json_data != None):
 			if(json_data["Unstable"] == "false"):
-				stable = "Stable" 
+				stable = "Stable"
 			else:
-				stable = "Unstable" 
+				stable = "Unstable"
 			istr = istr+json_data["Name"]+":"+"\n"
 			istr = istr+"\tVersion: "+json_data["Version"]+" ("+stable+")"+"\n"
 			istr = istr+"\tAuthor(s): "+json_data["Author"]+"\n"
