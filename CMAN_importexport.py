@@ -1,4 +1,3 @@
-import urllib.request
 import shutil
 import os
 import glob

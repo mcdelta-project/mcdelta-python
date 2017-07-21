@@ -1,4 +1,3 @@
-import urllib.request
 import shutil
 import os
 import glob
@@ -194,9 +193,9 @@ class Gui(tk.Frame):
         self.ccpane.pack(side = tk.BOTTOM)
 
         self.run = tk.Button(self.ccpane, text = "Run", command=runcmd)
-        self.run.pack(side = tk.RIGHT)  
+        self.run.pack(side = tk.RIGHT)
         self.cmdin = tk.Entry(self.ccpane, text = "", width = 150)
-        self.cmdin.pack(side = tk.RIGHT)        
+        self.cmdin.pack(side = tk.RIGHT)
 
         self.instmod = tk.Button(self.bpane, text = "Install Mods", command=instmods)
         self.instmod.pack()

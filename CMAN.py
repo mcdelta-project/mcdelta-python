@@ -1,4 +1,3 @@
-import urllib.request
 import shutil
 import os
 import glob
@@ -74,7 +73,7 @@ parser.add_argument("-r", "--remove", help="remove mod", metavar="MOD", default=
 parser.add_argument("-u", "--upgrade", help="upgrade mod", metavar="MOD", default="None")
 parser.add_argument("--info", help="give info about a mod", metavar="MOD", default="None")
 parser.add_argument("-e", "--export", help="export a modlist", metavar="FILENAME", default="None")
-parser.add_argument("--import", help="import a modlist", metavar="MODLIST", default="None", dest="importa")  # importa because import is already taken  
+parser.add_argument("--import", help="import a modlist", metavar="MODLIST", default="None", dest="importa")  # importa because import is already taken
 parser.add_argument("-I", "--instance", help="sets the Minecraft instance to install into", metavar="INSTANCE", default=instance)
 parser.add_argument("-g", "--gui", help="enable GUI", action="store_true")
 args = parser.parse_args()

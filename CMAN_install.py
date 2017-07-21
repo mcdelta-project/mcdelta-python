@@ -1,4 +1,4 @@
-import urllib.request
+import requests
 import shutil
 import os
 import glob
@@ -35,7 +35,6 @@ def install_mod(modname):
 		for file in glob.glob(modname + ".json"):
 			cprint(file + " found.")
 	else:
-		
 		cprint("Mod "+modname+" not found.")
 		return -1
 
@@ -53,11 +52,11 @@ def install_mod(modname):
 			pass
 		else:
 			cprint("Install canceled.")
-			return 
+			return
 	if (mod_installed(modname)):  # Making sure that the mod is not already installed
 		cprint(modname + " is already installed!")
 		return
- 
+
 	originalfile = execdir + "/Data/CMAN-Archive/" + modname + ".json"  # Saving Modname.json for future reference
 	if(not os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
 			os.mkdir(execdir + "/LocalData/ModsDownloaded/"+instance)
@@ -65,7 +64,7 @@ def install_mod(modname):
 	newfilename = modname + ".installed"
 	newfile = open(newfilename, 'w+')
 	shutil.copyfile(originalfile, newfilename)
- 
+
 	requirements = json_data["Requirements"]
 	for requirement in requirements:
 		if (os.path.exists(requirement + ".installed") == False):
@@ -104,8 +103,9 @@ def install_mod(modname):
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + "-CMANtemp.zip"
 		cprint("Downloading " + url)
-		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-			shutil.copyfileobj(response, out_file)
+		with open(file_name, 'wb') as out_file:
+			response = requests.get(url)
+			out_file.write(response.content)
 		zipfile.ZipFile(file_name).extractall(path="./"+modname)
 		vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
 		#cannot check for compatibility because you may be installing into a modded jar with a nonstandard name
@@ -148,8 +148,9 @@ def install_mod(modname):
 		file_name = modname + "-" + version + ".jar"
 		os.chdir(modfolder)
 		cprint("Downloading " + url + " as " + file_name)
-		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-			shutil.copyfileobj(response, out_file)
+		with open(file_name, 'wb') as out_file:
+			response = requests.get(url)
+			out_file.write(response.content)
 		cprint("Done.")
 
 	elif (modtype == "Liteloader"):
@@ -160,8 +161,9 @@ def install_mod(modname):
 		file_name = modname + "-" + version + ".litemod"
 		os.chdir(modfolder)
 		cprint("Downloading " + url + " as " + file_name)
-		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-			shutil.copyfileobj(response, out_file)
+		with open(file_name, 'wb') as out_file:
+			response = requests.get(url)
+			out_file.write(response.content)
 		cprint("Done.")
 
 	elif (modtype == "Installer"):
@@ -174,8 +176,9 @@ def install_mod(modname):
 		files = os.listdir(execdir)
 
 		cprint("Downloading " + url + " as " + file_name)
-		with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
-			shutil.copyfileobj(response, out_file)
+		with open(file_name, 'wb') as out_file:
+			response = requests.get(url)
+			out_file.write(response.content)
 		if(gui):
 			msgbox.showinfo("Installer Downloaded", "The installer for "+modname+" has been downloaded.\nRun the installer, then click OK to continue.", parent=tkinst)
 		cprint("Done. Please run the installer.")
