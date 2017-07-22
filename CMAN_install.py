@@ -100,7 +100,7 @@ def install_mod(modname, version = None):
 		os.chdir(execdir + "/Data/temp")
 		version = get_latest_version(mod_data)
 		mcversion = mod_data.Versions[3]
-		url = mod_data.link
+		url = get_url(mod_data, version)
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + "-CMANtemp.zip"
 		cprint("Downloading " + url)
@@ -144,7 +144,7 @@ def install_mod(modname, version = None):
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
 		version = get_latest_version(mod_data)
-		url = mod_data.link
+		url = get_url(mod_data, version)
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".jar"
 		os.chdir(modfolder)
@@ -157,7 +157,7 @@ def install_mod(modname, version = None):
 	elif (modtype == "Liteloader"):
 		os.chdir(execdir + "/LocalData")
 		version = get_latest_version(mod_data)
-		url = mod_data.link
+		url = get_url(mod_data, version)
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".litemod"
 		os.chdir(modfolder)
