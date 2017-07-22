@@ -24,6 +24,6 @@ class Mod:
         self.incompatibilities = incompat
         self.recommended = recmd
         self._type = _type
-        self.unstable = True if unstable == 'true' else False 
+        self.unstable = True if unstable == 'true' else False
         self.installer_name = instname
         self.versions = versions
