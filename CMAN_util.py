@@ -384,7 +384,10 @@ def update_archive(start=False):
 		mod_list.append(mod_item)
 		cprint(mod_item.name)
 		cprint(mod_item.versions)
+		cprint(mod_item.versions[0])
+		cprint(type(mod_item.versions[0]))
 		cprint(mod_item.unstable)
+		get_url(mod_item, '13.20.1.2421')
 
 	cprint("Done.")
 	if(gui and not start):
@@ -484,3 +487,16 @@ def get_mod_from_json(json_data):
 
 def get_mod_from_name(modname):
 	return get_mod_from_json(get_json(modname))
+
+def get_url(mod, version):
+	link = mod.link
+	version_number = 0
+	cprint(link)
+
+	for x in range(len(mod.versions)):
+		if (version == mod.versions[x]):
+			version_number = x
+			break
+
+	link = link.format(mod.versions[0]['Version'], mod.versions[0]['MCVersion'][0])
+	cprint(link)
