@@ -30,7 +30,7 @@ def recieve_tkinst_install(data):
 def install_mod(modname, version = None):
 	os.chdir(execdir + "/Data/CMAN-Archive")
 	if(modname == None):
-		modname = input("Enter mod name: ")
+		modname = cinput("Enter mod name: ")
 
 	if(os.path.exists(modname + ".json")):  # Telling user that file exists
 		for file in glob.glob(modname + ".json"):
@@ -108,26 +108,26 @@ def install_mod(modname, version = None):
 			response = requests.get(url)
 			out_file.write(response.content)
 		zipfile.ZipFile(file_name).extractall(path="./"+modname)
-		vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+		vname = cinput("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
 		#cannot check for compatibility because you may be installing into a modded jar with a nonstandard name
 		vpath = os.path.join(jarfolder, vname)
 		while(not os.path.exists(vpath)):
 			cprint("The instance you selected was not found. Select another instance.")
-			vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+			vname = cinput("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
 			vpath = os.path.join(jarfolder, vname)
 		jarname = vname+".jar"
 		jarpath = os.path.join(vpath, jarname)
 		foldername =  modname + "-" + version #the default version folder name
-		foldernamefinal = input("Enter install folder name or leave blank for default (default: "+foldername+"): ")
+		foldernamefinal = cinput("Enter install folder name or leave blank for default (default: "+foldername+"): ")
 		if(foldername == ""):
 			foldernamefinal = foldername
 		newjarname = foldername+".jar"
 		cprint("Installing on version "+vname+" as "+foldernamefinal+".")
 		if(os.path.exists(os.path.join(jarfolder, foldernamefinal))):
-			if(input("The folder "+foldernamefinal+" already exists. Type OK to overwrite, or anything else to choose a new name: ") == "OK"):
+			if(cinput("The folder "+foldernamefinal+" already exists. Type OK to overwrite, or anything else to choose a new name: ") == "OK"):
 				shutil.rmtree(os.path.join(jarfolder, foldernamefinal))
 			else:
-				foldernamefinal = input("Enter new install folder name (current name: "+foldernamefinal+"): ")
+				foldernamefinal = cinput("Enter new install folder name (current name: "+foldernamefinal+"): ")
 		folderpath = os.path.join(jarfolder, foldernamefinal)
 		shutil.copytree(vpath, folderpath)
 		fix_names(folderpath, vname, foldernamefinal)

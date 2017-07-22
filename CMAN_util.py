@@ -97,38 +97,39 @@ def read_config(instance):
 				modfolder = json_data[instance]["modfolder"] # If config exists, get modfolder and versions folder from that. Else, ask for it.
 			except(KeyError): #modfolder data missing
 				f = open("config.json", "w")
-				json_data[instance]["modfolder"] = input("Enter mod folder location for instance "+instance+" (absolute path): ")
+				json_data[instance]["modfolder"] = cinput("Enter mod folder location for instance "+instance+" (absolute path): ", "Mod folder for "+instance, 'path')
 				json.dump(json_data, f)
 				f.close()
 			try:
 				jarfolder = json_data[instance]["jarfolder"]
 			except(KeyError): #jarfolder data missing
 				f = open("config.json", "w")
-				json_data[instance]["jarfolder"] = input("Enter jar folder location for instance "+instance+" (absolute path): ")
+				json_data[instance]["jarfolder"] = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
 				json.dump(json_data, f)
 				f.close()
 			try:
 				mc_version = json_data[instance]["mc_version"]
 			except(KeyError): #mc version data missing
 				f = open("config.json", "w")
-				json_data[instance]["mc_version"] = input("Enter Minecraft version for instance "+instance+": ")
+				json_data[instance]["mc_version"] = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version:")
 				json.dump(json_data, f)
 				f.close()
 		else:
 			cprint("Config for instance "+instance+" is missing. Setting up config.")
-			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
-			jarfolder = input("Enter jar folder location for instance "+instance+" (absolute path): ")
-			mc_version = input("Enter Minecraft version for instance "+instance+": ")
+			modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ", "Mod folder for "+instance, 'path')
+			jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
+			mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version:")
 			f = open("config.json", 'w')
 			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
 			json.dump(json_data, f)
 			f.close()
 	else:
-		print("Config for instance "+instance+" is missing. Setting up config.")
-		modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
-		jarfolder = input("Enter jar folder location for instance "+instance+" (absolute path): ")
+		cprint("Config for instance "+instance+" is missing. Setting up config.")
+		modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ")
+		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ")
+		mc_version = cinput("Enter Minecraft version for instance "+instance+": ")
 		f = open("config.json", 'w')
-		json_data = {instance: {"modfolder": modfolder, "jarfolder": jarfolder}}
+		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
 		json.dump(json_data, f)
 		f.close()
 	return(modfolder, jarfolder)
@@ -140,22 +141,17 @@ def new_config(instance):
 		if(instance in json_data.keys()):
 			cprint("Instance "+instance+" already exists, cannot add it.")
 		else:
-			if(gui):
-				modfolder = filedialogs.askdirectory(parent=tkinst, title="Select Mod Folder")
-				jarfolder = filedialogs.askdirectory(parent=tkinst, title="Select Jar Folder")
-				mc_version = dialogs.askstring(parent=tkinst, title="Enter Minecraft Version")
-			else:
-				modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
-				if(modfolder == None):
-					return (-1, -1)
-				jarfolder = input("Enter jar folder location for instance "+instance+" (absolute path): ")
-				if(jarfolder == None):
-					return (-1, -1)
-				mc_version = input("Enter Minecraft version for instance "+instance+": ")
-			f = open(execdir+"/LocalData/config.json", 'w')
-			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version": mc_version}
-			json.dump(json_data, f)
-			f.close()
+			modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ")
+			if(modfolder == None):
+				return (-1, -1)
+				jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ")
+			if(jarfolder == None):
+				return (-1, -1)
+			mc_version = cinput("Enter Minecraft version for instance "+instance+": ")
+		f = open(execdir+"/LocalData/config.json", 'w')
+		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version": mc_version}
+		json.dump(json_data, f)
+		f.close()
 		cprint("Done.")
 		return(modfolder, jarfolder)
 
@@ -177,10 +173,7 @@ def rm_config(_instance):
 				json.dump(json_data, f)
 			cprint("Removed config data for instance "+_instance+".")
 			if(os.path.exists(os.path.join("ModsDownloaded", _instance))):
-				if(gui):
-					a = msgbox.askyesno("Delete installed mod listing", "Delete installed mod listing for instance "+_instance+"?\nType OK to delete.", parent=tkinst)
-				else:
-					a = input("Delete installed mod listing for instance "+_instance+"? Type OK to delete, or anything else to skip: ") == "OK"
+				a = cinput("Delete installed mod listing for instance "+_instance+"? Type OK to delete, or anything else to skip: ", "Delete installed mod listing for instance "+_instance+"?", 'bool') in ["OK", True]
 				if(a):
 					shutil.rmtree(os.path.join("ModsDownloaded", _instance))
 					cprint("Deleted installed mod listing.")
@@ -407,7 +400,7 @@ def get_info_console(modname, output=False):
 	istr = []
 	ostr = ""
 	if(modname == None):
-		modname = input("Enter mod name: ")
+		modname = cinput("Enter mod name: ")
 
 	mod_data = get_mod_from_name(modname)
 	if (mod_data != None):
@@ -435,7 +428,7 @@ def get_info_console(modname, output=False):
 def get_info(modname, output=True):
 	istr = ""
 	if(modname == None):
-		modname = input("Enter mod name: ")
+		modname = cinput("Enter mod name: ")
 
 	mod_data = get_mod_from_name(modname)
 	if (mod_data != None):
@@ -516,3 +509,14 @@ def get_url(mod, version):
 
 def get_latest_version(mod):
 	return mod.versions[0]['Version']
+
+def cinput(terminal_text, gui_text, input_type='text'):
+	if (gui):
+		if (input_type == 'text'):
+			return dialogs.askstring(parent=tkinst, title=gui_text)
+		elif (input_type == 'path'):
+			return filedialog.askdirectory(parent=tkinst, title=gui_text)
+		elif (input_type == 'boolean'):
+			return dialogs.askyesno(parent=tkinst, title=gui_text)
+
+	return input(terminal_text)
