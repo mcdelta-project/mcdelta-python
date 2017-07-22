@@ -14,7 +14,7 @@ import textwrap
 from modclass import Mod
 
 modfolder = "@ERROR@"
-versionsfolder = "@ERROR@"
+jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
@@ -47,8 +47,8 @@ def check_for_updates():
 		cprint("!!Update Available! You are running CMAN " + version + ". The newest version is " + str(latestversion) + "!!")
 
 def init_config_util(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui  #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, execdir, instance, gui  #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, execdir, instance, gui = data
 
 def recieve_tkinst_util(data):
 	global tkinst
@@ -101,29 +101,37 @@ def read_config(instance):
 				json.dump(json_data, f)
 				f.close()
 			try:
-				versionsfolder = json_data[instance]["versionsfolder"]
-			except(KeyError): #versionsfolder data missing
+				jarfolder = json_data[instance]["jarfolder"]
+			except(KeyError): #jarfolder data missing
 				f = open("config.json", "w")
-				son_data[instance]["versionsfolder"] = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+				json_data[instance]["jarfolder"] = input("Enter jar folder location for instance "+instance+" (absolute path): ")
+				json.dump(json_data, f)
+				f.close()
+			try:
+				mc_version = json_data[instance]["mc_version"]
+			except(KeyError): #mc version data missing
+				f = open("config.json", "w")
+				json_data[instance]["mc_version"] = input("Enter Minecraft version for instance "+instance+": ")
 				json.dump(json_data, f)
 				f.close()
 		else:
 			cprint("Config for instance "+instance+" is missing. Setting up config.")
 			modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
-			versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+			jarfolder = input("Enter jar folder location for instance "+instance+" (absolute path): ")
+			mc_version = input("Enter Minecraft version for instance "+instance+": ")
 			f = open("config.json", 'w')
-			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
+			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
 			json.dump(json_data, f)
 			f.close()
 	else:
 		print("Config for instance "+instance+" is missing. Setting up config.")
 		modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
-		versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
+		jarfolder = input("Enter jar folder location for instance "+instance+" (absolute path): ")
 		f = open("config.json", 'w')
-		json_data = {instance: {"modfolder": modfolder, "versionsfolder": versionsfolder}}
+		json_data = {instance: {"modfolder": modfolder, "jarfolder": jarfolder}}
 		json.dump(json_data, f)
 		f.close()
-	return(modfolder, versionsfolder)
+	return(modfolder, jarfolder)
 
 def new_config(instance):
 		with open(execdir+"/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
@@ -134,20 +142,22 @@ def new_config(instance):
 		else:
 			if(gui):
 				modfolder = filedialogs.askdirectory(parent=tkinst, title="Select Mod Folder")
-				versionsfolder = filedialogs.askdirectory(parent=tkinst, title="Select Versions Folder")
+				jarfolder = filedialogs.askdirectory(parent=tkinst, title="Select Jar Folder")
+				mc_version = dialogs.askstring(parent=tkinst, title="Enter Minecraft Version")
 			else:
 				modfolder = input("Enter mod folder location for instance "+instance+" (absolute path): ")
 				if(modfolder == None):
 					return (-1, -1)
-				versionsfolder = input("Enter versions folder location for instance "+instance+" (absolute path): ")
-			if(versionsfolder == None):
-				return (-1, -1)
+				jarfolder = input("Enter jar folder location for instance "+instance+" (absolute path): ")
+				if(jarfolder == None):
+					return (-1, -1)
+				mc_version = input("Enter Minecraft version for instance "+instance+": ")
 			f = open(execdir+"/LocalData/config.json", 'w')
-			json_data[instance] = {"modfolder": modfolder, "versionsfolder": versionsfolder}
+			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version": mc_version}
 			json.dump(json_data, f)
 			f.close()
 		cprint("Done.")
-		return(modfolder, versionsfolder)
+		return(modfolder, jarfolder)
 
 def rm_config(_instance):
 	if instance == _instance:

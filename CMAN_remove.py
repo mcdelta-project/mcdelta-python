@@ -10,14 +10,14 @@ import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
 modfolder = "@ERROR@"
-versionsfolder = "@ERROR@"
+jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
 
 def init_config_remove(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, execdir, instance, gui = data
 
 def recieve_tkinst_remove(data):
 	global tkinst

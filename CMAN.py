@@ -37,17 +37,17 @@ def read_default_instance():
 	return default
 
 def setup_config(_instance):
-    global modfolder, versionsfolder, instance, gui
+    global modfolder, jarfolder, instance, gui
     os.chdir(os.path.join(execdir, "LocalData"))
     instance = _instance
-    modfolder, versionsfolder = read_config(_instance)  # gets config stuff
+    modfolder, jarfolder = read_config(_instance)  # gets config stuff
     os.chdir(execdir)
-    init_config_util((modfolder, versionsfolder, execdir, instance, gui))  # transferring config data (and Tkinter instance) to all files
-    CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui))
-    CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui))
-    CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui))
-    CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui))
-    init_config_gui((modfolder, versionsfolder, execdir, instance, gui))
+    init_config_util((modfolder, jarfolder, execdir, instance, gui))  # transferring config data (and Tkinter instance) to all files
+    CMAN_install.init_config_install((modfolder, jarfolder, execdir, instance, gui))
+    CMAN_remove.init_config_remove((modfolder, jarfolder, execdir, instance, gui))
+    CMAN_upgrade.init_config_upgrade((modfolder, jarfolder, execdir, instance, gui))
+    CMAN_importexport.init_config_importexport((modfolder, jarfolder, execdir, instance, gui))
+    init_config_gui((modfolder, jarfolder, execdir, instance, gui))
 
 
 def transfer_tkinst():

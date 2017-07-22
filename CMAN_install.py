@@ -13,14 +13,14 @@ import tkinter.simpledialog as dialogs
 from modclass import Mod
 
 modfolder = "@ERROR@"
-versionsfolder = "@ERROR@"
+jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
 
 def init_config_install(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, execdir, instance, gui = data
 
 def recieve_tkinst_install(data):
 	global tkinst
@@ -110,11 +110,11 @@ def install_mod(modname, version = None):
 		zipfile.ZipFile(file_name).extractall(path="./"+modname)
 		vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
 		#cannot check for compatibility because you may be installing into a modded jar with a nonstandard name
-		vpath = os.path.join(versionsfolder, vname)
+		vpath = os.path.join(jarfolder, vname)
 		while(not os.path.exists(vpath)):
 			cprint("The instance you selected was not found. Select another instance.")
 			vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
-			vpath = os.path.join(versionsfolder, vname)
+			vpath = os.path.join(jarfolder, vname)
 		jarname = vname+".jar"
 		jarpath = os.path.join(vpath, jarname)
 		foldername =  modname + "-" + version #the default version folder name
@@ -123,15 +123,15 @@ def install_mod(modname, version = None):
 			foldernamefinal = foldername
 		newjarname = foldername+".jar"
 		cprint("Installing on version "+vname+" as "+foldernamefinal+".")
-		if(os.path.exists(os.path.join(versionsfolder, foldernamefinal))):
+		if(os.path.exists(os.path.join(jarfolder, foldernamefinal))):
 			if(input("The folder "+foldernamefinal+" already exists. Type OK to overwrite, or anything else to choose a new name: ") == "OK"):
-				shutil.rmtree(os.path.join(versionsfolder, foldernamefinal))
+				shutil.rmtree(os.path.join(jarfolder, foldernamefinal))
 			else:
 				foldernamefinal = input("Enter new install folder name (current name: "+foldernamefinal+"): ")
-		folderpath = os.path.join(versionsfolder, foldernamefinal)
+		folderpath = os.path.join(jarfolder, foldernamefinal)
 		shutil.copytree(vpath, folderpath)
 		fix_names(folderpath, vname, foldernamefinal)
-		zipfile.ZipFile(os.path.join(versionsfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"CMANtemp")
+		zipfile.ZipFile(os.path.join(jarfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"CMANtemp")
 		mergedirs(modname, file_name+"CMANtemp")
 		os.chdir(file_name+"CMANtemp")
 		shutil.rmtree("META-INF") #delete META-INF

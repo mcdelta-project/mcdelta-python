@@ -8,13 +8,13 @@ import zipfile
 from CMAN_util import *
 
 modfolder = "@ERROR@"
-versionsfolder = "@ERROR@"
+jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 
 def init_config_importexport(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, execdir, instance, gui = data
 
 def recieve_tkinst_importexport(data):
 	global tkinst
