@@ -22,7 +22,7 @@ def recieve_tkinst_importexport(data):
 
 def export_mods(filename):
 	if (filename == None):
-		filename = input("What would you like your new modlist to be called?")
+		filename = cinput("What would you like your new modlist to be called?")
 	os.chdir(execdir)
 	os.chdir("LocalData/Modlists")
 	mods = []
@@ -47,7 +47,7 @@ def export_mods(filename):
 
 def import_mods(path):
 	if (path == None):
-		path = input("Please enter the path to the modlist.")
+		path = cinput("Please enter the path to the modlist.")
 
 	if(os.path.exists(path)):  # Telling user that file exists
 		cprint(path + " found.")

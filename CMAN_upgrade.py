@@ -27,7 +27,7 @@ def recieve_tkinst_upgrade(data):
 def upgrade_mod(modname):
 	os.chdir(execdir + "/Data/CMAN-Archive")
 	if(modname == None):
-		modname = input("Enter mod name: ")
+		modname = cinput("Enter mod name: ")
 	update = [get_installed_json(modname),get_json(modname)]
 	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded/"+instance, modname + ".installed"))):  # Telling user that file exists
 		for file in glob.glob(modname + ".installed"):

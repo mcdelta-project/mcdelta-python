@@ -25,7 +25,7 @@ def recieve_tkinst_remove(data):
 
 def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
 	if(modname == None):
-		modname = input("Enter mod name: ")
+		modname = cinput("Enter mod name: ")
 	cprint("Removing file for mod in ModsDownloaded")
 	try:
 		os.remove(execdir + "/LocalData/ModsDownloaded/"+instance+"/"+modname+".installed") #removing json in ModsDownloaded dir
