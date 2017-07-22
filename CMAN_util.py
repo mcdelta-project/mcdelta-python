@@ -403,13 +403,13 @@ def get_info_console(modname, output=False):
 	if (mod_data != None):
 		stable = "Unstable" if mod_data.unstable else "Stable"
 		istr.append(mod_data.name+":"+"\n\n")
-		istr.append("Version: "+mod_data.Version+" ("+stable+")"+"\n\n")
-		istr.append("Author(s): "+mod_data.Author+"\n\n")
-		istr.append("Description: "+mod_data.Desc+"\n\n")
-		istr.append("Requirements: "+str(mod_data.Requirements)+"\n\n")
-		istr.append("Known Incompatibilities: "+str(mod_data.Incompatibilities)+"\n\n")
-		istr.append("Download Link: "+str(mod_data.Link)+"\n\n")
-		istr.append("License: "+mod_data.License)
+		istr.append("Latest Version: "+get_latest_version(mod_data)+" ("+stable+")"+"\n\n")
+		istr.append("Author(s): "+mod_data.author+"\n\n")
+		istr.append("Description: "+mod_data.desc+"\n\n")
+		istr.append("Requirements: "+str(mod_data.requirements)+"\n\n")
+		istr.append("Known Incompatibilities: "+str(mod_data.incompatibilities)+"\n\n")
+		istr.append("Download Link: "+get_url(mod_data, version)+"\n\n")
+		istr.append("License: "+mod_data.license)
 	else:
 		istr.append("Mod "+modname+" not found.")
 	if(output):
@@ -431,13 +431,13 @@ def get_info(modname, output=True):
 	if (mod_data != None):
 		stable = "Unstable" if mod_data.unstable else "Stable"
 		istr.append(mod_data.name+":"+"\n\n")
-		istr.append("Version: "+mod_data.Version+" ("+stable+")"+"\n\n")
+		istr.append("Latest Version: "+get_latest_version(mod_data)+" ("+stable+")"+"\n\n")
 		istr.append("Author(s): "+mod_data.author+"\n\n")
-		istr.append("Description: "+mod_data.Desc+"\n\n")
-		istr.append("Requirements: "+str(mod_data.Requirements)+"\n\n")
-		istr.append("Known Incompatibilities: "+str(mod_data.Incompatibilities)+"\n\n")
-		istr.append("Download Link: "+str(mod_data.Link)+"\n\n")
-		istr.append("License: "+mod_data.License)
+		istr.append("Description: "+mod_data.desc+"\n\n")
+		istr.append("Requirements: "+str(mod_data.requirements)+"\n\n")
+		istr.append("Known Incompatibilities: "+str(mod_data.incompatibilities)+"\n\n")
+		istr.append("Download Link: "+get_url(mod_data, version)+"\n\n")
+		istr.append("License: "+mod_data.license)
 	else:
 		istr.append("Mod "+modname+" not found.")
 		if(output):
