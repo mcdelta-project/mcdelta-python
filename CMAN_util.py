@@ -11,6 +11,7 @@ import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
 import tkinter.filedialog as filedialogs
 import textwrap
+from modclass import Mod
 
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
@@ -338,7 +339,7 @@ def update_archive(start=False):
 	# Download it.
 	try:
 		with open(file_name, 'wb') as out_file:
-			response = requests.get('https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master')
+			response = requests.get('https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/new-syntax')
 			out_file.write(response.content)
 		cprint("Done.")
 	except Exception as e:
@@ -356,6 +357,22 @@ def update_archive(start=False):
 	tar.extractall()
 	tarlist = tar.getnames()
 	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
+	cprint("Converting to Mod objects")
+	for json_item in get_all_jsons():
+		if (json_item["Type"] == "Installer"):
+			mod_item = Mod(json_item["Name"], json_item["Link"], json_item["Author"],
+			json_item["Desc"], json_item["License"], json_item["Requirements"],
+			json_item["Incompatibilities"], json_item["Recommended"], json_item["Type"],
+			json_item["Unstable"], json_item["Versions"], json_item["InstallerName"])
+		else:
+			mod_item = Mod(json_item["Name"], json_item["Link"], json_item["Author"],
+			json_item["Desc"], json_item["License"], json_item["Requirements"],
+			json_item["Incompatibilities"], json_item["Recommended"], json_item["Type"],
+			json_item["Unstable"], json_item["Versions"])
+
+		cprint(mod_item.name)
+		cprint(mod_item.versions)
+
 	cprint("Done.")
 	if(gui and not start):
 		msgbox.showinfo("Archive updated", "The CMAN archive has been successfully updated.", parent=tkinst)
