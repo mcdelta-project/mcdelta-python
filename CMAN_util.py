@@ -494,9 +494,11 @@ def get_url(mod, version):
 	cprint(link)
 
 	for x in range(len(mod.versions)):
-		if (version == mod.versions[x]):
+		cprint(mod.versions[x]['Version'])
+		cprint(version)
+		if (version == mod.versions[x]['Version']):
 			version_number = x
 			break
-
+	cprint(x)
 	link = link.format(mod.versions[x]['Version'], mod.versions[x]['MCVersion'][0])
 	cprint(link)
