@@ -498,5 +498,5 @@ def get_url(mod, version):
 			version_number = x
 			break
 
-	link = link.format(mod.versions[0]['Version'], mod.versions[0]['MCVersion'][0])
+	link = link.format(mod.versions[x]['Version'], mod.versions[x]['MCVersion'][0])
 	cprint(link)
