@@ -56,12 +56,12 @@ def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in w
 
 def get_upgrade_names(inst = None): #returns a list of mod names
 	updates = []
-	mods = get_installed_jsons(inst)
+	mods = get_installed_mods(inst)
 	for mod in mods:
 		if(mod != None):
-			json_data = get_json(mod["Name"])
-			if(json_data != None and json_data["Version"] != mod["Version"]):
-				updates.append(mod["Name"]) #append mod name
+			mod_data = get_mod_from_name(mod.name)
+			if(mod_data != None and get_latest_version(mod_data) != get_latest_version(mod)):
+				updates.append(mod_data.name) #append mod name
 	return(updates)
 
 def check_upgrades(full, inst = None): #full is a flag for whether to print full list of updates or just updates available message
