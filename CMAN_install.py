@@ -10,6 +10,7 @@ from CMAN_util import *
 import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
+from modclass import Mod
 
 modfolder = "@ERROR@"
 versionsfolder = "@ERROR@"
@@ -26,7 +27,7 @@ def recieve_tkinst_install(data):
 	tkinst = data
 
 
-def install_mod(modname):
+def install_mod(modname, version = None):
 	os.chdir(execdir + "/Data/CMAN-Archive")
 	if(modname == None):
 		modname = input("Enter mod name: ")
@@ -38,11 +39,11 @@ def install_mod(modname):
 		cprint("Mod "+modname+" not found.")
 		return -1
 
-	json_data = get_json(modname)
+	mod_data = get_mod_from_name(modname)
 
 	# Install
-	modtype = json_data["Type"] # Work out which type of mod it is
-	IsUnstable = json.loads(json_data["Unstable"])
+	modtype = mod_data._type # Work out which type of mod it is
+	IsUnstable = mod_data.unstable
 	if (IsUnstable == True):
 		if not gui:
 			a = input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"
@@ -65,7 +66,7 @@ def install_mod(modname):
 	newfile = open(newfilename, 'w+')
 	shutil.copyfile(originalfile, newfilename)
 
-	requirements = json_data["Requirements"]
+	requirements = mod_data.requirements
 	for requirement in requirements:
 		if (os.path.exists(requirement + ".installed") == False):
 			cprint("You must install " + requirement + " first!")
@@ -78,8 +79,8 @@ def install_mod(modname):
 			elif(not wanttoinstall):
 				msgbox.showerror("Installation Canceled", "The installation has been canceled due to required mod "+requirement+" not being installed.", parent=tkinst)
 				return -1
-	recommendations = json_data["Recommended"]
-	for recommendation in recommendations:
+	recommended = mod_data.recommended
+	for recommendation in recommended:
 		if (os.path.exists(recommendation + ".installed") == False):
 			cprint("This mod recommends " + recommendation + "!")
 			if not gui:
@@ -90,16 +91,15 @@ def install_mod(modname):
 				install_mod(recommendation)
 			elif(not wanttoinstall):
 				pass
-	incompatibilities = json_data["Incompatibilities"]
+	incompatibilities = mod_data.incompatibilities
 	for incompatibility in incompatibilities:
 		if (os.path.exists(incompatibility + ".installed") == True):
 			msgbox.showerror("Installation Canceled", "The installation has been canceled due to incompatible mod "+incompatibility+" being installed.", parent=tkinst)
 			return -1
 	if (modtype == "Basemod"):
 		os.chdir(execdir + "/Data/temp")
-		url = json_data["Link"]
-		version = json_data["Version"]
-		mcversions = json_data["MCVersion"]
+		url = mod_data.link
+		mcversions = mod_data.Versions[3]
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + "-CMANtemp.zip"
 		cprint("Downloading " + url)
@@ -142,8 +142,8 @@ def install_mod(modname):
 
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
-		url = json_data["Link"]
-		version = json_data["Version"]
+		url = mod_data.link
+		version = mod_data.version
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".jar"
 		os.chdir(modfolder)
@@ -155,8 +155,8 @@ def install_mod(modname):
 
 	elif (modtype == "Liteloader"):
 		os.chdir(execdir + "/LocalData")
-		url = json_data["Link"]
-		version = json_data["Version"]
+		url = mod_data.link
+		version = mod_data.version
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".litemod"
 		os.chdir(modfolder)
@@ -168,10 +168,10 @@ def install_mod(modname):
 
 	elif (modtype == "Installer"):
 		os.chdir(execdir + "/LocalData")
-		url = json_data["Link"]
-		version = json_data["Version"]
+		url = mod_data.link
+		version = mod_data.version
 		cprint(modname + " is at version " + version)
-		file_name = json_data["InstallerName"]
+		file_name = mod_data.installer_name
 		os.chdir(execdir)
 		files = os.listdir(execdir)
 
