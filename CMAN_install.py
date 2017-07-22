@@ -98,8 +98,9 @@ def install_mod(modname, version = None):
 			return -1
 	if (modtype == "Basemod"):
 		os.chdir(execdir + "/Data/temp")
+		version = get_latest_version(mod_data)
+		mcversion = mod_data.Versions[3]
 		url = mod_data.link
-		mcversions = mod_data.Versions[3]
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + "-CMANtemp.zip"
 		cprint("Downloading " + url)
@@ -142,8 +143,8 @@ def install_mod(modname, version = None):
 
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
+		version = get_latest_version(mod_data)
 		url = mod_data.link
-		version = mod_data.version
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".jar"
 		os.chdir(modfolder)
@@ -155,8 +156,8 @@ def install_mod(modname, version = None):
 
 	elif (modtype == "Liteloader"):
 		os.chdir(execdir + "/LocalData")
+		version = get_latest_version(mod_data)
 		url = mod_data.link
-		version = mod_data.version
 		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".litemod"
 		os.chdir(modfolder)
@@ -168,8 +169,8 @@ def install_mod(modname, version = None):
 
 	elif (modtype == "Installer"):
 		os.chdir(execdir + "/LocalData")
-		url = mod_data.link
-		version = mod_data.version
+		version = get_latest_version(mod_data)
+		url = get_url(mod_data, version)
 		cprint(modname + " is at version " + version)
 		file_name = mod_data.installer_name
 		os.chdir(execdir)
@@ -182,7 +183,8 @@ def install_mod(modname, version = None):
 		if(gui):
 			msgbox.showinfo("Installer Downloaded", "The installer for "+modname+" has been downloaded.\nRun the installer, then click OK to continue.", parent=tkinst)
 		cprint("Done. Please run the installer.")
-	tkinst.mlisti.insert(tk.END, modname)
+		if (gui):
+			tkinst.mlisti.insert(tk.END, modname)
 	return 0
 
 def install_deps(modname):

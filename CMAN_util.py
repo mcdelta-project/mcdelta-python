@@ -502,3 +502,7 @@ def get_url(mod, version):
 	cprint(x)
 	link = link.format(mod.versions[x]['Version'], mod.versions[x]['MCVersion'][0])
 	cprint(link)
+	return link
+
+def get_latest_version(mod):
+	return mod.versions[0]['Version']

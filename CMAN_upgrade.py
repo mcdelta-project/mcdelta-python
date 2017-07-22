@@ -50,7 +50,7 @@ def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in w
 	for mod in mods:
 		if(mod != None):
 			mod_data = get_mod_from_name(mod.name)
-			if(mod_data != None and mod_data.version != mod.version):
+			if(mod_data != None and get_latest_version(mod_data) != get_latest_version(mod)):
 				updates.append([mod,mod_data]) #append list of jsons for installed version and newest version
 	return(updates)
 
