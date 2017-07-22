@@ -46,12 +46,12 @@ def upgrade_mod(modname):
 
 def get_upgrades(inst = None): #returns a list of 2-element lists of jsons (in which index 0 is the version you have and index 1 is the newest version)
 	updates = []
-	mods = get_installed_jsons(inst)
+	mods = get_installed_mods(inst)
 	for mod in mods:
 		if(mod != None):
-			json_data = get_json(mod["Name"])
-			if(json_data != None and json_data["Version"] != mod["Version"]):
-				updates.append([mod,json_data]) #append list of jsons for installed version and newest version
+			mod_data = get_mod_from_name(mod.name)
+			if(mod_data != None and mod_data.version != mod.version):
+				updates.append([mod,mod_data]) #append list of jsons for installed version and newest version
 	return(updates)
 
 def get_upgrade_names(inst = None): #returns a list of mod names

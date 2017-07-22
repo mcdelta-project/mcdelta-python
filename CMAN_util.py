@@ -19,6 +19,8 @@ execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
 
+mod_list = []
+
 version = "2.1.0"
 
 def read_default_instance():
@@ -251,6 +253,26 @@ def get_installed_jsons(inst = None, allinst=True):
 				jsons.append(json_data)
 	return(jsons)
 
+def get_installed_mods(inst = None, allinst=True):
+	mods = []
+	if(inst == None and allinst):
+		with open(execdir + "/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
+			json_data = json.load(json_file)
+			json_file.close()
+		insts = json_data.keys()
+	elif(inst == None and not allinst):
+		insts = [instance]
+	else:
+		insts = [inst]
+	for inst in insts:
+		if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+inst)):
+			_mods = os.listdir(execdir + "/LocalData/ModsDownloaded/"+inst)
+			os.chdir(execdir + "/LocalData/ModsDownloaded/"+inst)
+			for _mod in _mods:
+				json_data = get_installed_json(_mod[:-10]) #[:-10] cuts off the .installed extension
+				mods.append(get_mod_from_json(json_data))
+	return(mods)
+
 
 def get_all_jsons():
 	jsons = []
@@ -323,9 +345,8 @@ def display_versions(versions): #just makes the version list into a nicer string
 	return(versionstr[:-2]) #cuts off the extra ", " at the end
 
 def get_deps(modname):
-	json_data = get_json(modname)
-	deps = json_data["Requirements"]
-	return(deps)
+	mod = get_mod(modname)
+	return(mod.requirements)
 
 def update_archive(start=False):
 	#Delete old archive
@@ -358,20 +379,12 @@ def update_archive(start=False):
 	tarlist = tar.getnames()
 	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
 	cprint("Converting to Mod objects")
-	for json_item in get_all_jsons():
-		if (json_item["Type"] == "Installer"):
-			mod_item = Mod(json_item["Name"], json_item["Link"], json_item["Author"],
-			json_item["Desc"], json_item["License"], json_item["Requirements"],
-			json_item["Incompatibilities"], json_item["Recommended"], json_item["Type"],
-			json_item["Unstable"], json_item["Versions"], json_item["InstallerName"])
-		else:
-			mod_item = Mod(json_item["Name"], json_item["Link"], json_item["Author"],
-			json_item["Desc"], json_item["License"], json_item["Requirements"],
-			json_item["Incompatibilities"], json_item["Recommended"], json_item["Type"],
-			json_item["Unstable"], json_item["Versions"])
-
+	for json_data in get_all_jsons():
+		mod_item = get_mod_from_json(json_data)
+		mod_list.append(mod_item)
 		cprint(mod_item.name)
 		cprint(mod_item.versions)
+		cprint(mod_item.unstable)
 
 	cprint("Done.")
 	if(gui and not start):
@@ -383,33 +396,27 @@ def get_info_console(modname, output=False):
 	if(modname == None):
 		modname = input("Enter mod name: ")
 
-	json_data = get_json(modname)
-	if(json_data == -1):
-		return
+	mod_data = get_mod_from_name(modname)
+	if (mod_data != None):
+		stable = "Unstable" if mod_data.unstable else "Stable"
+		istr.append(mod_data.name+":"+"\n\n")
+		istr.append("Version: "+mod_data.Version+" ("+stable+")"+"\n\n")
+		istr.append("Author(s): "+mod_data.Author+"\n\n")
+		istr.append("Description: "+mod_data.Desc+"\n\n")
+		istr.append("Requirements: "+str(mod_data.Requirements)+"\n\n")
+		istr.append("Known Incompatibilities: "+str(mod_data.Incompatibilities)+"\n\n")
+		istr.append("Download Link: "+str(mod_data.Link)+"\n\n")
+		istr.append("License: "+mod_data.License)
 	else:
-		if (json_data != None):
-			if(json_data["Unstable"] == "false"):
-				stable = "Stable"
-			else:
-				stable = "Unstable"
-			istr.append(json_data["Name"]+":"+"\n\n")
-			istr.append("Version: "+json_data["Version"]+" ("+stable+")"+"\n\n")
-			istr.append("Author(s): "+json_data["Author"]+"\n\n")
-			istr.append("Description: "+json_data["Desc"]+"\n\n")
-			istr.append("Requirements: "+str(json_data["Requirements"])+"\n\n")
-			istr.append("Known Incompatibilities: "+str(json_data["Incompatibilities"])+"\n\n")
-			istr.append("Download Link: "+str(json_data["Link"])+"\n\n")
-			istr.append("License: "+json_data["License"])
-		else:
-			istr.append("Mod "+modname+" not found.")
-		if(output):
-			cprint(istr)
-		else:
-			for _istr in istr:
-				_istr = textwrap.fill(_istr, 46)
-				ostr = ostr+_istr+"\n\n"
-			#print(textwrap.fill(istr, 46).replace("  *", "\n\n"))
-			return(ostr)
+		istr.append("Mod "+modname+" not found.")
+	if(output):
+		cprint(istr)
+	else:
+		for _istr in istr:
+			_istr = textwrap.fill(_istr, 46)
+			ostr = ostr+_istr+"\n\n"
+		#print(textwrap.fill(istr, 46).replace("  *", "\n\n"))
+		return(ostr)
 
 
 def get_info(modname, output=True):
@@ -417,25 +424,19 @@ def get_info(modname, output=True):
 	if(modname == None):
 		modname = input("Enter mod name: ")
 
-	json_data = get_json(modname)
-	if(json_data == -1):
-		return
+	mod_data = get_mod_from_name(modname)
+	if (mod_data != None):
+		stable = "Unstable" if mod_data.unstable else "Stable"
+		istr.append(mod_data.name+":"+"\n\n")
+		istr.append("Version: "+mod_data.Version+" ("+stable+")"+"\n\n")
+		istr.append("Author(s): "+mod_data.author+"\n\n")
+		istr.append("Description: "+mod_data.Desc+"\n\n")
+		istr.append("Requirements: "+str(mod_data.Requirements)+"\n\n")
+		istr.append("Known Incompatibilities: "+str(mod_data.Incompatibilities)+"\n\n")
+		istr.append("Download Link: "+str(mod_data.Link)+"\n\n")
+		istr.append("License: "+mod_data.License)
 	else:
-		if (json_data != None):
-			if(json_data["Unstable"] == "false"):
-				stable = "Stable"
-			else:
-				stable = "Unstable"
-			istr = istr+json_data["Name"]+":"+"\n"
-			istr = istr+"\tVersion: "+json_data["Version"]+" ("+stable+")"+"\n"
-			istr = istr+"\tAuthor(s): "+json_data["Author"]+"\n"
-			istr = istr+"\tDescription: "+json_data["Desc"]+"\n"
-			istr = istr+"\tRequirements: "+str(json_data["Requirements"])+"\n"
-			istr = istr+"\tKnown Incompatibilities: "+str(json_data["Incompatibilities"])+"\n"
-			istr = istr+"\tDownload Link: "+str(json_data["Link"])+"\n"
-			istr = istr+"\tLicense: "+json_data["License"]
-		else:
-			istr = istr+"Mod "+modname+" not found."
+		istr.append("Mod "+modname+" not found.")
 		if(output):
 			cprint(istr)
 		else:
@@ -465,3 +466,21 @@ def print_help():
 	cprint(" rminst 'inst': removes the Minecraft instance 'inst'")
 	cprint(" insts: lists all Minecraft instances")
 	cprint(" exit: exit CMAN")
+
+
+def get_mod_from_json(json_data):
+	if (json_data["Type"] == "Installer"):
+		mod = Mod(json_data["Name"], json_data["Link"], json_data["Author"],
+		json_data["Desc"], json_data["License"], json_data["Requirements"],
+		json_data["Incompatibilities"], json_data["Recommended"], json_data["Type"],
+		json_data["Unstable"], json_data["Versions"], json_data["InstallerName"])
+	else:
+		mod = Mod(json_data["Name"], json_data["Link"], json_data["Author"],
+		json_data["Desc"], json_data["License"], json_data["Requirements"],
+		json_data["Incompatibilities"], json_data["Recommended"], json_data["Type"],
+		json_data["Unstable"], json_data["Versions"])
+	return mod
+
+
+def get_mod_from_name(modname):
+	return get_mod_from_json(get_json(modname))
