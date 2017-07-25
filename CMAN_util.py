@@ -134,7 +134,7 @@ def read_config(instance):
 		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
 		mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version")
 		f = open("config.json", 'w')
-		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
+		json_data = {instance: {"modfolder": modfolder, "jarfolder": jarfolder}}
 		json.dump(json_data, f)
 		f.close()
 	return(modfolder, jarfolder)
