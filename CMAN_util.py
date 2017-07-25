@@ -18,6 +18,7 @@ jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
+gui = False
 
 mod_list = []
 
@@ -124,6 +125,7 @@ def read_config(instance):
 			json.dump(json_data, f)
 			f.close()
 	else:
+		json_data = {}
 		cprint("Config for instance "+instance+" is missing. Setting up config.")
 		modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ")
 		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ")
@@ -510,13 +512,15 @@ def get_url(mod, version):
 def get_latest_version(mod):
 	return mod.versions[0]['Version']
 
-def cinput(terminal_text, gui_text, input_type='text'):
+def cinput(terminal_text, gui_text=None, title="CMAN", input_type='text'):
+	if gui_text == None:
+		gui_text = terminal_text
 	if (gui):
 		if (input_type == 'text'):
-			return dialogs.askstring(parent=tkinst, title=gui_text)
+			return dialogs.askstring(parent=tkinst, prompt=gui_text, title=title)
 		elif (input_type == 'path'):
-			return filedialog.askdirectory(parent=tkinst, title=gui_text)
+			return filedialog.askdirectory(parent=tkinst, prompt=gui_text, title=title)
 		elif (input_type == 'boolean'):
-			return dialogs.askyesno(parent=tkinst, title=gui_text)
+			return dialogs.askyesno(parent=tkinst, prompt=gui_text, title=title)
 
 	return input(terminal_text)
