@@ -42,7 +42,7 @@ def install_mod(modname, version = None):
 	mod_data = get_mod_from_name(modname)
 
 	if (version == None):
-		version = get_latest_version(mod_data)
+		version = get_latest_compatible_version(mod_data)
 
 	version_number = 0
 	for x in range(len(mod_data.versions)):

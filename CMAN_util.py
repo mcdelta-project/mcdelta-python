@@ -515,6 +515,11 @@ def get_url(mod, version):
 def get_latest_version(mod):
 	return mod.versions[0]['Version']
 
+def get_latest_compatible_version(mod):
+	for mod_version in mod.versions:
+		if (mc_version in mod_version['MCVersion']):
+			return mod_version['Version']
+
 def cinput(terminal_text, gui_text, input_type='text'):
 	try:
 		gui
