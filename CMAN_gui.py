@@ -23,8 +23,8 @@ instance = "@ERROR@"
 tkinst = None
 
 def init_config_gui(data): #data is a 5-tuple
-    global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-    modfolder, jarfolder, execdir, instance, gui = data
+    global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+    modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_gui(data):
     global tkinst
@@ -34,14 +34,14 @@ def gui_setup_config(_instance):
     global modfolder, jarfolder, instance, gui
     os.chdir(os.path.join(execdir, "LocalData"))
     instance = _instance
-    modfolder, jarfolder = read_config(_instance) #gets config stuff
+    modfolder, jarfolder, mc_version = read_config(_instance) #gets config stuff
     os.chdir(execdir)
-    init_config_util((modfolder, jarfolder, execdir, instance, gui)) #transferring config data (and Tkinter instance) to all files
-    CMAN_install.init_config_install((modfolder, jarfolder, execdir, instance, gui))
-    CMAN_remove.init_config_remove((modfolder, jarfolder, execdir, instance, gui))
-    CMAN_upgrade.init_config_upgrade((modfolder, jarfolder, execdir, instance, gui))
-    CMAN_importexport.init_config_importexport((modfolder, jarfolder, execdir, instance, gui))
-    init_config_gui((modfolder, jarfolder, execdir, instance, gui))
+    init_config_util((modfolder, jarfolder, mc_version, execdir, instance, gui)) #transferring config data (and Tkinter instance) to all files
+    CMAN_install.init_config_install((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    CMAN_remove.init_config_remove((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    CMAN_upgrade.init_config_upgrade((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    CMAN_importexport.init_config_importexport((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    init_config_gui((modfolder, jarfolder, mc_version, execdir, instance, gui))
 
 
 #Callbacks

@@ -19,8 +19,8 @@ instance = "@ERROR@"
 tkinst = None
 
 def init_config_install(data): #data is a 5-tuple
-	global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, jarfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_install(data):
 	global tkinst
@@ -40,6 +40,17 @@ def install_mod(modname, version = None):
 		return -1
 
 	mod_data = get_mod_from_name(modname)
+
+	if (version == None):
+		version = get_latest_compatible_version(mod_data)
+
+	version_number = 0
+	for x in range(len(mod_data.versions)):
+		cprint(mod_data.versions[x]['Version'])
+		cprint(version)
+		if (version == mod_data.versions[x]['Version']):
+			version_number = x
+			break
 
 	# Install
 	modtype = mod_data._type # Work out which type of mod it is
@@ -96,12 +107,14 @@ def install_mod(modname, version = None):
 		if (os.path.exists(incompatibility + ".installed") == True):
 			msgbox.showerror("Installation Canceled", "The installation has been canceled due to incompatible mod "+incompatibility+" being installed.", parent=tkinst)
 			return -1
+	mod_mc_versions = mod_data.versions[version_number]['MCVersion']
+	if (mc_version not in mod_mc_versions):
+		cprint("Mod not compatible with current Minecraft Version!")
+		return
+	url = get_url(mod_data, version)
+	cprint(modname + " is at version " + version)
 	if (modtype == "Basemod"):
 		os.chdir(execdir + "/Data/temp")
-		version = get_latest_version(mod_data)
-		mcversion = mod_data.Versions[3]
-		url = get_url(mod_data, version)
-		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + "-CMANtemp.zip"
 		cprint("Downloading " + url)
 		with open(file_name, 'wb') as out_file:
@@ -143,10 +156,6 @@ def install_mod(modname, version = None):
 
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
-		version = get_latest_version(mod_data)
-		url = get_url(mod_data, version)
-		cprint(modname + " is at version " + version)
-		file_name = modname + "-" + version + ".jar"
 		os.chdir(modfolder)
 		cprint("Downloading " + url + " as " + file_name)
 		with open(file_name, 'wb') as out_file:
@@ -156,9 +165,6 @@ def install_mod(modname, version = None):
 
 	elif (modtype == "Liteloader"):
 		os.chdir(execdir + "/LocalData")
-		version = get_latest_version(mod_data)
-		url = get_url(mod_data, version)
-		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".litemod"
 		os.chdir(modfolder)
 		cprint("Downloading " + url + " as " + file_name)

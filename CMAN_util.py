@@ -49,8 +49,8 @@ def check_for_updates():
 		cprint("!!Update Available! You are running CMAN " + version + ". The newest version is " + str(latestversion) + "!!")
 
 def init_config_util(data): #data is a 5-tuple
-	global modfolder, jarfolder, execdir, instance, gui  #makes it edit the global vars rather than create new ones
-	modfolder, jarfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, mc_version, execdir, instance, gui  #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def init_config_util_guionly(data):
 	global gui  #makes it edit the global var
@@ -132,17 +132,15 @@ def read_config(instance):
 			json.dump(json_data, f)
 			f.close()
 	else:
-		json_data = {}
-		print("hi")
 		cprint("Config for instance "+instance+" is missing. Setting up config.")
 		modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ", "Mod folder for "+instance, 'path')
 		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
-		mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version:")
+		mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version")
 		f = open("config.json", 'w')
-		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version":mc_version}
+		json_data = {instance: {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version": mc_version}}
 		json.dump(json_data, f)
 		f.close()
-	return(modfolder, jarfolder)
+	return(modfolder, jarfolder, mc_version)
 
 def new_config(instance):
 		with open(execdir+"/LocalData/config.json") as json_file: #can assume it exists and is valid, the program has loaded before this is called
@@ -520,6 +518,11 @@ def get_url(mod, version):
 def get_latest_version(mod):
 	return mod.versions[0]['Version']
 
+def get_latest_compatible_version(mod):
+	for mod_version in mod.versions:
+		if (mc_version in mod_version['MCVersion']):
+			return mod_version['Version']
+			
 def cinput(terminal_text, gui_text=None, input_type='text', title="CMAN"):
 	print(terminal_text, gui_text, input_type, title)
 	if gui_text == None:

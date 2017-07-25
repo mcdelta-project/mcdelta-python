@@ -16,8 +16,8 @@ instance = "@ERROR@"
 tkinst = None
 
 def init_config_remove(data): #data is a 5-tuple
-	global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, jarfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_remove(data):
 	global tkinst
@@ -25,7 +25,7 @@ def recieve_tkinst_remove(data):
 
 def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
 	if(modname == None):
-		modname = input("Enter mod name: ")
+		modname = cinput("Enter mod name: ")
 	cprint("Removing file for mod in ModsDownloaded")
 	try:
 		os.remove(execdir + "/LocalData/ModsDownloaded/"+instance+"/"+modname+".installed") #removing json in ModsDownloaded dir
