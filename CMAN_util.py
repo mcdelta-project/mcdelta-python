@@ -55,13 +55,18 @@ def recieve_tkinst_util(data):
 	tkinst = data
 
 def cprint(text): #outputs text to console pane in GUI if gui enabled, otherwise prints it
-	if (gui == True):
-		tkinst.console.config(state = tk.NORMAL)
-		tkinst.console.insert(tk.END, str(text)+"\n")
-		tkinst.console.config(state = tk.DISABLED)
-		tkinst.console.see(tk.END)
-	else:
+	try:
+		gui
+	except NameError:
 		print(text)
+	else:
+		if (gui):
+			tkinst.console.config(state = tk.NORMAL)
+			tkinst.console.insert(tk.END, str(text)+"\n")
+			tkinst.console.config(state = tk.DISABLED)
+			tkinst.console.see(tk.END)
+		else:
+			print(text)
 
 def iprint(text): #outputs text to info pane in GUI if gui enabled, otherwise prints it
 	if (gui == True):
@@ -125,9 +130,9 @@ def read_config(instance):
 			f.close()
 	else:
 		cprint("Config for instance "+instance+" is missing. Setting up config.")
-		modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ")
-		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ")
-		mc_version = cinput("Enter Minecraft version for instance "+instance+": ")
+		modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ", "Mod folder for "+instance, 'path')
+		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
+		mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version")
 		f = open("config.json", 'w')
 		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
 		json.dump(json_data, f)
@@ -511,12 +516,16 @@ def get_latest_version(mod):
 	return mod.versions[0]['Version']
 
 def cinput(terminal_text, gui_text, input_type='text'):
-	if (gui):
-		if (input_type == 'text'):
-			return dialogs.askstring(parent=tkinst, title=gui_text)
-		elif (input_type == 'path'):
-			return filedialog.askdirectory(parent=tkinst, title=gui_text)
-		elif (input_type == 'boolean'):
-			return dialogs.askyesno(parent=tkinst, title=gui_text)
-
-	return input(terminal_text)
+	try:
+		gui
+	except NameError:
+		return input(terminal_text)
+	else:
+		if (gui):
+			if (input_type == 'text'):
+				return dialogs.askstring(parent=tkinst, title=gui_text)
+			elif (input_type == 'path'):
+				return filedialog.askdirectory(parent=tkinst, title=gui_text)
+			elif (input_type == 'boolean'):
+				return dialogs.askyesno(parent=tkinst, title=gui_text)
+		return input(terminal_text)
