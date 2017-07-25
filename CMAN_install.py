@@ -19,8 +19,8 @@ instance = "@ERROR@"
 tkinst = None
 
 def init_config_install(data): #data is a 5-tuple
-	global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, jarfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_install(data):
 	global tkinst

@@ -17,8 +17,8 @@ instance = "@ERROR@"
 tkinst = None
 
 def init_config_upgrade(data): #data is a 5-tuple
-	global modfolder, jarfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, jarfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_upgrade(data):
 	global tkinst
