@@ -19,6 +19,7 @@ execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
 gui = False
+tk_ready = False
 
 mod_list = []
 
@@ -51,12 +52,18 @@ def init_config_util(data): #data is a 5-tuple
 	global modfolder, jarfolder, execdir, instance, gui  #makes it edit the global vars rather than create new ones
 	modfolder, jarfolder, execdir, instance, gui = data
 
+def init_config_util_guionly(data):
+	global gui  #makes it edit the global var
+	gui = data
+	tk_ready = False
+
 def recieve_tkinst_util(data):
-	global tkinst
+	global tkinst, tk_ready
 	tkinst = data
+	tk_ready = True
 
 def cprint(text): #outputs text to console pane in GUI if gui enabled, otherwise prints it
-	if (gui == True):
+	if (gui == True and tk_ready == True):
 		tkinst.console.config(state = tk.NORMAL)
 		tkinst.console.insert(tk.END, str(text)+"\n")
 		tkinst.console.config(state = tk.DISABLED)
@@ -121,17 +128,18 @@ def read_config(instance):
 			jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
 			mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version:")
 			f = open("config.json", 'w')
-			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
+			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version":mc_version}
 			json.dump(json_data, f)
 			f.close()
 	else:
 		json_data = {}
+		print("hi")
 		cprint("Config for instance "+instance+" is missing. Setting up config.")
-		modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ")
-		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ")
-		mc_version = cinput("Enter Minecraft version for instance "+instance+": ")
+		modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ", "Mod folder for "+instance, 'path')
+		jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
+		mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version:")
 		f = open("config.json", 'w')
-		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
+		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version":mc_version}
 		json.dump(json_data, f)
 		f.close()
 	return(modfolder, jarfolder)
@@ -512,14 +520,15 @@ def get_url(mod, version):
 def get_latest_version(mod):
 	return mod.versions[0]['Version']
 
-def cinput(terminal_text, gui_text=None, title="CMAN", input_type='text'):
+def cinput(terminal_text, gui_text=None, input_type='text', title="CMAN"):
+	print(terminal_text, gui_text, input_type, title)
 	if gui_text == None:
 		gui_text = terminal_text
 	if (gui):
 		if (input_type == 'text'):
 			return dialogs.askstring(parent=tkinst, prompt=gui_text, title=title)
 		elif (input_type == 'path'):
-			return filedialog.askdirectory(parent=tkinst, prompt=gui_text, title=title)
+			return filedialogs.askdirectory(parent=tkinst, title=gui_text)
 		elif (input_type == 'boolean'):
 			return dialogs.askyesno(parent=tkinst, prompt=gui_text, title=title)
 

@@ -40,9 +40,10 @@ def setup_config(_instance):
     global modfolder, jarfolder, instance, gui
     os.chdir(os.path.join(execdir, "LocalData"))
     instance = _instance
+    init_config_util_guionly(gui)  # transferring gui flag to CMAN_util 
     modfolder, jarfolder = read_config(_instance)  # gets config stuff
     os.chdir(execdir)
-    init_config_util((modfolder, jarfolder, execdir, instance, gui))  # transferring config data (and Tkinter instance) to all files
+    init_config_util((modfolder, jarfolder, execdir, instance, gui))  # transferring config data to all files
     CMAN_install.init_config_install((modfolder, jarfolder, execdir, instance, gui))
     CMAN_remove.init_config_remove((modfolder, jarfolder, execdir, instance, gui))
     CMAN_upgrade.init_config_upgrade((modfolder, jarfolder, execdir, instance, gui))
