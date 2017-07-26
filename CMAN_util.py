@@ -146,13 +146,13 @@ def new_config(instance):
 		if(instance in json_data.keys()):
 			cprint("Instance "+instance+" already exists, cannot add it.")
 		else:
-			modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ")
+			modfolder = cinput("Enter mod folder location for instance "+instance+" (absolute path): ", "Mod folder for "+instance, 'path')
 			if(modfolder == None):
 				return (-1, -1)
-				jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ")
+			jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
 			if(jarfolder == None):
 				return (-1, -1)
-			mc_version = cinput("Enter Minecraft version for instance "+instance+": ")
+			mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version")
 		f = open(execdir+"/LocalData/config.json", 'w')
 		json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version": mc_version}
 		json.dump(json_data, f)
@@ -528,9 +528,9 @@ def cinput(terminal_text, gui_text, input_type='text'):
 	else:
 		if (gui):
 			if (input_type == 'text'):
-				return dialogs.askstring(parent=tkinst, title=gui_text)
+				return dialogs.askstring(parent=tkinst, title='CMAN', prompt=gui_text)
 			elif (input_type == 'path'):
-				return filedialog.askdirectory(parent=tkinst, title=gui_text)
+				return filedialogs.askdirectory(parent=tkinst, title='CMAN', message=gui_text)
 			elif (input_type == 'boolean'):
-				return dialogs.askyesno(parent=tkinst, title=gui_text)
+				return dialogs.askyesno(parent=tkinst, title='CMAN', prompt=gui_text)
 		return input(terminal_text)
