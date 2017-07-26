@@ -74,8 +74,10 @@ def install_mod(modname, version = None):
 			os.mkdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	newfilename = modname + ".installed"
-	newfile = open(newfilename, 'w+')
-	shutil.copyfile(originalfile, newfilename)
+	with open(newfilename, 'w+') as newfile:
+		installedjson = get_json(modname)
+		installedjson["Versions"] = [mod_data.versions[version_number]]
+		newfile.write(json.dumps(installedjson))
 
 	requirements = mod_data.requirements
 	for requirement in requirements:

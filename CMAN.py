@@ -148,7 +148,7 @@ if (upgradesavailable == []):
 else:
 	cprint("The following upgrades are available for instance "+instance+":")
 	for upgrade in upgradesavailable:
-		cprint(" "+upgrade[0]["Name"]+" (current version: "+upgrade[1]["Version"]+", you have: "+upgrade[0]["Version"]+")")
+		cprint(" "+upgrade[0].name+" (current version: "+upgrade[1].versions[0]["Version"]+", you have: "+upgrade[0].versions[0]["Version"]+")")
 if (args.install != "None"):
 	CMAN_install.install_mod(args.install)
 	sys.exit()
