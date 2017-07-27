@@ -18,6 +18,8 @@ jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
+gui = False
+tk_ready = False
 
 mod_list = []
 
@@ -50,23 +52,24 @@ def init_config_util(data): #data is a 5-tuple
 	global modfolder, jarfolder, mc_version, execdir, instance, gui  #makes it edit the global vars rather than create new ones
 	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
+def init_config_util_guionly(data):
+	global gui  #makes it edit the global var
+	gui = data
+	tk_ready = False
+
 def recieve_tkinst_util(data):
-	global tkinst
+	global tkinst, tk_ready
 	tkinst = data
+	tk_ready = True
 
 def cprint(text): #outputs text to console pane in GUI if gui enabled, otherwise prints it
-	try:
-		gui
-	except NameError:
-		print(text)
+	if (gui == True and tk_ready == True):
+		tkinst.console.config(state = tk.NORMAL)
+		tkinst.console.insert(tk.END, str(text)+"\n")
+		tkinst.console.config(state = tk.DISABLED)
+		tkinst.console.see(tk.END)
 	else:
-		if (gui):
-			tkinst.console.config(state = tk.NORMAL)
-			tkinst.console.insert(tk.END, str(text)+"\n")
-			tkinst.console.config(state = tk.DISABLED)
-			tkinst.console.see(tk.END)
-		else:
-			print(text)
+		print(text)
 
 def iprint(text): #outputs text to info pane in GUI if gui enabled, otherwise prints it
 	if (gui == True):
@@ -125,7 +128,7 @@ def read_config(instance):
 			jarfolder = cinput("Enter jar folder location for instance "+instance+" (absolute path): ", "Jar folder for "+instance, 'path')
 			mc_version = cinput("Enter Minecraft version for instance "+instance+": ", "Minecraft Version:")
 			f = open("config.json", 'w')
-			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder}
+			json_data[instance] = {"modfolder": modfolder, "jarfolder": jarfolder, "mc_version":mc_version}
 			json.dump(json_data, f)
 			f.close()
 	else:
@@ -519,6 +522,7 @@ def get_latest_compatible_version(mod):
 	for mod_version in mod.versions:
 		if (mc_version in mod_version['MCVersion']):
 			return mod_version['Version']
+<<<<<<< HEAD
 
 def cinput(terminal_text, gui_text, input_type='text'):
 	try:
@@ -534,3 +538,19 @@ def cinput(terminal_text, gui_text, input_type='text'):
 			elif (input_type == 'boolean'):
 				return dialogs.askyesno(parent=tkinst, title='CMAN', prompt=gui_text)
 		return input(terminal_text)
+=======
+			
+def cinput(terminal_text, gui_text=None, input_type='text', title="CMAN"):
+	print(terminal_text, gui_text, input_type, title)
+	if gui_text == None:
+		gui_text = terminal_text
+	if (gui):
+		if (input_type == 'text'):
+			return dialogs.askstring(parent=tkinst, prompt=gui_text, title=title)
+		elif (input_type == 'path'):
+			return filedialogs.askdirectory(parent=tkinst, title=gui_text)
+		elif (input_type == 'boolean'):
+			return dialogs.askyesno(parent=tkinst, prompt=gui_text, title=title)
+
+	return input(terminal_text)
+>>>>>>> 3d7c81695d2e75ca19f20f608084b0c435c172ea

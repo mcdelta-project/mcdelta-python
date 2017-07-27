@@ -40,6 +40,7 @@ def setup_config(_instance):
 	global modfolder, jarfolder, instance, gui
 	os.chdir(os.path.join(execdir, "LocalData"))
 	instance = _instance
+	init_config_util_guionly(gui)  # transferring gui flag to CMAN_util 
 	modfolder, jarfolder, mc_version = read_config(_instance)  # gets config stuff
 	os.chdir(execdir)
 	init_config_util((modfolder, jarfolder, mc_version, execdir, instance, gui))  # transferring config data (and Tkinter instance) to all files
