@@ -522,23 +522,6 @@ def get_latest_compatible_version(mod):
 	for mod_version in mod.versions:
 		if (mc_version in mod_version['MCVersion']):
 			return mod_version['Version']
-<<<<<<< HEAD
-
-def cinput(terminal_text, gui_text, input_type='text'):
-	try:
-		gui
-	except NameError:
-		return input(terminal_text)
-	else:
-		if (gui):
-			if (input_type == 'text'):
-				return dialogs.askstring(parent=tkinst, title='CMAN', prompt=gui_text)
-			elif (input_type == 'path'):
-				return filedialogs.askdirectory(parent=tkinst, title='CMAN', message=gui_text)
-			elif (input_type == 'boolean'):
-				return dialogs.askyesno(parent=tkinst, title='CMAN', prompt=gui_text)
-		return input(terminal_text)
-=======
 			
 def cinput(terminal_text, gui_text=None, input_type='text', title="CMAN"):
 	print(terminal_text, gui_text, input_type, title)
@@ -553,4 +536,3 @@ def cinput(terminal_text, gui_text=None, input_type='text', title="CMAN"):
 			return dialogs.askyesno(parent=tkinst, prompt=gui_text, title=title)
 
 	return input(terminal_text)
->>>>>>> 3d7c81695d2e75ca19f20f608084b0c435c172ea
