@@ -153,7 +153,7 @@ class Gui(tk.Frame):
     def __init__(self, master = None):
         tk.Frame.__init__(self, master)
         self.initialise_window()
-        self.pack()
+        self.pack(expand=True, fill=tk.BOTH)
     def update_modlist(self):
         self.mods = listmods_all(False)
         self.mlist.delete(0, tk.END)
@@ -162,11 +162,11 @@ class Gui(tk.Frame):
             if mod != None:
                 self.mlist.insert(tk.END, mod["Name"])
     def initialise_window(self):
-        self.master.title("CMAN v2.1.0")
-        self.master.geometry("800x400")
+        self.master.title("CMAN v2.1.1.0")
+        #self.master.geometry("800x400")
 
         self.winv = tk.PanedWindow(self, orient=tk.VERTICAL, sashrelief=tk.RAISED, height=400, width=800)
-        self.winv.pack()
+        self.winv.pack(expand=True, fill=tk.BOTH)
 
         self.win = tk.PanedWindow(self, orient=tk.HORIZONTAL, sashrelief=tk.RAISED, height=300, width=800)
         self.winv.add(self.win)
@@ -186,7 +186,7 @@ class Gui(tk.Frame):
         self.consoles.pack(side=tk.RIGHT, fill=tk.Y)
         self.console = tk.Text(self.cpane, height = 4, yscrollcommand=self.consoles.set)
         self.console.config(state = tk.DISABLED)
-        self.console.pack()
+        self.console.pack(expand=True, fill=tk.BOTH)
         self.consoles.config(command=self.console.yview)
 
         self.ccpane = tk.Frame(self.cpane)
@@ -217,7 +217,7 @@ class Gui(tk.Frame):
         self.ilabel.pack()
 
         self.instf = tk.Frame(self.lpane)
-        self.instf.pack()
+        self.instf.pack(expand=True)
 
         self._ilabel = tk.Label(self.instf, text = "Instance:")
         self._ilabel.pack(side=tk.LEFT)
@@ -241,7 +241,7 @@ class Gui(tk.Frame):
         self.update.pack(side = tk.BOTTOM)
 
         self.blankf = tk.Frame(self.lpane, height = 20)
-        self.blankf.pack(side = tk.BOTTOM)
+        self.blankf.pack(side = tk.BOTTOM, expand=True)
 
         self.explist = tk.Button(self.lpane, text = "Export Mod List...", command=exportmlist)
         self.explist.pack(side = tk.BOTTOM)
@@ -296,7 +296,7 @@ class Gui(tk.Frame):
         self.info = tk.Text(self.infopane, width = 250, yscrollcommand=self.infos.set)
         self.info.insert(tk.END, "No mod selected.")
         self.info.config(state = tk.DISABLED)
-        self.info.pack(fill = tk.BOTH, expand = 1)
+        self.info.pack(fill = tk.BOTH, expand = True)
         self.infos.config(command=self.info.yview)
 
 
