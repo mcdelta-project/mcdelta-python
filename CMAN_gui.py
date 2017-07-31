@@ -162,7 +162,7 @@ class Gui(tk.Frame):
             if mod != None:
                 self.mlist.insert(tk.END, mod["Name"])
     def initialise_window(self):
-        self.master.title("CMAN v2.1.1.0")
+        self.master.title("CMAN v2.1.0")
         #self.master.geometry("800x400")
 
         self.winv = tk.PanedWindow(self, orient=tk.VERTICAL, sashrelief=tk.RAISED, height=400, width=800)
