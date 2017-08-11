@@ -522,7 +522,13 @@ def get_latest_compatible_version(mod):
 	for mod_version in mod.versions:
 		if (mc_version in mod_version['MCVersion']):
 			return mod_version['Version']
-			
+
+def is_any_version_compatible(mod):
+	for mod_version in mod.versions:
+		if (mc_version in mod_version['MCVersion']):
+			return True
+	return False
+
 def cinput(terminal_text, gui_text=None, input_type='text', title="CMAN"):
 	print(terminal_text, gui_text, input_type, title)
 	if gui_text == None:

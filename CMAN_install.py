@@ -42,6 +42,9 @@ def install_mod(modname, version = None):
 	mod_data = get_mod_from_name(modname)
 
 	if (version == None):
+		if (not is_any_version_compatible(mod_data)):
+			cprint('No version of the mod is compatible!')
+			return
 		version = get_latest_compatible_version(mod_data)
 
 	version_number = 0
