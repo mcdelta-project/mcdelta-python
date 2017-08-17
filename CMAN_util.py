@@ -484,12 +484,12 @@ def print_help():
 
 def get_mod_from_json(json_data):
 	if (json_data["Type"] == "Installer"):
-		mod = Mod(json_data["Name"], json_data["Link"], json_data["Author"],
+		mod = Mod(json_data["Name"], json_data["Author"],
 		json_data["Desc"], json_data["License"], json_data["Requirements"],
 		json_data["Incompatibilities"], json_data["Recommended"], json_data["Type"],
 		json_data["Unstable"], json_data["Versions"], json_data["InstallerName"])
 	else:
-		mod = Mod(json_data["Name"], json_data["Link"], json_data["Author"],
+		mod = Mod(json_data["Name"], json_data["Author"],
 		json_data["Desc"], json_data["License"], json_data["Requirements"],
 		json_data["Incompatibilities"], json_data["Recommended"], json_data["Type"],
 		json_data["Unstable"], json_data["Versions"])
@@ -500,9 +500,7 @@ def get_mod_from_name(modname):
 	return get_mod_from_json(get_json(modname))
 
 def get_url(mod, version):
-	link = mod.link
 	version_number = 0
-	cprint(link)
 
 	for x in range(len(mod.versions)):
 		cprint(mod.versions[x]['Version'])
@@ -511,7 +509,7 @@ def get_url(mod, version):
 			version_number = x
 			break
 	cprint(x)
-	link = link.format(mod.versions[x]['Version'], mod.versions[x]['MCVersion'][0])
+	link = mod.versions[x]['Link']
 	cprint(link)
 	return link
 

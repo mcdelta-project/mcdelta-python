@@ -1,7 +1,6 @@
 class Mod:
 
     name = ''
-    link = ''
     author = ''
     desc = ''
     license = ''
@@ -13,10 +12,9 @@ class Mod:
     installer_name = ''
     versions = []
 
-    def __init__(self, name, link, author, desc, license, reqr, incompat, recmd,
+    def __init__(self, name, author, desc, license, reqr, incompat, recmd,
         _type, unstable, versions, instname = ''):
         self.name = name
-        self.link = link
         self.author = author
         self.desc = desc
         self.license = license
