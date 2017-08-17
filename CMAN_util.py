@@ -459,7 +459,7 @@ def get_info(modname, output=True):
 
 def print_help():
 	cprint("Commands:")
-	cprint(" install 'mod': install the mod 'mod'")
+	cprint(" install 'mod' 'version': install the mod 'mod', version 'version'. 'version' argument is optional")
 	cprint(" installm: install multiple mods")
 	cprint(" info 'mod': get info for the mod 'mod'")
 	cprint(" remove 'mod': remove the mod 'mod'")
