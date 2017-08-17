@@ -37,10 +37,10 @@ def read_default_instance():
 	return default
 
 def setup_config(_instance):
-	global modfolder, jarfolder, instance, gui
+	global modfolder, jarfolder, mc_version, instance, gui
 	os.chdir(os.path.join(execdir, "LocalData"))
 	instance = _instance
-	init_config_util_guionly(gui)  # transferring gui flag to CMAN_util 
+	init_config_util_guionly(gui)  # transferring gui flag to CMAN_util
 	modfolder, jarfolder, mc_version = read_config(_instance)  # gets config stuff
 	os.chdir(execdir)
 	init_config_util((modfolder, jarfolder, mc_version, execdir, instance, gui))  # transferring config data (and Tkinter instance) to all files
@@ -142,6 +142,7 @@ if (args.instance != "None"):
 if(instance == "@ERROR@"):
 	instance = CMAN_gui.instance
 cprint("Selected Instance: "+instance)
+cprint("Minecraft Version: "+mc_version)
 
 upgradesavailable = CMAN_upgrade.get_upgrades(instance)
 if (upgradesavailable == []):
