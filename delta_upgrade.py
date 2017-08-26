@@ -6,9 +6,9 @@ import json
 import sys
 import tarfile
 import zipfile
-from CMAN_util import *
-import CMAN_install
-import CMAN_remove
+from delta_util import *
+import delta_install
+import delta_remove
 
 modfolder = "@ERROR@"
 jarfolder = "@ERROR@"
@@ -25,7 +25,7 @@ def recieve_tkinst_upgrade(data):
 	tkinst = data
 
 def upgrade_mod(modname):
-	os.chdir(execdir + "/Data/CMAN-Archive")
+	os.chdir(execdir + "/Data/DeltaMC-Archive")
 	if(modname == None):
 		modname = cinput("Enter mod name: ")
 	update = [get_installed_json(modname),get_mod(modname)]
@@ -37,8 +37,8 @@ def upgrade_mod(modname):
 		return
 	os.chdir(execdir + "/LocalData") #restoring current working dir
 	if(update[1]["Versions"][0]["Version"] != get_latest_compatible_version(update[0]) and mod_installed(modname)):
-		CMAN_remove.remove_mod(modname)
-		CMAN_install.install_mod(modname)
+		delta_remove.remove_mod(modname)
+		delta_install.install_mod(modname)
 	elif(not mod_installed(modname)):
 		cprint(modname+" is not installed.")
 	else:

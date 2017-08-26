@@ -5,7 +5,7 @@ import json
 import sys
 import tarfile
 import zipfile
-from CMAN_util import *
+from delta_util import *
 import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
@@ -23,7 +23,7 @@ def recieve_tkinst_remove(data):
 	global tkinst
 	tkinst = data
 
-def remove_mod(modname): #behavior not guaranteed on mods installed outside of CMAN
+def remove_mod(modname): #behavior not guaranteed on mods installed outside of DeltaMC
 	if(modname == None):
 		modname = cinput("Enter mod name: ")
 	cprint("Removing file for mod in ModsDownloaded")
@@ -49,5 +49,5 @@ def remove_mod(modname): #behavior not guaranteed on mods installed outside of C
 				cprint("Skipped \""+file+"\".")
 	else:
 		if(gui):
-			msgbox.showerror("Removal Failed", "CMAN cannot remove installer mods or base mods.\nRemoving mod from CMAN listing only.")
-		cprint("CMAN cannot remove installer mods or base mods! (If "+modname+" is not an installer mod or base mod, then something went wrong.)")
+			msgbox.showerror("Removal Failed", "DeltaMC cannot remove installer mods or base mods.\nRemoving mod from DeltaMC listing only.")
+		cprint("DeltaMC cannot remove installer mods or base mods! (If "+modname+" is not an installer mod or base mod, then something went wrong.)")

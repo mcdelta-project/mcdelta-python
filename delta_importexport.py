@@ -5,7 +5,7 @@ import json
 import sys
 import tarfile
 import zipfile
-from CMAN_util import *
+from delta_util import *
 
 modfolder = "@ERROR@"
 jarfolder = "@ERROR@"
@@ -62,4 +62,4 @@ def import_mods(path):
 	mods = json_data["Mods"]
 	for mod in mods:
 			cprint(mod)
-			CMAN_install.install_mod(mod)
+			delta_install.install_mod(mod)

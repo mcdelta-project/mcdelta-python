@@ -40,13 +40,13 @@ def read_default_instance():
 	return default
 
 def check_for_updates():
-	response = requests.get('http://raw.githubusercontent.com/Comprehensive-Minecraft-Archive-Network/CMAN-Python/master/version.txt')
+	response = requests.get('https://raw.githubusercontent.com/deltamc-project/deltamc-python/master/version.txt')
 	latestversion = response.text
 	if (version != str(latestversion)):
 		#if (gui):
-		#	msgbox.askyesno("Update available", "You are running CMAN " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
+		#	msgbox.askyesno("Update available", "You are running DeltaMC " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
 		#else:
-		cprint("!!Update Available! You are running CMAN " + version + ". The newest version is " + str(latestversion) + "!!")
+		cprint("!!Update Available! You are running DeltaMC " + version + ". The newest version is " + str(latestversion) + "!!")
 
 def init_config_util(data): #data is a 5-tuple
 	global modfolder, jarfolder, mc_version, execdir, instance, gui  #makes it edit the global vars rather than create new ones
@@ -85,7 +85,7 @@ def instance_exists(instance):
 		try:
 			json_data = json.load(json_file)
 		except(json.decoder.JSONDecodeError):
-			cprint("The config JSON appears to be invalid. Delete it and run CMAN again.")
+			cprint("The config JSON appears to be invalid. Delete it and run DeltaMC again.")
 			json_file.close()
 			sys.exit()
 	return(instance in json_data.keys())
@@ -96,7 +96,7 @@ def read_config(instance):
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
-				cprint("The config JSON appears to be invalid. Delete it and run CMAN again.")
+				cprint("The config JSON appears to be invalid. Delete it and run DeltaMC again.")
 				json_file.close()
 				sys.exit()
 			json_file.close()
@@ -171,7 +171,7 @@ def rm_config(_instance):
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
-				cprint("The config JSON appears to be invalid. Delete it and run CMAN again.")
+				cprint("The config JSON appears to be invalid. Delete it and run DeltaMC again.")
 				json_file.close()
 				sys.exit()
 			json_file.close()
@@ -190,10 +190,10 @@ def rm_config(_instance):
 	cprint("Done.")
 
 def get_json(modname):
-	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
-		os.chdir(execdir + "/Data/CMAN-Archive")
+	if(os.path.exists(execdir + "/Data/DeltaMC-Archive")):
+		os.chdir(execdir + "/Data/DeltaMC-Archive")
 	else:
-		cprint("CMAN archive not found. Please update the CMAN archive.")
+		cprint("DeltaMC archive not found. Please update the DeltaMC archive.")
 		return(-1)
 	if(os.path.exists(modname + ".json")):
 		# JSON parsing
@@ -202,7 +202,7 @@ def get_json(modname):
 				json_data = json.load(json_file)
 				json_file.close()
 			except(json.decoder.JSONDecodeError):
-				cprint("The JSON file \""+modname+".json\" appears to be invalid. Please update the CMAN archive.")
+				cprint("The JSON file \""+modname+".json\" appears to be invalid. Please update the DeltaMC archive.")
 				json_file.close()
 				return
 		return(json_data)
@@ -220,7 +220,7 @@ def get_installed_json(modname):
 			try:
 				json_data = json.load(json_file)
 			except(json.decoder.JSONDecodeError):
-				cprint("The JSON file \""+modname+".installed\" appears to be invalid. Using data from CMAN archive.")
+				cprint("The JSON file \""+modname+".installed\" appears to be invalid. Using data from DeltaMC archive.")
 				json_data = (get_json(modname))
 			finally:
 				json_file.close()
@@ -287,8 +287,8 @@ def get_installed_mods(inst = None, allinst=True):
 
 def get_all_jsons():
 	jsons = []
-	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
-		mods = os.listdir(execdir + "/Data/CMAN-Archive")
+	if(os.path.exists(execdir + "/Data/DeltaMC-Archive")):
+		mods = os.listdir(execdir + "/Data/DeltaMC-Archive")
 		for mod in mods:
 			json_data = get_json(mod[:-5]) #[:-5] cuts off the .json extension
 			if json_data != None:
@@ -362,16 +362,16 @@ def get_deps(modname):
 def update_archive(start=False):
 	#Delete old archive
 	os.chdir(execdir + "/Data")
-	if(os.path.exists(execdir + "/Data/CMAN-Archive")):
-		shutil.rmtree("CMAN-Archive")
+	if(os.path.exists(execdir + "/Data/DeltaMC-Archive")):
+		shutil.rmtree("DeltaMC-Archive")
 	# Archive Download
-	url = "https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/master"
-	file_name = "CMAN.tar.gz"
+	url = "https://github.com/deltamc-project/deltamc-archive/tarball/master"
+	file_name = "DeltaMC.tar.gz"
 	cprint("Downloading Archive...")
 	# Download it.
 	try:
 		with open(file_name, 'wb') as out_file:
-			response = requests.get('https://github.com/Comprehensive-Minecraft-Archive-Network/CMAN-Archive/tarball/new-syntax')
+			response = requests.get('https://github.com/deltamc-project/deltamc-archive/tarball/new-syntax')
 			out_file.write(response.content)
 		cprint("Done.")
 	except Exception as e:
@@ -380,15 +380,15 @@ def update_archive(start=False):
 		if(gui and not start):
 			msgbox.showerror("Archive download failed", "Something went wrong while downloading the archive.", parent=tkinst)
 		if(start):
-			print("CMAN: fatal: Something went wrong while downloading the archive.")
+			print("DeltaMC: fatal: Something went wrong while downloading the archive.")
 			sys.exit()
 		else:
 			return -1
 	cprint("Extracting Archive...")
-	tar = tarfile.open("CMAN.tar.gz")  # untar
+	tar = tarfile.open("DeltaMC.tar.gz")  # untar
 	tar.extractall()
 	tarlist = tar.getnames()
-	os.rename(tarlist[0], "CMAN-Archive") #rename the resulting folder to CMAN-Archive
+	os.rename(tarlist[0], "DeltaMC-Archive") #rename the resulting folder to DeltaMC-Archive
 	cprint("Converting to Mod objects")
 	for json_data in get_all_jsons():
 		mod_item = get_mod_from_json(json_data)
@@ -402,7 +402,7 @@ def update_archive(start=False):
 
 	cprint("Done.")
 	if(gui and not start):
-		msgbox.showinfo("Archive updated", "The CMAN archive has been successfully updated.", parent=tkinst)
+		msgbox.showinfo("Archive updated", "The DeltaMC archive has been successfully updated.", parent=tkinst)
 
 def get_info_console(modname, output=False):
 	istr = []
@@ -468,9 +468,9 @@ def print_help():
 	cprint(" upgradem: upgrade multiple mods")
 	cprint(" upgradeall: upgrade all outdated mods for Minecraft instance 'inst', or use '*' to check all instances")
 	cprint(" upgrades 'inst': list available mod upgrades for Minecraft instance 'inst', or use '*' to check all instances")
-	cprint(" update: update the CMAN archive")
+	cprint(" update: update the DeltaMC archive")
 	cprint(" help: display this help message")
-	cprint(" version: display the CMAN version number")
+	cprint(" version: display the DeltaMC version number")
 	cprint(" list: list installed mods")
 	cprint(" export 'name': export a modlist with the name 'name' , which can be imported later")
 	cprint(" import 'pathtomodlist': import the modlist 'pathtomodlist'")
@@ -479,7 +479,7 @@ def print_help():
 	cprint(" addinst 'inst': adds the Minecraft instance 'inst'")
 	cprint(" rminst 'inst': removes the Minecraft instance 'inst'")
 	cprint(" insts: lists all Minecraft instances")
-	cprint(" exit: exit CMAN")
+	cprint(" exit: exit DeltaMC")
 
 
 def get_mod_from_json(json_data):
@@ -527,7 +527,7 @@ def is_any_version_compatible(mod):
 			return True
 	return False
 
-def cinput(terminal_text, gui_text=None, input_type='text', title="CMAN"):
+def cinput(terminal_text, gui_text=None, input_type='text', title="DeltaMC"):
 	print(terminal_text, gui_text, input_type, title)
 	if gui_text == None:
 		gui_text = terminal_text

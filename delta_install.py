@@ -6,7 +6,7 @@ import json
 import sys
 import tarfile
 import zipfile
-from CMAN_util import *
+from delta_util import *
 import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
@@ -28,7 +28,7 @@ def recieve_tkinst_install(data):
 
 
 def install_mod(modname, version = None):
-	os.chdir(execdir + "/Data/CMAN-Archive")
+	os.chdir(execdir + "/Data/DeltaMC-Archive")
 	if(modname == None):
 		modname = cinput("Enter mod name: ")
 
@@ -72,7 +72,7 @@ def install_mod(modname, version = None):
 		cprint(modname + " is already installed!")
 		return
 
-	originalfile = execdir + "/Data/CMAN-Archive/" + modname + ".json"  # Saving Modname.json for future reference
+	originalfile = execdir + "/Data/DeltaMC-Archive/" + modname + ".json"  # Saving Modname.json for future reference
 	if(not os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
 			os.mkdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
@@ -120,7 +120,7 @@ def install_mod(modname, version = None):
 	cprint(modname + " is at version " + version)
 	if (modtype == "Basemod"):
 		os.chdir(execdir + "/Data/temp")
-		file_name = modname + "-" + version + "-CMANtemp.zip"
+		file_name = modname + "-" + version + "-DeltaMCtemp.zip"
 		cprint("Downloading " + url)
 		with open(file_name, 'wb') as out_file:
 			response = requests.get(url)
@@ -149,9 +149,9 @@ def install_mod(modname, version = None):
 		folderpath = os.path.join(jarfolder, foldernamefinal)
 		shutil.copytree(vpath, folderpath)
 		fix_names(folderpath, vname, foldernamefinal)
-		zipfile.ZipFile(os.path.join(jarfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"CMANtemp")
-		mergedirs(modname, file_name+"CMANtemp")
-		os.chdir(file_name+"CMANtemp")
+		zipfile.ZipFile(os.path.join(jarfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"DeltaMCtemp")
+		mergedirs(modname, file_name+"DeltaMCtemp")
+		os.chdir(file_name+"DeltaMCtemp")
 		shutil.rmtree("META-INF") #delete META-INF
 		cprint("Making jar (this might take a while).")
 		shutil.make_archive("../"+foldername, "zip")
