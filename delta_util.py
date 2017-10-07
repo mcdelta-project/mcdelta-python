@@ -503,14 +503,10 @@ def get_url(mod, version):
 	version_number = 0
 
 	for x in range(len(mod.versions)):
-		cprint(mod.versions[x]['Version'])
-		cprint(version)
 		if (version == mod.versions[x]['Version']):
 			version_number = x
 			break
-	cprint(x)
 	link = mod.versions[x]['Link']
-	cprint(link)
 	return link
 
 def get_latest_version(mod):
@@ -528,7 +524,6 @@ def is_any_version_compatible(mod):
 	return False
 
 def cinput(terminal_text, gui_text=None, input_type='text', title="DeltaMC"):
-	print(terminal_text, gui_text, input_type, title)
 	if gui_text == None:
 		gui_text = terminal_text
 	if (gui):
