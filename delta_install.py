@@ -162,6 +162,7 @@ def install_mod(modname, version = None):
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
 		os.chdir(modfolder)
+		file_name = modname + "-" + version + ".jar"
 		cprint("Downloading " + url + " as " + file_name)
 		with open(file_name, 'wb') as out_file:
 			response = requests.get(url)
