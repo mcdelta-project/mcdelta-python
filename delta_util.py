@@ -389,16 +389,9 @@ def update_archive(start=False):
 	tar.extractall()
 	tarlist = tar.getnames()
 	os.rename(tarlist[0], "DeltaMC-Archive") #rename the resulting folder to DeltaMC-Archive
-	cprint("Converting to Mod objects")
 	for json_data in get_all_jsons():
 		mod_item = get_mod_from_json(json_data)
 		mod_list.append(mod_item)
-		cprint(mod_item.name)
-		cprint(mod_item.versions)
-		cprint(mod_item.versions[0])
-		cprint(type(mod_item.versions[0]))
-		cprint(mod_item.unstable)
-		get_url(mod_item, '13.20.1.2421')
 
 	cprint("Done.")
 	if(gui and not start):
