@@ -7,41 +7,41 @@ import tarfile
 import zipfile
 import argparse
 import tkinter as tk
-import CMAN_remove
-import CMAN_upgrade
-import CMAN_install
-import CMAN_importexport
+import delta_remove
+import delta_upgrade
+import delta_install
+import delta_importexport
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
 import tkinter.filedialog as filedialogs
-from CMAN_util import *
+from delta_util import *
 
 modfolder = "@ERROR@"
-versionsfolder = "@ERROR@"
+jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
 
 def init_config_gui(data): #data is a 5-tuple
-    global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-    modfolder, versionsfolder, execdir, instance, gui = data
+    global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+    modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_gui(data):
     global tkinst
     tkinst = data
 
 def gui_setup_config(_instance):
-    global modfolder, versionsfolder, instance, gui
+    global modfolder, jarfolder, instance, gui
     os.chdir(os.path.join(execdir, "LocalData"))
     instance = _instance
-    modfolder, versionsfolder = read_config(_instance) #gets config stuff
+    modfolder, jarfolder, mc_version = read_config(_instance) #gets config stuff
     os.chdir(execdir)
-    init_config_util((modfolder, versionsfolder, execdir, instance, gui)) #transferring config data (and Tkinter instance) to all files
-    CMAN_install.init_config_install((modfolder, versionsfolder, execdir, instance, gui))
-    CMAN_remove.init_config_remove((modfolder, versionsfolder, execdir, instance, gui))
-    CMAN_upgrade.init_config_upgrade((modfolder, versionsfolder, execdir, instance, gui))
-    CMAN_importexport.init_config_importexport((modfolder, versionsfolder, execdir, instance, gui))
-    init_config_gui((modfolder, versionsfolder, execdir, instance, gui))
+    init_config_util((modfolder, jarfolder, mc_version, execdir, instance, gui)) #transferring config data (and Tkinter instance) to all files
+    delta_install.init_config_install((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    delta_remove.init_config_remove((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    delta_upgrade.init_config_upgrade((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    delta_importexport.init_config_importexport((modfolder, jarfolder, mc_version, execdir, instance, gui))
+    init_config_gui((modfolder, jarfolder, mc_version, execdir, instance, gui))
 
 
 #Callbacks
@@ -51,7 +51,7 @@ def instmods():
 
     _mods = map(int, tkinst.mlist.curselection())
     for _mod in _mods:
-        CMAN_install.install_mod(tkinst.mods[int(_mod)]["Name"])
+        delta_install.install_mod(tkinst.mods[int(_mod)]["Name"])
     updateinst()
 
 
@@ -59,14 +59,14 @@ def removmods():
 
     _mods = map(int, tkinst.mlisti.curselection())
     for _mod in _mods:
-        CMAN_remove.remove_mod(tkinst.modsi[int(_mod)]["Name"])
+        delta_remove.remove_mod(tkinst.modsi[int(_mod)]["Name"])
     updateinst()
 
 def upgrmods():
 
     _mods = map(int, tkinst.mlisti.curselection())
     for _mod in _mods:
-        CMAN_upgrade.upgrade_mod(tkinst.modsi[int(_mod)]["Name"])
+        delta_upgrade.upgrade_mod(tkinst.modsi[int(_mod)]["Name"])
     updateinst()
 
 def runcmd():
@@ -129,7 +129,7 @@ def updateinst():
     tkinst.ilabel.configure(text = "Current Instance: "+instance)
     tkinst.mlisti.delete(0, tk.END)
     tkinst.modsi = listmods(False, False)
-    upgrades = CMAN_upgrade.get_upgrade_names(instance)
+    upgrades = delta_upgrade.get_upgrade_names(instance)
     for mod in tkinst.modsi:
         if mod != None:
             if mod in upgrades:
@@ -140,11 +140,11 @@ def updateinst():
 
 def importmlist():
     fname = filedialogs.askopenfilename(parent=tkinst)
-    CMAN_importexport.import_mods(fname)
+    delta_importexport.import_mods(fname)
 
 def exportmlist():
     fname = filedialogs.asksaveasfilename(parent=tkinst)
-    CMAN_importexport.export_mods(fname)
+    delta_importexport.export_mods(fname)
 
 def exit():
     sys.exit()
@@ -153,7 +153,7 @@ class Gui(tk.Frame):
     def __init__(self, master = None):
         tk.Frame.__init__(self, master)
         self.initialise_window()
-        self.pack()
+        self.pack(expand=True, fill=tk.BOTH)
     def update_modlist(self):
         self.mods = listmods_all(False)
         self.mlist.delete(0, tk.END)
@@ -162,11 +162,11 @@ class Gui(tk.Frame):
             if mod != None:
                 self.mlist.insert(tk.END, mod["Name"])
     def initialise_window(self):
-        self.master.title("CMAN v2.1.0")
-        self.master.geometry("800x400")
+        self.master.title("DeltaMC v2.1.0")
+        #self.master.geometry("800x400")
 
         self.winv = tk.PanedWindow(self, orient=tk.VERTICAL, sashrelief=tk.RAISED, height=400, width=800)
-        self.winv.pack()
+        self.winv.pack(expand=True, fill=tk.BOTH)
 
         self.win = tk.PanedWindow(self, orient=tk.HORIZONTAL, sashrelief=tk.RAISED, height=300, width=800)
         self.winv.add(self.win)
@@ -186,7 +186,7 @@ class Gui(tk.Frame):
         self.consoles.pack(side=tk.RIGHT, fill=tk.Y)
         self.console = tk.Text(self.cpane, height = 4, yscrollcommand=self.consoles.set)
         self.console.config(state = tk.DISABLED)
-        self.console.pack()
+        self.console.pack(expand=True, fill=tk.BOTH)
         self.consoles.config(command=self.console.yview)
 
         self.ccpane = tk.Frame(self.cpane)
@@ -217,7 +217,7 @@ class Gui(tk.Frame):
         self.ilabel.pack()
 
         self.instf = tk.Frame(self.lpane)
-        self.instf.pack()
+        self.instf.pack(expand=True)
 
         self._ilabel = tk.Label(self.instf, text = "Instance:")
         self._ilabel.pack(side=tk.LEFT)
@@ -237,11 +237,11 @@ class Gui(tk.Frame):
         self.definst = tk.Button(self.lpane, text = "Set as Default Instance", command=sdinst)
         self.definst.pack()
 
-        self.update = tk.Button(self.lpane, text = "Update CMAN Archive", command=update_archive)
+        self.update = tk.Button(self.lpane, text = "Update DeltaMC Archive", command=update_archive)
         self.update.pack(side = tk.BOTTOM)
 
         self.blankf = tk.Frame(self.lpane, height = 20)
-        self.blankf.pack(side = tk.BOTTOM)
+        self.blankf.pack(side = tk.BOTTOM, expand=True)
 
         self.explist = tk.Button(self.lpane, text = "Export Mod List...", command=exportmlist)
         self.explist.pack(side = tk.BOTTOM)
@@ -249,7 +249,7 @@ class Gui(tk.Frame):
         self.implist = tk.Button(self.lpane, text = "Import Mod List...", command=importmlist)
         self.implist.pack(side = tk.BOTTOM)
 
-        self.exit = tk.Button(self.lpane, text = "Exit CMAN", command=exit)
+        self.exit = tk.Button(self.lpane, text = "Exit DeltaMC", command=exit)
         self.exit.pack(side = tk.BOTTOM)
 
         self.mpane = tk.Frame(self.win)
@@ -296,7 +296,7 @@ class Gui(tk.Frame):
         self.info = tk.Text(self.infopane, width = 250, yscrollcommand=self.infos.set)
         self.info.insert(tk.END, "No mod selected.")
         self.info.config(state = tk.DISABLED)
-        self.info.pack(fill = tk.BOTH, expand = 1)
+        self.info.pack(fill = tk.BOTH, expand = True)
         self.infos.config(command=self.info.yview)
 
 
@@ -312,7 +312,7 @@ def parsecmd(command):
                     cprint("Instance "+inst+" does not exist.")
                     return
                 update_archive()
-                CMAN_upgrade.check_upgrades(True, inst)
+                delta_upgrade.check_upgrades(True, inst)
             elif(len(command.split(" ")) == 1):
                 cprint("upgrades: not enough arguments")
             else:
@@ -321,13 +321,13 @@ def parsecmd(command):
             if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
                 mod = command.split(" ")[1]
                 update_archive()
-                upgrades = CMAN_upgrade.get_upgrades()
-                CMAN_upgrade.upgrade_mod(mod)
+                upgrades = delta_upgrade.get_upgrades()
+                delta_upgrade.upgrade_mod(mod)
             elif(len(command.split(" ")) == 1):
                 mod = None
                 update_archive()
-                upgrades = CMAN_upgrade.get_upgrades()
-                CMAN_upgrade.upgrade_mod(mod)
+                upgrades = delta_upgrade.get_upgrades()
+                delta_upgrade.upgrade_mod(mod)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "upgradeall"):
@@ -343,30 +343,30 @@ def parsecmd(command):
             else:
                 cprint("Invalid command syntax.")
             update_archive()
-            updates = CMAN_upgrade.get_upgrades(inst)
+            updates = delta_upgrade.get_upgrades(inst)
             if(len(updates) == 0):
                 cprint("No upgrades available.")
             else:
                 for update in updates:
-                    CMAN_upgrade.upgrade_mod(update[0]["Name"])
+                    delta_upgrade.upgrade_mod(update[0]["Name"])
         elif(command.split(" ")[0] == "install"):
             if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
                 mod = command.split(" ")[1]
                 update_archive()
-                CMAN_install.install_mod(mod)
+                delta_install.install_mod(mod)
             elif(len(command.split(" ")) == 1):
                 mod = None
                 update_archive()
-                CMAN_install.install_mod(mod)
+                delta_install.install_mod(mod)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "remove"):
             if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
                 mod = command.split(" ")[1]
-                CMAN_remove.remove_mod(mod)
+                delta_remove.remove_mod(mod)
             elif(len(command.split(" ")) == 1):
                 mod = None
-                CMAN_remove.remove_mod(mod)
+                delta_remove.remove_mod(mod)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "info"):
@@ -385,7 +385,7 @@ def parsecmd(command):
                     string = string + item+", "
                 cprint(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
                 for item in modslist:
-                    CMAN_install.install_mod(item)
+                    delta_install.install_mod(item)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "removem" or command.split(" ")[0] == "removemany"):
@@ -397,7 +397,7 @@ def parsecmd(command):
                     string = string + item+", "
                 cprint(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
                 for item in modslist:
-                    CMAN_remove.remove_mod(item)
+                    delta_remove.remove_mod(item)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "upgradem" or command.split(" ")[0] == "upgrademany"):
@@ -409,29 +409,29 @@ def parsecmd(command):
                     string = string + item+", "
                 cprint(string[:-2]+"...") #[:-2] to cut off the extra ", " after the last element
                 for item in modslist:
-                    CMAN_upgrade.upgrade_mod(item)
+                    delta_upgrade.upgrade_mod(item)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "export"):
             if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
                 name = command.split(" ")[1]
                 update_archive()
-                CMAN_importexport.export_mods(name)
+                delta_importexport.export_mods(name)
             elif(len(command.split(" ")) == 1):
                 name = None
                 update_archive()
-                CMAN_importexport.export_mods(name)
+                delta_importexport.export_mods(name)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "import"):
             if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
                 path = command.split(" ")[1]
                 update_archive()
-                CMAN_importexport.import_mods(path)
+                delta_importexport.import_mods(path)
             elif(len(command.split(" ")) == 1):
                 path = None
                 update_archive()
-                CMAN_importexport.import_mods(path)
+                delta_importexport.import_mods(path)
             else:
                 cprint("Invalid command syntax.")
         elif(command.split(" ")[0] == "instance" or command.split(" ")[0] == "inst"):
@@ -500,7 +500,7 @@ def parsecmd(command):
         elif(command.split(" ")[0] == "list"):
             listmods()
         elif(command.split(" ")[0] == "version"):
-            cprint("CMAN v"+version)
+            cprint("DeltaMC v"+version)
         elif(command.split(" ")[0] == "help" or command.split(" ")[0] == "?"):
             print_help()
         elif(command.split(" ")[0] == "exit"):

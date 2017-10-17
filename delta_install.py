@@ -6,30 +6,31 @@ import json
 import sys
 import tarfile
 import zipfile
-from CMAN_util import *
+from delta_util import *
 import tkinter as tk
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
+from modclass import Mod
 
 modfolder = "@ERROR@"
-versionsfolder = "@ERROR@"
+jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 tkinst = None
 
 def init_config_install(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_install(data):
 	global tkinst
 	tkinst = data
 
 
-def install_mod(modname):
-	os.chdir(execdir + "/Data/CMAN-Archive")
+def install_mod(modname, version = None):
+	os.chdir(execdir + "/Data/DeltaMC-Archive")
 	if(modname == None):
-		modname = input("Enter mod name: ")
+		modname = cinput("Enter mod name: ")
 
 	if(os.path.exists(modname + ".json")):  # Telling user that file exists
 		for file in glob.glob(modname + ".json"):
@@ -38,11 +39,25 @@ def install_mod(modname):
 		cprint("Mod "+modname+" not found.")
 		return -1
 
-	json_data = get_json(modname)
+	mod_data = get_mod_from_name(modname)
+
+	if (version == None):
+		if (not is_any_version_compatible(mod_data)):
+			cprint('No version of the mod is compatible!')
+			return
+		version = get_latest_compatible_version(mod_data)
+
+	version_number = 0
+	for x in range(len(mod_data.versions)):
+		cprint(mod_data.versions[x]['Version'])
+		cprint(version)
+		if (version == mod_data.versions[x]['Version']):
+			version_number = x
+			break
 
 	# Install
-	modtype = json_data["Type"] # Work out which type of mod it is
-	IsUnstable = json.loads(json_data["Unstable"])
+	modtype = mod_data._type # Work out which type of mod it is
+	IsUnstable = mod_data.unstable
 	if (IsUnstable == True):
 		if not gui:
 			a = input("This mod may be unstable. Type OK to install, or anything else to cancel: ") == "OK"
@@ -57,15 +72,17 @@ def install_mod(modname):
 		cprint(modname + " is already installed!")
 		return
 
-	originalfile = execdir + "/Data/CMAN-Archive/" + modname + ".json"  # Saving Modname.json for future reference
+	originalfile = execdir + "/Data/DeltaMC-Archive/" + modname + ".json"  # Saving Modname.json for future reference
 	if(not os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
 			os.mkdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	os.chdir(execdir + "/LocalData/ModsDownloaded/"+instance)
 	newfilename = modname + ".installed"
-	newfile = open(newfilename, 'w+')
-	shutil.copyfile(originalfile, newfilename)
+	with open(newfilename, 'w+') as newfile:
+		installedjson = get_json(modname)
+		installedjson["Versions"] = [mod_data.versions[version_number]]
+		newfile.write(json.dumps(installedjson))
 
-	requirements = json_data["Requirements"]
+	requirements = mod_data.requirements
 	for requirement in requirements:
 		if (os.path.exists(requirement + ".installed") == False):
 			cprint("You must install " + requirement + " first!")
@@ -78,8 +95,8 @@ def install_mod(modname):
 			elif(not wanttoinstall):
 				msgbox.showerror("Installation Canceled", "The installation has been canceled due to required mod "+requirement+" not being installed.", parent=tkinst)
 				return -1
-	recommendations = json_data["Recommended"]
-	for recommendation in recommendations:
+	recommended = mod_data.recommended
+	for recommendation in recommended:
 		if (os.path.exists(recommendation + ".installed") == False):
 			cprint("This mod recommends " + recommendation + "!")
 			if not gui:
@@ -90,49 +107,51 @@ def install_mod(modname):
 				install_mod(recommendation)
 			elif(not wanttoinstall):
 				pass
-	incompatibilities = json_data["Incompatibilities"]
+	incompatibilities = mod_data.incompatibilities
 	for incompatibility in incompatibilities:
 		if (os.path.exists(incompatibility + ".installed") == True):
 			msgbox.showerror("Installation Canceled", "The installation has been canceled due to incompatible mod "+incompatibility+" being installed.", parent=tkinst)
 			return -1
+	mod_mc_versions = mod_data.versions[version_number]['MCVersion']
+	if (mc_version not in mod_mc_versions):
+		cprint("Mod not compatible with current Minecraft Version!")
+		return
+	url = get_url(mod_data, version)
+	cprint(modname + " is at version " + version)
 	if (modtype == "Basemod"):
 		os.chdir(execdir + "/Data/temp")
-		url = json_data["Link"]
-		version = json_data["Version"]
-		mcversions = json_data["MCVersion"]
-		cprint(modname + " is at version " + version)
-		file_name = modname + "-" + version + "-CMANtemp.zip"
+		file_name = modname + "-" + version + "-DeltaMCtemp.zip"
 		cprint("Downloading " + url)
 		with open(file_name, 'wb') as out_file:
 			response = requests.get(url)
 			out_file.write(response.content)
 		zipfile.ZipFile(file_name).extractall(path="./"+modname)
-		vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+		vname = cinput("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
 		#cannot check for compatibility because you may be installing into a modded jar with a nonstandard name
-		vpath = os.path.join(versionsfolder, vname)
+		vpath = os.path.join(jarfolder, vname)
 		while(not os.path.exists(vpath)):
 			cprint("The instance you selected was not found. Select another instance.")
-			vname = input("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
-			vpath = os.path.join(versionsfolder, vname)
+			vname = cinput("Enter name (as displayed in launcher) of minecraft instance to install into (compatible versions: "+display_versions(mcversions)+"): ")
+			vpath = os.path.join(jarfolder, vname)
 		jarname = vname+".jar"
 		jarpath = os.path.join(vpath, jarname)
 		foldername =  modname + "-" + version #the default version folder name
-		foldernamefinal = input("Enter install folder name or leave blank for default (default: "+foldername+"): ")
+		foldernamefinal = cinput("Enter install folder name or leave blank for default (default: "+foldername+"): ")
 		if(foldername == ""):
 			foldernamefinal = foldername
 		newjarname = foldername+".jar"
 		cprint("Installing on version "+vname+" as "+foldernamefinal+".")
-		if(os.path.exists(os.path.join(versionsfolder, foldernamefinal))):
-			if(input("The folder "+foldernamefinal+" already exists. Type OK to overwrite, or anything else to choose a new name: ") == "OK"):
-				shutil.rmtree(os.path.join(versionsfolder, foldernamefinal))
+		if(os.path.exists(os.path.join(jarfolder, foldernamefinal))):
+			if(cinput("The folder "+foldernamefinal+" already exists. Type OK to overwrite, or anything else to choose a new name: ") == "OK"):
+				shutil.rmtree(os.path.join(jarfolder, foldernamefinal))
 			else:
-				foldernamefinal = input("Enter new install folder name (current name: "+foldernamefinal+"): ")
-		folderpath = os.path.join(versionsfolder, foldernamefinal)
+				foldernamefinal = cinput("Enter new install folder name (current name: "+foldernamefinal+"): ")
+		folderpath = os.path.join(jarfolder, foldernamefinal)
 		shutil.copytree(vpath, folderpath)
 		fix_names(folderpath, vname, foldernamefinal)
-		zipfile.ZipFile(os.path.join(versionsfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"CMANtemp")
-		mergedirs(modname, file_name+"CMANtemp")
-		os.chdir(file_name+"CMANtemp")
+		zipfile.ZipFile(os.path.join(jarfolder, foldernamefinal, newjarname)).extractall(path="./"+file_name+"DeltaMCtemp")
+		mergedirs(modname, file_name+"DeltaMCtemp")
+		os.chdir(file_name+"DeltaMCtemp")
 		shutil.rmtree("META-INF") #delete META-INF
 		cprint("Making jar (this might take a while).")
 		shutil.make_archive("../"+foldername, "zip")
@@ -142,11 +161,8 @@ def install_mod(modname):
 
 	elif (modtype == "Forge"):
 		os.chdir(execdir + "/LocalData")
-		url = json_data["Link"]
-		version = json_data["Version"]
-		cprint(modname + " is at version " + version)
-		file_name = modname + "-" + version + ".jar"
 		os.chdir(modfolder)
+		file_name = modname + "-" + version + ".jar"
 		cprint("Downloading " + url + " as " + file_name)
 		with open(file_name, 'wb') as out_file:
 			response = requests.get(url)
@@ -155,9 +171,6 @@ def install_mod(modname):
 
 	elif (modtype == "Liteloader"):
 		os.chdir(execdir + "/LocalData")
-		url = json_data["Link"]
-		version = json_data["Version"]
-		cprint(modname + " is at version " + version)
 		file_name = modname + "-" + version + ".litemod"
 		os.chdir(modfolder)
 		cprint("Downloading " + url + " as " + file_name)
@@ -168,10 +181,10 @@ def install_mod(modname):
 
 	elif (modtype == "Installer"):
 		os.chdir(execdir + "/LocalData")
-		url = json_data["Link"]
-		version = json_data["Version"]
+		version = get_latest_version(mod_data)
+		url = get_url(mod_data, version)
 		cprint(modname + " is at version " + version)
-		file_name = json_data["InstallerName"]
+		file_name = mod_data.installer_name
 		os.chdir(execdir)
 		files = os.listdir(execdir)
 
@@ -182,7 +195,8 @@ def install_mod(modname):
 		if(gui):
 			msgbox.showinfo("Installer Downloaded", "The installer for "+modname+" has been downloaded.\nRun the installer, then click OK to continue.", parent=tkinst)
 		cprint("Done. Please run the installer.")
-	tkinst.mlisti.insert(tk.END, modname)
+		if (gui):
+			tkinst.mlisti.insert(tk.END, modname)
 	return 0
 
 def install_deps(modname):

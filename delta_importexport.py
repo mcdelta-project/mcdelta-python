@@ -5,16 +5,16 @@ import json
 import sys
 import tarfile
 import zipfile
-from CMAN_util import *
+from delta_util import *
 
 modfolder = "@ERROR@"
-versionsfolder = "@ERROR@"
+jarfolder = "@ERROR@"
 execdir = "@ERROR@"
 instance = "@ERROR@"
 
 def init_config_importexport(data): #data is a 5-tuple
-	global modfolder, versionsfolder, execdir, instance, gui #makes it edit the global vars rather than create new ones
-	modfolder, versionsfolder, execdir, instance, gui = data
+	global modfolder, jarfolder, mc_version, execdir, instance, gui #makes it edit the global vars rather than create new ones
+	modfolder, jarfolder, mc_version, execdir, instance, gui = data
 
 def recieve_tkinst_importexport(data):
 	global tkinst
@@ -22,7 +22,7 @@ def recieve_tkinst_importexport(data):
 
 def export_mods(filename):
 	if (filename == None):
-		filename = input("What would you like your new modlist to be called?")
+		filename = cinput("What would you like your new modlist to be called?")
 	os.chdir(execdir)
 	os.chdir("LocalData/Modlists")
 	mods = []
@@ -47,7 +47,7 @@ def export_mods(filename):
 
 def import_mods(path):
 	if (path == None):
-		path = input("Please enter the path to the modlist.")
+		path = cinput("Please enter the path to the modlist.")
 
 	if(os.path.exists(path)):  # Telling user that file exists
 		cprint(path + " found.")
@@ -62,4 +62,4 @@ def import_mods(path):
 	mods = json_data["Mods"]
 	for mod in mods:
 			cprint(mod)
-			CMAN_install.install_mod(mod)
+			delta_install.install_mod(mod)
