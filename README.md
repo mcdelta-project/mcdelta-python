@@ -1,6 +1,7 @@
 # DeltaMC
 
-![Badge](https://img.shields.io/github/downloads/comprehensive-minecraft-archive-network/CMAN-Python/total.svg)
+![Downloads](https://img.shields.io/github/downloads/deltamc-project/deltamc-python/total.svg)
+[![Build Status](https://travis-ci.org/deltamc-project/deltamc-python.svg?branch=master)](https://travis-ci.org/deltamc-project/deltamc-python)
 
 Licenced under the GPL v3
 
@@ -13,8 +14,3 @@ Have a mod on DeltaMC? Add one of these to your forum page so that everyone know
 ![Badge](https://img.shields.io/badge/DeltaMC-Indexed-green.svg?style=plastic)
 
 Proudly supporting [#StopModReposts](http://www.stopmodreposts.org)!
-
-
-#Issue tracker
-
-[![Stories in Ready](https://badge.waffle.io/Comprehensive-Minecraft-Archive-Network/CMAN-Python.png?label=ready&title=Ready)](http://waffle.io/Comprehensive-Minecraft-Archive-Network/CMAN-Python)
