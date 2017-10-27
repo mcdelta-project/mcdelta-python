@@ -406,16 +406,16 @@ def get_info_console(modname, output=False):
 	mod_data = get_mod_from_name(modname)
 	if (mod_data != None):
 		stable = "Unstable" if mod_data.unstable else "Stable"
-		istr.append(mod_data.name+":"+"\n\n")
-		istr.append("Latest Version: "+get_latest_version(mod_data)+" ("+stable+")"+"\n\n")
-		istr.append("Author(s): "+mod_data.author+"\n\n")
-		istr.append("Description: "+mod_data.desc+"\n\n")
-		istr.append("Requirements: "+str(mod_data.requirements)+"\n\n")
-		istr.append("Known Incompatibilities: "+str(mod_data.incompatibilities)+"\n\n")
-		istr.append("Download Link: "+get_url(mod_data, version)+"\n\n")
-		istr.append("License: "+mod_data.license)
+		istr += mod_data.name+":"+"\n\n"
+		istr += "Latest Version: "+get_latest_version(mod_data)+" ("+stable+")"+"\n\n"
+		istr += "Author(s): "+mod_data.author+"\n\n"
+		istr += "Description: "+mod_data.desc+"\n\n"
+		istr += "Requirements: "+str(mod_data.requirements)+"\n\n"
+		istr += "Known Incompatibilities: "+str(mod_data.incompatibilities)+"\n\n"
+		istr += "Download Link: "+get_url(mod_data, version)+"\n\n"
+		istr += "License: "+mod_data.license
 	else:
-		istr.append("Mod "+modname+" not found.")
+		istr += "Mod "+modname+" not found."
 	if(output):
 		cprint(istr)
 	else:
@@ -434,20 +434,20 @@ def get_info(modname, output=True):
 	mod_data = get_mod_from_name(modname)
 	if (mod_data != None):
 		stable = "Unstable" if mod_data.unstable else "Stable"
-		istr.append(mod_data.name+":"+"\n\n")
-		istr.append("Latest Version: "+get_latest_version(mod_data)+" ("+stable+")"+"\n\n")
-		istr.append("Author(s): "+mod_data.author+"\n\n")
-		istr.append("Description: "+mod_data.desc+"\n\n")
-		istr.append("Requirements: "+str(mod_data.requirements)+"\n\n")
-		istr.append("Known Incompatibilities: "+str(mod_data.incompatibilities)+"\n\n")
-		istr.append("Download Link: "+get_url(mod_data, version)+"\n\n")
-		istr.append("License: "+mod_data.license)
+		istr += mod_data.name+":"+"\n\n"
+		istr += "Latest Version: "+get_latest_version(mod_data)+" ("+stable+")"+"\n\n"
+		istr += "Author(s): "+mod_data.author+"\n\n"
+		istr += "Description: "+mod_data.desc+"\n\n"
+		istr += "Requirements: "+str(mod_data.requirements)+"\n\n"
+		istr += "Known Incompatibilities: "+str(mod_data.incompatibilities)+"\n\n"
+		istr += "Download Link: "+get_url(mod_data, version)+"\n\n"
+		istr += "License: "+mod_data.license
 	else:
-		istr.append("Mod "+modname+" not found.")
-		if(output):
-			cprint(istr)
-		else:
-			return(istr)
+		istr += "Mod "+modname+" not found."
+	if(output):
+	    cprint(istr)
+	else:
+	    return(istr)
 
 
 def print_help():
