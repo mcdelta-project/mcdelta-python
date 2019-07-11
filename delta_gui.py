@@ -81,7 +81,10 @@ def updateinfo(event):
     elif len(_mods) == 1:
         _mod = _mods[0]
         if event.widget == tkinst.mlist:
-            name = tkinst.mods[int(_mod)]["Name"]
+            if(int(_mod) < len(tkinst.mods)):
+                name = tkinst.mods[int(_mod)]["Name"]
+            else:
+                name = tkinst.mods_curse[int(_mod)-len(tkinst.mods)]
         elif event.widget == tkinst.mlisti:
             name = tkinst.modsi[int(_mod)]["Name"]
         iprint(get_info_console(name, output=False))
@@ -156,11 +159,15 @@ class Gui(tk.Frame):
         self.pack(expand=True, fill=tk.BOTH)
     def update_modlist(self):
         self.mods = listmods_all(False)
+        self.mods_curse = json.loads(requests.get("http://kpabr.com/curse/mods").text)
         self.mlist.delete(0, tk.END)
         for mod in self.mods:
             #print(mod)
             if mod != None:
                 self.mlist.insert(tk.END, mod["Name"])
+        for mod in self.mods_curse:
+            #print(mod)
+                self.mlist.insert(tk.END, mod)
     def initialise_window(self):
         self.master.title("DeltaMC v2.1.0")
         #self.master.geometry("800x400")
