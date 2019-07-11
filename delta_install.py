@@ -28,18 +28,21 @@ def recieve_tkinst_install(data):
 
 
 def install_mod(modname, version = None):
+	mods_curse = json.loads(requests.get("http://kpabr.com/curse/mods").text)
 	os.chdir(execdir + "/Data/DeltaMC-Archive")
 	if(modname == None):
 		modname = cinput("Enter mod name: ")
-
 	if(os.path.exists(modname + ".json")):  # Telling user that file exists
 		for file in glob.glob(modname + ".json"):
 			cprint(file + " found.")
+			mod_data = get_mod_from_name(modname)
+	elif modname in mods_curse:
+		cprint(modname + " found on CurseForge.")
+		mod_data = get_mod_from_json(get_mod_from_curse(modname))
 	else:
 		cprint("Mod "+modname+" not found.")
 		return -1
 
-	mod_data = get_mod_from_name(modname)
 
 	if (version == None):
 		if (not is_any_version_compatible(mod_data)):
@@ -79,6 +82,8 @@ def install_mod(modname, version = None):
 	newfilename = modname + ".installed"
 	with open(newfilename, 'w+') as newfile:
 		installedjson = get_json(modname)
+		if installedjson == None:
+			installedjson = get_mod_from_curse(modname)
 		installedjson["Versions"] = [mod_data.versions[version_number]]
 		newfile.write(json.dumps(installedjson))
 
