@@ -366,9 +366,7 @@ def update_archive(start=False):
 		shutil.rmtree("DeltaMC-Archive")
 	# Archive Download
 	url = "https://github.com/deltamc-project/deltamc-archive/tarball/master"
-	#curse_url = "https://addons-ecs.forgesvc.net/api/v2/addon/search?&gameId=432" #this is from the Twitch/Curse API, it gets all mods on CurseForge at once
 	file_name = "DeltaMC.tar.gz"
-	#curse_file_name = "cursemods.json"
 	cprint("Downloading Archive...")
 	# Download it.
 	try:
@@ -492,51 +490,7 @@ def get_mod_from_json(json_data):
 		json_data["Unstable"], json_data["Versions"])
 	return mod
 
-def get_mod_from_json_curse(entry):
-	authors = []
-	for author in entry["authors"]:
-		authors.append(author["name"])
-	versions = []
-	for version in entry["gameVersionLatestFiles"]:
-		versiondict = {}
-		versiondict["Version"] = version["projectFileId"]
-		versiondict["MCVersion"] = [version["gameVersion"]]
-		versiondict["Link"] = "https://www.curseforge.com/minecraft/mc-mods/"+entry["slug"]+"/download/"+str(version["projectFileId"])
-		versions.append(versiondict)
-	mod = Mod(entry["slug"], ", ".join(authors), entry["summary"], "N/A", "N/A", "Forge", "N/A", versions)
-	return mod
-
-def get_json_from_curse(entry):
-	authors = []
-	for author in entry["authors"]:
-		authors.append(author["name"])
-	versions = []
-	for version in entry["gameVersionLatestFiles"]:
-		versiondict = {}
-		versiondict["Version"] = str(version["projectFileId"])
-		versiondict["MCVersion"] = [version["gameVersion"]]
-		versiondict["Link"] = "https://www.curseforge.com/minecraft/mc-mods/"+entry["slug"]+"/download/"+str(version["projectFileId"])
-		versions.append(versiondict)
-	mod = {"Name": entry["slug"], "Author": ", ".join(authors), "Desc": entry["summary"], "License": "N/A", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
-	return mod
-
-def get_mod_from_curse(modname):
-	entry = json.loads(requests.get("https://ddph1n5l22.execute-api.eu-central-1.amazonaws.com/dev/mod/"+modname).text)["result"]
-	versions_data = json.loads(requests.get("https://ddph1n5l22.execute-api.eu-central-1.amazonaws.com/dev/mod/"+modname+"/files").text)["result"]
-	versions = []
-	for version in versions_data:
-		versiondict = {}
-		versiondict["Version"] = str(version["id"])
-		versiondict["MCVersion"] = version["minecraft_version"][0]
-		versiondict["Link"] = version["download_url"]
-		versions.append(versiondict)
-	mod = {"Name": entry["name"], "Author": entry["owner"], "Desc": entry["description"], "License": "N/A", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
-	return mod
-
-
 def get_mod_from_name(modname):
-	if get_json(modname) == None:
-		return get_mod_from_json(get_mod_from_curse(modname))
 	return get_mod_from_json(get_json(modname))
 
 def get_url(mod, version):
