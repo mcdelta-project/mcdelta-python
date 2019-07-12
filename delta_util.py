@@ -42,7 +42,7 @@ def read_default_instance():
 def check_for_updates():
 	response = requests.get('https://raw.githubusercontent.com/deltamc-project/deltamc-python/master/version.txt')
 	latestversion = response.text
-	if (version != str(latestversion)):
+	if (str(version).strip() != str(latestversion).strip()):
 		#if (gui):
 		#	msgbox.askyesno("Update available", "You are running DeltaMC " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
 		#else:
@@ -210,7 +210,8 @@ def get_json(modname):
 		curse = get_mod_from_curse(modname)
 		if curse != None:
 			return(curse)
-		return(None)
+		else:
+			return(None)
 
 def get_installed_json(modname):
 	if(os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
@@ -539,13 +540,11 @@ def get_mod_from_curse(modname):
 		versiondict["MCVersion"] = version["minecraft_version"][0]
 		versiondict["Link"] = version["download_url"]
 		versions.append(versiondict)
-	mod = {"Name": entry["name"], "Author": entry["owner"], "Desc": entry["description"], "License": "N/A", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
+	mod = {"Name": entry["name"], "Author": entry["owner"], "Desc": entry["description"], "License": "Not available for CurseForge mods", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
 	return mod
 
 
 def get_mod_from_name(modname):
-	if get_json(modname) == None:
-		return get_mod_from_json(get_mod_from_curse(modname))
 	return get_mod_from_json(get_json(modname))
 
 def get_url(mod, version):
