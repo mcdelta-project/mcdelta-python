@@ -28,7 +28,7 @@ def upgrade_mod(modname):
 	os.chdir(execdir + "/Data/DeltaMC-Archive")
 	if(modname == None):
 		modname = cinput("Enter mod name: ")
-	update = [get_installed_json(modname),get_mod(modname)]
+	update = [get_installed_json(modname),get_json(modname)]
 	if(os.path.exists(os.path.join(execdir + "/LocalData/ModsDownloaded/"+instance, modname + ".installed"))):  # Telling user that file exists
 		for file in glob.glob(modname + ".installed"):
 			cprint(file + " found.")
@@ -36,7 +36,7 @@ def upgrade_mod(modname):
 		cprint("Mod "+modname+" not found.")
 		return
 	os.chdir(execdir + "/LocalData") #restoring current working dir
-	if(update[1]["Versions"][0]["Version"] != get_latest_compatible_version(update[0]) and mod_installed(modname)):
+	if(update[1]["Versions"][0]["Version"] != get_latest_compatible_version(get_mod_from_json(update[0])) and mod_installed(modname)):
 		delta_remove.remove_mod(modname)
 		delta_install.install_mod(modname)
 	elif(not mod_installed(modname)):

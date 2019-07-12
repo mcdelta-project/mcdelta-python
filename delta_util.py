@@ -207,6 +207,9 @@ def get_json(modname):
 				return
 		return(json_data)
 	else:
+		curse = get_mod_from_curse(modname)
+		if curse != None:
+			return(curse)
 		return(None)
 
 def get_installed_json(modname):
@@ -280,6 +283,8 @@ def get_installed_mods(inst = None, allinst=True):
 			_mods = os.listdir(execdir + "/LocalData/ModsDownloaded/"+inst)
 			os.chdir(execdir + "/LocalData/ModsDownloaded/"+inst)
 			for _mod in _mods:
+				if _mod == '.DS_Store':
+					continue
 				json_data = get_installed_json(_mod[:-10]) #[:-10] cuts off the .installed extension
 				mods.append(get_mod_from_json(json_data))
 	return(mods)
@@ -290,6 +295,8 @@ def get_all_jsons():
 	if(os.path.exists(execdir + "/Data/DeltaMC-Archive")):
 		mods = os.listdir(execdir + "/Data/DeltaMC-Archive")
 		for mod in mods:
+			if mod == "README.md":
+				continue
 			json_data = get_json(mod[:-5]) #[:-5] cuts off the .json extension
 			if json_data != None:
 				jsons.append(json_data)
@@ -522,6 +529,8 @@ def get_json_from_curse(entry):
 
 def get_mod_from_curse(modname):
 	entry = json.loads(requests.get("https://ddph1n5l22.execute-api.eu-central-1.amazonaws.com/dev/mod/"+modname).text)["result"]
+	if entry == None:
+		return(None)
 	versions_data = json.loads(requests.get("https://ddph1n5l22.execute-api.eu-central-1.amazonaws.com/dev/mod/"+modname+"/files").text)["result"]
 	versions = []
 	for version in versions_data:

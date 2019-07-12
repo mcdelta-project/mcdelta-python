@@ -24,6 +24,7 @@ def recieve_tkinst_remove(data):
 	tkinst = data
 
 def remove_mod(modname): #behavior not guaranteed on mods installed outside of DeltaMC
+	print("MOD NAME IS "+modname)
 	if(modname == None):
 		modname = cinput("Enter mod name: ")
 	cprint("Removing file for mod in ModsDownloaded")
