@@ -5,7 +5,6 @@ import json
 import sys
 import tarfile
 import zipfile
-import argparse
 import tkinter as tk
 import delta_remove
 import delta_upgrade
@@ -68,23 +67,38 @@ root = None
 
 tkinst = None
 
-parser = argparse.ArgumentParser(description="DeltaMC: A package manager for Minecraft Mods")
+def print_usage():
+	pass
 
-parser.add_argument("-i", "--install", help="install mod", metavar="MOD", default="None")
-parser.add_argument("-r", "--remove", help="remove mod", metavar="MOD", default="None")
-parser.add_argument("-u", "--upgrade", help="upgrade mod", metavar="MOD", default="None")
-parser.add_argument("--info", help="give info about a mod", metavar="MOD", default="None")
-parser.add_argument("-e", "--export", help="export a modlist", metavar="FILENAME", default="None")
-parser.add_argument("--import", help="import a modlist", metavar="MODLIST", default="None", dest="importa")  # importa because import is already taken
-parser.add_argument("-I", "--instance", help="sets the Minecraft instance to install into", metavar="INSTANCE", default=instance)
-parser.add_argument("-g", "--gui", help="enable GUI", action="store_true")
-args = parser.parse_args()
-gui = args.gui
+valid_actions_with_args = ['install', 'remove', 'upgrade', 'search', 'export', 'import', 'instance']
+valid_actions_no_args = ['gui', 'help']
+
+args = {'gui': False, 'instance': "None", 'install': "None", 'remove': "None", 'upgrade': "None", 'info': "None", 'export': "None", 'importa': "None"}
+if len(sys.argv) == 2 and sys.argv[1] in valid_actions_with_args: #1 argument
+	cprint(f"MCDelta: fatal: action {sys.argv[1]} requires arguments")
+	print_usage()
+	sys.exit(2)
+elif len(sys.argv) == 2 and sys.argv[1] in valid_actions_no_args: #1 argument
+	action = sys.argv[1]
+	if action == 'help':
+		print_usage()
+		sys.exit(0)
+	else:
+		args["gui"] = True
+elif len(sys.argv) >= 3 and sys.argv[1] in valid_actions_with_args: #2 arguments
+	action = sys.argv[1]
+	args[action] = sys.argv[2:]
+else:
+	cprint(f"MCDelta: fatal: action {sys.argv[1]} does not exist")
+	print_usage()
+	sys.exit(2)
+
+gui = args["gui"]
 
 if (gui):
 	root = tk.Tk()
 
-# print(args.gui)
+# print(args["gui"])
 # print(gui)
 
 # not making Data dir here because it is done later
@@ -137,8 +151,8 @@ check_for_updates()
 
 cprint("DeltaMC v"+version)
 instance = delta_gui.instance
-if (args.instance != "None"):
-	instance = args.instance
+if (args["instance"] != "None"):
+	instance = args["instance"]
 if(instance == "@ERROR@"):
 	instance = delta_gui.instance
 cprint("Selected Instance: "+instance)
@@ -151,23 +165,23 @@ else:
 	cprint("The following upgrades are available for instance "+instance+":")
 	for upgrade in upgradesavailable:
 		cprint(" "+upgrade[0].name+" (current version: "+upgrade[1].versions[0]["Version"]+", you have: "+upgrade[0].versions[0]["Version"]+")")
-if (args.install != "None"):
-	delta_install.install_mod(args.install)
+if (args["install"] != "None"):
+	delta_install.install_mod(args["install"][0])
 	sys.exit()
-if (args.remove != "None"):
-	delta_remove.remove_mod(args.remove)
+if (args["remove"] != "None"):
+	delta_remove.remove_mod(args["remove"][0])
 	sys.exit()
-if (args.upgrade != "None"):
-	delta_upgrade.upgrade_mod(args.upgrade)
+if (args["upgrade"] != "None"):
+	delta_upgrade.upgrade_mod(args["upgrade"][0])
 	sys.exit()
-if (args.info != "None"):
-	get_info(args.info, output=True)
+if (args["search"] != "None"):
+	get_info(args["search"][0], output=True)
 	sys.exit()
-if (args.export != "None"):
-	delta_importexport.export_mods(args.export)
+if (args["export"] != "None"):
+	delta_importexport.export_mods(args["export"][0])
 	sys.exit()
-if (args.importa != "None"):
-	delta_importexport.import_mods(args.importa)
+if (args["importa"] != "None"):
+	delta_importexport.import_mods(args["importa"][0])
 	sys.exit()
 
 if (gui == False):
