@@ -73,7 +73,7 @@ def print_usage():
 valid_actions_with_args = ['install', 'remove', 'upgrade', 'search', 'export', 'import', 'instance']
 valid_actions_no_args = ['gui', 'help']
 
-args = {'gui': False, 'instance': "None", 'install': "None", 'remove': "None", 'upgrade': "None", 'info': "None", 'export': "None", 'importa': "None"}
+args = {'gui': False, 'instance': "None", 'install': "None", 'remove': "None", 'upgrade': "None", 'search': "None", 'export': "None", 'importa': "None"}
 if len(sys.argv) == 2 and sys.argv[1] in valid_actions_with_args: #1 argument
 	cprint(f"MCDelta: fatal: action {sys.argv[1]} requires arguments")
 	print_usage()
@@ -89,9 +89,10 @@ elif len(sys.argv) >= 3 and sys.argv[1] in valid_actions_with_args: #2 arguments
 	action = sys.argv[1]
 	args[action] = sys.argv[2:]
 else:
-	cprint(f"MCDelta: fatal: action {sys.argv[1]} does not exist")
-	print_usage()
-	sys.exit(2)
+	if len(sys.argv) >= 2:
+		cprint(f"MCDelta: fatal: action {sys.argv[1]} does not exist")
+		print_usage()
+		sys.exit(2)
 
 gui = args["gui"]
 
