@@ -1,0 +1,5 @@
+echo '#!/bin/sh' > deltamc
+echo "python3 `pwd`/deltamc.py \$@" >> deltamc
+
+echo "export PATH=\$PATH:`pwd`" >> ~/.bash_profile
+echo "export PATH=\$PATH:`pwd`" >> ~/.bashrc
