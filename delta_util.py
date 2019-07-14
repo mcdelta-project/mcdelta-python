@@ -540,7 +540,7 @@ def get_mod_from_curse(modname):
 		versiondict["MCVersion"] = version["minecraft_version"][0]
 		versiondict["Link"] = version["download_url"]
 		versions.append(versiondict)
-	mod = {"Name": entry["name"], "Author": entry["owner"], "Desc": entry["description"], "License": "Not available for CurseForge mods", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
+	mod = {"Name": entry["slug"], "Author": entry["owner"], "Desc": entry["description"], "License": "Not available for CurseForge mods", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
 	return mod
 
 
