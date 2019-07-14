@@ -16,8 +16,8 @@ from delta_util import *
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
 
-execdir = os.getcwd()  # needed for startup
-
+execdir = os.getenv("DELTA_HOME")  # needed for startup
+os.chdir(execdir)
 
 def read_default_instance():
 	old_cwd = os.getcwd() #to reset cwd afterward

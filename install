@@ -3,3 +3,8 @@ echo "python3 `pwd`/deltamc.py \$@" >> deltamc
 
 echo "export PATH=\$PATH:`pwd`" >> ~/.bash_profile
 echo "export PATH=\$PATH:`pwd`" >> ~/.bashrc
+
+echo "export DELTA_HOME=`pwd`" >> ~/.bash_profile
+echo "export DELTA_HOME=`pwd`" >> ~/.bashrc
+
+bash ~/.bash_profile
