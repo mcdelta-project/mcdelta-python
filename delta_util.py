@@ -308,15 +308,20 @@ def switch_path_dir(path, dir): #switches tkinst of path to dir given
 	pathsplit[0] = dir.split(os.sep)[-1] #just in case it ends with os.sep
 	return(os.sep.join(pathsplit))
 
-def listmods(output=True, allinst=True):
-	modsinstalled = get_installed_jsons(inst = None, allinst=allinst)
-	if output:
-		cprint("Installed mods:")
-		cprint(str(modsinstalled))
-	else:
-		return modsinstalled
+def listmods(allinst=True):
+	modsinstalled = listmods_no_output(allinst=allinst)
+	cprint("Installed mods:")
+	cprint(str(modsinstalled))
 
-def listmods_all(output=True):
+def listmods_no_output(allinst=True):
+	return get_installed_jsons(inst = None, allinst=allinst)
+
+def listmods_all():
+	mods = listmods_all_no_output()
+	cprint("Mods:")
+	cprint(str(mods))
+
+def listmods_all_no_output():
 	mods = get_all_jsons()
 	if output:
 		cprint("Mods:")
@@ -409,7 +414,7 @@ def update_archive(start=False):
 	if(gui and not start):
 		msgbox.showinfo("Archive updated", "The DeltaMC archive has been successfully updated.", parent=tkinst)
 
-def get_info_console(modname, output=False):
+def get_info_console(modname):
 	istr = []
 	ostr = ""
 	if(modname == None):
@@ -428,17 +433,17 @@ def get_info_console(modname, output=False):
 		istr += ["License: "+mod_data.license]
 	else:
 		istr += "Mod "+modname+" not found."
-	if(output):
-		cprint(istr)
-	else:
-		for _istr in istr:
-			_istr = textwrap.fill(_istr, 46)
-			ostr = ostr+_istr+"\n\n"
-		#print(textwrap.fill(istr, 46).replace("  *", "\n\n"))
-		return(ostr)
+	for _istr in istr:
+		_istr = textwrap.fill(_istr, 46)
+		ostr = ostr+_istr+"\n\n"
+	#print(textwrap.fill(istr, 46).replace("  *", "\n\n"))
+	return(ostr)
+
+def get_info_console_output(modname):
+	cprint(get_info_console(modname))
 
 
-def get_info(modname, output=True):
+def get_info_no_output(modname):
 	istr = ""
 	if(modname == None):
 		modname = cinput("Enter mod name: ")
@@ -456,10 +461,10 @@ def get_info(modname, output=True):
 		istr += "License: "+mod_data.license
 	else:
 		istr += "Mod "+modname+" not found."
-	if(output):
-	    cprint(istr)
-	else:
-	    return(istr)
+	return(istr)
+
+def get_info(modname):
+	cprint(get_info_no_output(modname))
 
 
 def print_help():

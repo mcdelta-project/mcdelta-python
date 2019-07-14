@@ -176,7 +176,7 @@ if (args["upgrade"] != "None"):
 	delta_upgrade.upgrade_mod(args["upgrade"][0])
 	sys.exit()
 if (args["search"] != "None"):
-	get_info(args["search"][0], output=True)
+	get_info(args["search"][0])
 	sys.exit()
 if (args["export"] != "None"):
 	delta_importexport.export_mods(args["export"][0])
@@ -278,10 +278,10 @@ def parsecmd(command):
 		elif(command.split(" ")[0] == "info"):
 			if(len(command.split(" ")) == 2 and command.split(" ")[1] != ""):
 				mod = command.split(" ")[1]
-				get_info(mod, output=True)
+				get_info(mod)
 			elif(len(command.split(" ")) == 1):
 				mod = None
-				get_info(mod, output=True)
+				get_info(mod)
 		elif(command.split(" ")[0] == "installm" or command.split(" ")[0] == "installmany"):
 			if(len(command.split(" ")) >= 2):
 				modslist = command.split(" ")[1:] # separate mod names with spaces

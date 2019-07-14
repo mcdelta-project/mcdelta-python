@@ -87,7 +87,7 @@ def updateinfo(event):
                 name = tkinst.mods_curse[int(_mod)-len(tkinst.mods)]
         elif event.widget == tkinst.mlisti:
             name = tkinst.modsi[int(_mod)]["Name"]
-        iprint(get_info_console(name, output=False))
+        iprint(get_info_console(name))
     else:
         iprint("Multiple mods selected.")
 
@@ -131,7 +131,7 @@ def updateinst():
     gui_setup_config(name)
     tkinst.ilabel.configure(text = "Current Instance: "+instance)
     tkinst.mlisti.delete(0, tk.END)
-    tkinst.modsi = listmods(False, False)
+    tkinst.modsi = listmods_no_output(False)
     upgrades = delta_upgrade.get_upgrade_names(instance)
     for mod in tkinst.modsi:
         if mod != None:
@@ -158,7 +158,7 @@ class Gui(tk.Frame):
         self.initialise_window()
         self.pack(expand=True, fill=tk.BOTH)
     def update_modlist(self):
-        self.mods = listmods_all(False)
+        self.mods = listmods_all_no_output()
         self.mods_curse = json.loads(requests.get("http://kpabr.com/curse/mods").text)
         self.mlist.delete(0, tk.END)
         for mod in self.mods:
@@ -262,7 +262,7 @@ class Gui(tk.Frame):
         self.mpane = tk.Frame(self.win)
         self.win.add(self.mpane)
 
-        self.mods = listmods_all(False)
+        self.mods = listmods_all_no_output()
         self.modslabel = tk.Label(self.mpane, text = "Available Mods: ")
         self.modslabel.pack()
         self.mlists = tk.Scrollbar(self.mpane, orient=tk.VERTICAL)
@@ -280,7 +280,7 @@ class Gui(tk.Frame):
         self.rpane = tk.Frame(self.win)
         self.win.add(self.rpane)
 
-        self.modsi = listmods(False, False)
+        self.modsi = listmods_no_output(False)
         self.imodslabel = tk.Label(self.rpane, text = "Installed Mods: ")
         self.imodslabel.pack()
         self.mlistsi = tk.Scrollbar(self.rpane, orient=tk.VERTICAL)
