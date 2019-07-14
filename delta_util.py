@@ -525,7 +525,7 @@ def get_json_from_curse(entry):
 		versiondict["MCVersion"] = [version["gameVersion"]]
 		versiondict["Link"] = "https://www.curseforge.com/minecraft/mc-mods/"+entry["slug"]+"/download/"+str(version["projectFileId"])
 		versions.append(versiondict)
-	mod = {"Name": entry["slug"], "Author": ", ".join(authors), "Desc": entry["summary"], "License": "N/A", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
+	mod = {"Name": entry["key"], "Author": ", ".join(authors), "Desc": entry["summary"], "License": "N/A", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
 	return mod
 
 def get_mod_from_curse(modname):
@@ -540,7 +540,7 @@ def get_mod_from_curse(modname):
 		versiondict["MCVersion"] = version["minecraft_version"][0]
 		versiondict["Link"] = version["download_url"]
 		versions.append(versiondict)
-	mod = {"Name": entry["slug"], "Author": entry["owner"], "Desc": entry["description"], "License": "Not available for CurseForge mods", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
+	mod = {"Name": entry["key"], "Author": entry["owner"], "Desc": entry["description"], "License": "Not available for CurseForge mods", "Requirements": [], "Incompatibilities": [], "Recommended": [], "Type": "Forge", "Unstable": "N/A", "Versions": versions}
 	return mod
 
 
