@@ -16,9 +16,6 @@ from delta_util import *
 import tkinter.messagebox as msgbox
 import tkinter.simpledialog as dialogs
 
-execdir = os.getenv("DELTA_HOME")  # needed for startup
-os.chdir(execdir)
-
 def read_default_instance():
 	old_cwd = os.getcwd() #to reset cwd afterward
 	if (os.path.exists("LocalData") == False):
@@ -59,134 +56,8 @@ def transfer_tkinst():
 	delta_importexport.recieve_tkinst_importexport(tkinst)
 	delta_gui.recieve_tkinst_gui(tkinst)
 
-
-
-# Start Program Here:
-
-root = None
-
-tkinst = None
-
 def print_usage():
 	pass
-
-valid_actions_with_args = ['install', 'remove', 'upgrade', 'search', 'export', 'import', 'instance']
-valid_actions_no_args = ['gui', 'help']
-
-args = {'gui': False, 'instance': "None", 'install': "None", 'remove': "None", 'upgrade': "None", 'search': "None", 'export': "None", 'importa': "None"}
-if len(sys.argv) == 2 and sys.argv[1] in valid_actions_with_args: #1 argument
-	cprint(f"MCDelta: fatal: action {sys.argv[1]} requires arguments")
-	print_usage()
-	sys.exit(2)
-elif len(sys.argv) == 2 and sys.argv[1] in valid_actions_no_args: #1 argument
-	action = sys.argv[1]
-	if action == 'help':
-		print_usage()
-		sys.exit(0)
-	else:
-		args["gui"] = True
-elif len(sys.argv) >= 3 and sys.argv[1] in valid_actions_with_args: #2 arguments
-	action = sys.argv[1]
-	args[action] = sys.argv[2:]
-else:
-	if len(sys.argv) >= 2:
-		cprint(f"MCDelta: fatal: action {sys.argv[1]} does not exist")
-		print_usage()
-		sys.exit(2)
-
-gui = args["gui"]
-
-if (gui):
-	root = tk.Tk()
-
-# print(args["gui"])
-# print(gui)
-
-# not making Data dir here because it is done later
-if (os.path.exists("LocalData") == False):
-	os.mkdir("LocalData")
-if (os.path.exists("LocalData/ModsDownloaded") == False):
-	os.mkdir("LocalData/ModsDownloaded")
-if (os.path.exists("LocalData/Modlists") == False):
-	os.mkdir("LocalData/Modlists")
-try:
-	shutil.rmtree("Data")  # deleting Data dir
-except(FileNotFoundError):  # Data dir not present
-	pass
-if (os.path.exists("Data") == False):
-	os.mkdir("Data")
-if (os.path.exists("Data/temp") == False):
-	os.mkdir("Data/temp")
-
-instance = read_default_instance()
-
-try:
-	with open("LocalData/config.json") as json_file:
-		json_data = json.load(json_file)
-		insts = json_data.keys()
-	for inst in insts:
-		if(not os.path.exists(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))):  # creating modsdownloaded subdirs for each instance
-			os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
-except:
-	pass
-
-execdir = os.getcwd()
-
-setup_config(instance)
-
-if (gui):
-	tkinst = Gui(root)
-
-transfer_tkinst()
-
-cprint("You are running " + sys.platform)
-
-update_archive(True)
-
-if(gui):
-	delta_gui.updateinst()
-
-	tkinst.update_modlist()
-
-check_for_updates()
-
-cprint("DeltaMC v"+version)
-instance = delta_gui.instance
-if (args["instance"] != "None"):
-	instance = args["instance"]
-if(instance == "@ERROR@"):
-	instance = delta_gui.instance
-cprint("Selected Instance: "+instance)
-cprint("Minecraft Version: "+mc_version)
-
-upgradesavailable = delta_upgrade.get_upgrades(instance)
-if (upgradesavailable == []):
-	pass
-else:
-	cprint("The following upgrades are available for instance "+instance+":")
-	for upgrade in upgradesavailable:
-		cprint(" "+upgrade[0].name+" (current version: "+upgrade[1].versions[0]["Version"]+", you have: "+upgrade[0].versions[0]["Version"]+")")
-if (args["install"] != "None"):
-	delta_install.install_mod(args["install"][0])
-	sys.exit()
-if (args["remove"] != "None"):
-	delta_remove.remove_mod(args["remove"][0])
-	sys.exit()
-if (args["upgrade"] != "None"):
-	delta_upgrade.upgrade_mod(args["upgrade"][0])
-	sys.exit()
-if (args["search"] != "None"):
-	get_info(args["search"][0])
-	sys.exit()
-if (args["export"] != "None"):
-	delta_importexport.export_mods(args["export"][0])
-	sys.exit()
-if (args["importa"] != "None"):
-	delta_importexport.import_mods(args["importa"][0])
-	sys.exit()
-
-if (gui == False):
-	print_help()
 
 def parsecmd(command):
 		if(command.split(" ")[0] == "update"):
@@ -442,12 +313,138 @@ def parsecmd(command):
 			cprint("Unknown command.")
 
 
+if __name__ == "__main__":
 
-if (gui == True):
-	tkinst.mainloop()
+	execdir = os.getenv("DELTA_HOME")  # needed for startup
+	os.chdir(execdir)
 
-else:
-	while(True):
-		os.chdir(execdir + "/LocalData/") # reset current working dir
-		command = input("> ")
-		parsecmd(command)
+	root = None
+
+	tkinst = None
+
+	valid_actions_with_args = ['install', 'remove', 'upgrade', 'search', 'export', 'import', 'instance']
+	valid_actions_no_args = ['gui', 'help']
+
+	args = {'gui': False, 'instance': "None", 'install': "None", 'remove': "None", 'upgrade': "None", 'search': "None", 'export': "None", 'importa': "None"}
+	if len(sys.argv) == 2 and sys.argv[1] in valid_actions_with_args: #1 argument
+		cprint(f"MCDelta: fatal: action {sys.argv[1]} requires arguments")
+		print_usage()
+		sys.exit(2)
+	elif len(sys.argv) == 2 and sys.argv[1] in valid_actions_no_args: #1 argument
+		action = sys.argv[1]
+		if action == 'help':
+			print_usage()
+			sys.exit(0)
+		else:
+			args["gui"] = True
+	elif len(sys.argv) >= 3 and sys.argv[1] in valid_actions_with_args: #2 arguments
+		action = sys.argv[1]
+		args[action] = sys.argv[2:]
+	else:
+		if len(sys.argv) >= 2:
+			cprint(f"MCDelta: fatal: action {sys.argv[1]} does not exist")
+			print_usage()
+			sys.exit(2)
+
+	gui = args["gui"]
+
+	if (gui):
+		root = tk.Tk()
+
+	# print(args["gui"])
+	# print(gui)
+
+	# not making Data dir here because it is done later
+	if (os.path.exists("LocalData") == False):
+		os.mkdir("LocalData")
+	if (os.path.exists("LocalData/ModsDownloaded") == False):
+		os.mkdir("LocalData/ModsDownloaded")
+	if (os.path.exists("LocalData/Modlists") == False):
+		os.mkdir("LocalData/Modlists")
+	try:
+		shutil.rmtree("Data")  # deleting Data dir
+	except(FileNotFoundError):  # Data dir not present
+		pass
+	if (os.path.exists("Data") == False):
+		os.mkdir("Data")
+	if (os.path.exists("Data/temp") == False):
+		os.mkdir("Data/temp")
+
+	instance = read_default_instance()
+
+	try:
+		with open("LocalData/config.json") as json_file:
+			json_data = json.load(json_file)
+			insts = json_data.keys()
+		for inst in insts:
+			if(not os.path.exists(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))):  # creating modsdownloaded subdirs for each instance
+				os.mkdir(os.path.join(execdir, "LocalData/ModsDownloaded/"+inst))
+	except:
+		pass
+
+	execdir = os.getcwd()
+
+	setup_config(instance)
+
+	if (gui):
+		tkinst = Gui(root)
+
+	transfer_tkinst()
+
+	cprint("You are running " + sys.platform)
+
+	update_archive(True)
+
+	if(gui):
+		delta_gui.updateinst()
+
+		tkinst.update_modlist()
+
+	check_for_updates()
+
+	cprint("DeltaMC v"+version)
+	instance = delta_gui.instance
+	if (args["instance"] != "None"):
+		instance = args["instance"]
+	if(instance == "@ERROR@"):
+		instance = delta_gui.instance
+	cprint("Selected Instance: "+instance)
+	cprint("Minecraft Version: "+mc_version)
+
+	upgradesavailable = delta_upgrade.get_upgrades(instance)
+	if (upgradesavailable == []):
+		pass
+	else:
+		cprint("The following upgrades are available for instance "+instance+":")
+		for upgrade in upgradesavailable:
+			cprint(" "+upgrade[0].name+" (current version: "+upgrade[1].versions[0]["Version"]+", you have: "+upgrade[0].versions[0]["Version"]+")")
+	if (args["install"] != "None"):
+		delta_install.install_mod(args["install"][0])
+		sys.exit()
+	if (args["remove"] != "None"):
+		delta_remove.remove_mod(args["remove"][0])
+		sys.exit()
+	if (args["upgrade"] != "None"):
+		delta_upgrade.upgrade_mod(args["upgrade"][0])
+		sys.exit()
+	if (args["search"] != "None"):
+		get_info(args["search"][0])
+		sys.exit()
+	if (args["export"] != "None"):
+		delta_importexport.export_mods(args["export"][0])
+		sys.exit()
+	if (args["importa"] != "None"):
+		delta_importexport.import_mods(args["importa"][0])
+		sys.exit()
+
+	if (gui == False):
+		print_help()
+
+	if (gui == True):
+		tkinst.mainloop()
+
+	else:
+		while(True):
+			os.chdir(execdir + "/LocalData/") # reset current working dir
+			command = input("> ")
+			parsecmd(command)
