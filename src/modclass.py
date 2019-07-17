@@ -13,7 +13,7 @@ class Mod:
     versions = []
 
     def __init__(self, name, author, desc, license, reqr, incompat, recmd,
-        _type, unstable, versions, instname = ''):
+                 _type, unstable, versions, instname=''):
         self.name = name
         self.author = author
         self.desc = desc
