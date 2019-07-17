@@ -4,4 +4,4 @@ python:
 install:
   - pip install requests pexpect
 script:
-  - python3 run_tests.py
+  - python3 src/run_tests.py
