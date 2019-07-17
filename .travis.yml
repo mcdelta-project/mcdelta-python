@@ -4,4 +4,4 @@ python:
 install:
   - pip install requests pexpect
 script:
-  - python3 src/run_tests.py
+  - DELTA_HOME=`pwd` python3 src/run_tests.py
