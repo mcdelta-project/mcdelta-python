@@ -1,8 +1,10 @@
 import pexpect
 import sys
+import os
 
 print("Running tests on " + sys.platform)
-deltamc = pexpect.spawn("python3 ./deltamc.py", encoding="UTF-8")
+print(os.getcwd())
+deltamc = pexpect.spawn("python3 ./src/deltamc.py", encoding="UTF-8")
 deltamc.logfile = sys.stdout
 print("\n *** Attempting to set up the default instance... *** \n")
 deltamc.expect(
