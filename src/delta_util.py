@@ -380,12 +380,7 @@ def listmods_all():
 
 
 def listmods_all_no_output():
-    mods = get_all_jsons()
-    if output:
-        cprint("Mods:")
-        cprint(str(mods))
-    else:
-        return mods
+    return get_all_jsons()
 
 
 def mergedirs(dir1, dir2):
