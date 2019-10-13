@@ -191,8 +191,11 @@ class Gui(tk.Frame):
 
     def update_modlist(self):
         self.mods = listmods_all_no_output()
-        self.mods_curse = json.loads(requests.get(
+	self.mods_curse = []
+	mods_dict = json.loads(requests.get(
             "http://kpabr.com/curse/mods").text)
+        for mod in mods_dict.keys():
+                self.mods_curse.append(mod)
         self.mlist.delete(0, tk.END)
         for mod in self.mods:
             # print(mod)

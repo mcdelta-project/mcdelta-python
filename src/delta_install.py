@@ -31,7 +31,10 @@ def recieve_tkinst_install(data):
 
 
 def install_mod(modname, version=None):
-    mods_curse = json.loads(requests.get("http://kpabr.com/curse/mods").text)
+    mods_dict = json.loads(requests.get("http://kpabr.com/curse/mods").text)
+    mods_curse = []
+    for mod in mods_dict:
+        mods_curse.append(mod)
     os.chdir(execdir + "/Data/DeltaMC-Archive")
     if(modname == None):
         modname = cinput("Enter mod name: ")
