@@ -31,35 +31,43 @@ def remove_mod(modname):  # behavior not guaranteed on mods installed outside of
     print("MOD NAME IS "+modname)
     if(modname == None):
         modname = cinput("Enter mod name: ")
-    cprint("Removing file for mod in ModsDownloaded")
-    try:
-        os.remove(execdir + "/LocalData/ModsDownloaded/"+instance+"/" +
-                  modname+".installed")  # removing json in ModsDownloaded dir
-    except FileNotFoundError:
-        if(gui):
-            msgbox.showerror("Removal Failed", "Could not remove "+modname +
-                             ".\nEither " + modname + " is not installed, or something went wrong.")
-        cprint("Either " + modname +
-               " is not installed, or something went horribly wrong.")
-        return
-    if(get_json(modname)["Type"] == "Forge" or get_json(modname)["Type"] == "Liteloader"):
-        os.chdir(modfolder)
-        files = glob.glob(modname + "-*.jar")  # get all versions of mod
-        for file in files:
-            if(gui):
-                a = msgbox.askyesno("Confirm Deletion",
-                                    "Delete \""+file+"\"?", parent=tkinst)
-            else:
-                a = input(
-                    "Delete \""+file+"\"? Type OK to delete, or anything else to skip: ") == "OK"
-            if(a):
-                os.remove(file)
-                cprint("Deleted \""+file+"\".")
-            else:
-                cprint("Skipped \""+file+"\".")
+    a = False
+    if(gui):
+        a = msgbox.askyesno("Confirm Removal",
+                                    "Remove mod '"+modname+"'?", parent=tkinst)
     else:
-        if(gui):
-            msgbox.showerror(
-                "Removal Failed", "DeltaMC cannot remove installer mods or base mods.\nRemoving mod from DeltaMC listing only.")
-        cprint("DeltaMC cannot remove installer mods or base mods! (If "+modname +
-               " is not an installer mod or base mod, then something went wrong.)")
+        a = input(
+             "Remove mod '"+modname+"'? [Y/n]: ") == "Y"
+    if a:
+        try:
+            os.remove(execdir + "/LocalData/ModsDownloaded/"+instance+"/" +
+                      modname+".installed")  # removing json in ModsDownloaded dir
+        except FileNotFoundError:
+            if(gui):
+                msgbox.showerror("Removal Failed", "Could not remove "+modname +
+                                 ".\nEither " + modname + " is not installed, or something went wrong.")
+            cprint("Either " + modname +
+                   " is not installed, or something went horribly wrong.")
+            return
+        if(get_json(modname)["Type"] == "Forge" or get_json(modname)["Type"] == "Liteloader"):
+            os.chdir(modfolder)
+            files = glob.glob(modname + "-*.jar")  # get all versions of mod
+            for file in files:
+                if(gui):
+                    a = msgbox.askyesno("Confirm Deletion",
+                                        "Delete \""+file+"\"?", parent=tkinst)
+                else:
+                    a = input(
+                        "Delete \""+file+"\"? [Y/n]: ") == "Y"
+                if(a):
+                    os.remove(file)
+                    cprint("Deleted \""+file+"\".")
+                else:
+                    cprint("Skipped \""+file+"\".")
+        else:
+            if(gui):
+                msgbox.showerror(
+                    "Removal Failed", "DeltaMC cannot remove installer mods or base mods.\nRemoving mod from DeltaMC listing only.")
+            cprint("DeltaMC cannot remove installer mods or base mods! (If "+modname +
+                   " is not an installer mod or base mod, then something went wrong.)")
+        cprint("Removing file for mod in ModsDownloaded")
