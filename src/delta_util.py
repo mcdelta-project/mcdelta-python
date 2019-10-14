@@ -448,7 +448,7 @@ def update_archive(start=False):
     try:
         with open(file_name, 'wb') as out_file:
             response = requests.get(
-                'https://github.com/mcdelta-project/mcdelta-archive/tarball/new-syntax')
+                'https://github.com/mcdelta-project/deltamc-archive/tarball/new-syntax')
             out_file.write(response.content)
         cprint("downloaded...", "")
     except Exception as e:
