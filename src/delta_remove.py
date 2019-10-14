@@ -27,7 +27,7 @@ def recieve_tkinst_remove(data):
     tkinst = data
 
 
-def remove_mod(modname):  # behavior not guaranteed on mods installed outside of DeltaMC
+def remove_mod(modname):  # behavior not guaranteed on mods installed outside of MCDelta
     print("MOD NAME IS "+modname)
     if(modname == None):
         modname = cinput("Enter mod name: ")
@@ -67,7 +67,7 @@ def remove_mod(modname):  # behavior not guaranteed on mods installed outside of
         else:
             if(gui):
                 msgbox.showerror(
-                    "Removal Failed", "DeltaMC cannot remove installer mods or base mods.\nRemoving mod from DeltaMC listing only.")
-            cprint("DeltaMC cannot remove installer mods or base mods! (If "+modname +
+                    "Removal Failed", "MCDelta cannot remove installer mods or base mods.\nRemoving mod from MCDelta listing only.")
+            cprint("MCDelta cannot remove installer mods or base mods! (If "+modname +
                    " is not an installer mod or base mod, then something went wrong.)")
-        cprint("Removing file for mod in ModsDownloaded")
+        #cprint("Removing file for mod in ModsDownloaded")

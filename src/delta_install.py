@@ -35,7 +35,7 @@ def install_mod(modname, version=None):
     mods_curse = []
     for mod in mods_dict:
         mods_curse.append(mod)
-    os.chdir(execdir + "/Data/DeltaMC-Archive")
+    os.chdir(execdir + "/Data/MCDelta-Archive")
     if(modname == None):
         modname = cinput("Enter mod name: ")
     if(os.path.exists(modname + ".json")):  # Telling user that file exists
@@ -82,7 +82,7 @@ def install_mod(modname, version=None):
         cprint(modname + " is already installed!")
         return
 
-    originalfile = execdir + "/Data/DeltaMC-Archive/" + modname + \
+    originalfile = execdir + "/Data/MCDelta-Archive/" + modname + \
         ".json"  # Saving Modname.json for future reference
     if(not os.path.exists(execdir + "/LocalData/ModsDownloaded/"+instance)):
         os.mkdir(execdir + "/LocalData/ModsDownloaded/"+instance)
@@ -139,7 +139,7 @@ def install_mod(modname, version=None):
     cprint(modname + " is at version " + str(version_number))
     if (modtype == "Basemod"):
         os.chdir(execdir + "/Data/temp")
-        file_name = modname + "-" + version + "-DeltaMCtemp.zip"
+        file_name = modname + "-" + version + "-MCDeltatemp.zip"
         cprint("Downloading " + url)
         with open(file_name, 'wb') as out_file:
             response = requests.get(url)
@@ -173,9 +173,9 @@ def install_mod(modname, version=None):
         shutil.copytree(vpath, folderpath)
         fix_names(folderpath, vname, foldernamefinal)
         zipfile.ZipFile(os.path.join(jarfolder, foldernamefinal, newjarname)).extractall(
-            path="./"+file_name+"DeltaMCtemp")
-        mergedirs(modname, file_name+"DeltaMCtemp")
-        os.chdir(file_name+"DeltaMCtemp")
+            path="./"+file_name+"MCDeltatemp")
+        mergedirs(modname, file_name+"MCDeltatemp")
+        os.chdir(file_name+"MCDeltatemp")
         shutil.rmtree("META-INF")  # delete META-INF
         cprint("Making jar (this might take a while).")
         shutil.make_archive("../"+foldername, "zip")

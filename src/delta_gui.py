@@ -206,7 +206,7 @@ class Gui(tk.Frame):
             self.mlist.insert(tk.END, mod)
 
     def initialise_window(self):
-        self.master.title("DeltaMC v2.1.0")
+        self.master.title("MCDelta v2.1.0")
         # self.master.geometry("800x400")
 
         self.winv = tk.PanedWindow(
@@ -293,7 +293,7 @@ class Gui(tk.Frame):
         self.definst.pack()
 
         self.update = tk.Button(
-            self.lpane, text="Update DeltaMC Archive", command=update_archive)
+            self.lpane, text="Update MCDelta Archive", command=update_archive)
         self.update.pack(side=tk.BOTTOM)
 
         self.blankf = tk.Frame(self.lpane, height=20)
@@ -307,7 +307,7 @@ class Gui(tk.Frame):
             self.lpane, text="Import Mod List...", command=importmlist)
         self.implist.pack(side=tk.BOTTOM)
 
-        self.exit = tk.Button(self.lpane, text="Exit DeltaMC", command=exit)
+        self.exit = tk.Button(self.lpane, text="Exit MCDelta", command=exit)
         self.exit.pack(side=tk.BOTTOM)
 
         self.mpane = tk.Frame(self.win)
@@ -563,7 +563,7 @@ def parsecmd(command):
     elif(command.split(" ")[0] == "list"):
         listmods()
     elif(command.split(" ")[0] == "version"):
-        cprint("DeltaMC v"+version)
+        cprint("MCDelta v"+version)
     elif(command.split(" ")[0] == "help" or command.split(" ")[0] == "?"):
         print_help()
     elif(command.split(" ")[0] == "exit"):

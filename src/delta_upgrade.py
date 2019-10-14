@@ -29,7 +29,7 @@ def recieve_tkinst_upgrade(data):
 
 
 def upgrade_mod(modname):
-    os.chdir(execdir + "/Data/DeltaMC-Archive")
+    os.chdir(execdir + "/Data/MCDelta-Archive")
     if(modname == None):
         modname = cinput("Enter mod name: ")
     update = [get_installed_json(modname), get_json(modname)]

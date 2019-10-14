@@ -44,13 +44,13 @@ def read_default_instance():
 
 def check_for_updates():
     response = requests.get(
-        'https://raw.githubusercontent.com/deltamc-project/deltamc-python/master/version.txt')
+        'https://raw.githubusercontent.com/mcdelta-project/mcdelta-python/master/version.txt')
     latestversion = response.text
     if (str(version).strip() != str(latestversion).strip()):
         # if (gui):
-        #	msgbox.askyesno("Update available", "You are running DeltaMC " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
+        #	msgbox.askyesno("Update available", "You are running MCDelta " + version + ".\nThe newest version is " + str(latestversion) + ".", parent=tkinst, master=tkinst)
         # else:
-        cprint("!!Update Available! You are running DeltaMC " + version +
+        cprint("!!Update Available! You are running MCDelta " + version +
                ". The newest version is " + str(latestversion) + "!!")
 
 
@@ -98,7 +98,7 @@ def instance_exists(instance):
             json_data = json.load(json_file)
         except(json.decoder.JSONDecodeError):
             cprint(
-                "The config JSON appears to be invalid. Delete it and run DeltaMC again.")
+                "The config JSON appears to be invalid. Delete it and run MCDelta again.")
             json_file.close()
             sys.exit()
     return(instance in json_data.keys())
@@ -111,7 +111,7 @@ def read_config(instance):
                 json_data = json.load(json_file)
             except(json.decoder.JSONDecodeError):
                 cprint(
-                    "The config JSON appears to be invalid. Delete it and run DeltaMC again.")
+                    "The config JSON appears to be invalid. Delete it and run MCDelta again.")
                 json_file.close()
                 sys.exit()
             json_file.close()
@@ -210,7 +210,7 @@ def rm_config(_instance):
                 json_data = json.load(json_file)
             except(json.decoder.JSONDecodeError):
                 cprint(
-                    "The config JSON appears to be invalid. Delete it and run DeltaMC again.")
+                    "The config JSON appears to be invalid. Delete it and run MCDelta again.")
                 json_file.close()
                 sys.exit()
             json_file.close()
@@ -231,10 +231,10 @@ def rm_config(_instance):
 
 
 def get_json(modname):
-    if(os.path.exists(execdir + "/Data/DeltaMC-Archive")):
-        os.chdir(execdir + "/Data/DeltaMC-Archive")
+    if(os.path.exists(execdir + "/Data/MCDelta-Archive")):
+        os.chdir(execdir + "/Data/MCDelta-Archive")
     else:
-        cprint("DeltaMC archive not found. Please update the DeltaMC archive.")
+        cprint("MCDelta archive not found. Please update the MCDelta archive.")
         return(-1)
     if(os.path.exists(modname + ".json")):
         # JSON parsing
@@ -244,7 +244,7 @@ def get_json(modname):
                 json_file.close()
             except(json.decoder.JSONDecodeError):
                 cprint("The JSON file \""+modname +
-                       ".json\" appears to be invalid. Please update the DeltaMC archive.")
+                       ".json\" appears to be invalid. Please update the MCDelta archive.")
                 json_file.close()
                 return
         return(json_data)
@@ -268,7 +268,7 @@ def get_installed_json(modname):
                 json_data = json.load(json_file)
             except(json.decoder.JSONDecodeError):
                 cprint("The JSON file \""+modname +
-                       ".installed\" appears to be invalid. Using data from DeltaMC archive.")
+                       ".installed\" appears to be invalid. Using data from MCDelta archive.")
                 json_data = (get_json(modname))
             finally:
                 json_file.close()
@@ -345,8 +345,8 @@ def get_installed_mods(inst=None, allinst=True):
 
 def get_all_jsons():
     jsons = []
-    if(os.path.exists(execdir + "/Data/DeltaMC-Archive")):
-        mods = os.listdir(execdir + "/Data/DeltaMC-Archive")
+    if(os.path.exists(execdir + "/Data/MCDelta-Archive")):
+        mods = os.listdir(execdir + "/Data/MCDelta-Archive")
         for mod in mods:
             if mod == "README.md":
                 continue
@@ -436,19 +436,19 @@ def get_deps(modname):
 def update_archive(start=False):
     # Delete old archive
     os.chdir(execdir + "/Data")
-    if(os.path.exists(execdir + "/Data/DeltaMC-Archive")):
-        shutil.rmtree("DeltaMC-Archive")
+    if(os.path.exists(execdir + "/Data/MCDelta-Archive")):
+        shutil.rmtree("MCDelta-Archive")
     # Archive Download
-    url = "https://github.com/deltamc-project/deltamc-archive/tarball/master"
+    url = "https://github.com/mcdelta-project/mcdelta-archive/tarball/master"
     # curse_url = "https://addons-ecs.forgesvc.net/api/v2/addon/search?&gameId=432" #this is from the Twitch/Curse API, it gets all mods on CurseForge at once
-    file_name = "DeltaMC.tar.gz"
+    file_name = "MCDelta.tar.gz"
     #curse_file_name = "cursemods.json"
     cprint("Updating archive...", "")
     # Download it.
     try:
         with open(file_name, 'wb') as out_file:
             response = requests.get(
-                'https://github.com/deltamc-project/deltamc-archive/tarball/new-syntax')
+                'https://github.com/mcdelta-project/mcdelta-archive/tarball/new-syntax')
             out_file.write(response.content)
         cprint("downloaded...", "")
     except Exception as e:
@@ -458,16 +458,16 @@ def update_archive(start=False):
             msgbox.showerror("Archive download failed",
                              "Something went wrong while downloading the archive.", parent=tkinst)
         if(start):
-            print("DeltaMC: fatal: Something went wrong while downloading the archive.")
+            print("MCDelta: fatal: Something went wrong while downloading the archive.")
             sys.exit()
         else:
             return -1
     # Download it.
-    tar = tarfile.open("DeltaMC.tar.gz")  # untar
+    tar = tarfile.open("MCDelta.tar.gz")  # untar
     tar.extractall()
     tarlist = tar.getnames()
-    # rename the resulting folder to DeltaMC-Archive
-    os.rename(tarlist[0], "DeltaMC-Archive")
+    # rename the resulting folder to MCDelta-Archive
+    os.rename(tarlist[0], "MCDelta-Archive")
     for json_data in get_all_jsons():
         mod_item = get_mod_from_json(json_data)
         mod_list.append(mod_item)
@@ -475,7 +475,7 @@ def update_archive(start=False):
     cprint("extracted")
     if(gui and not start):
         msgbox.showinfo(
-            "Archive updated", "The DeltaMC archive has been successfully updated.", parent=tkinst)
+            "Archive updated", "The MCDelta archive has been successfully updated.", parent=tkinst)
 
 
 def get_info_console(modname):
@@ -548,9 +548,9 @@ def print_help():
     cprint(" upgradem: upgrade multiple mods")
     cprint(" upgradeall: upgrade all outdated mods for Minecraft instance 'inst', or use '*' to check all instances")
     cprint(" upgrades 'inst': list available mod upgrades for Minecraft instance 'inst', or use '*' to check all instances")
-    cprint(" update: update the DeltaMC archive")
+    cprint(" update: update the MCDelta archive")
     cprint(" help: display this help message")
-    cprint(" version: display the DeltaMC version number")
+    cprint(" version: display the MCDelta version number")
     cprint(" list: list installed mods")
     cprint(" export 'name': export a modlist with the name 'name' , which can be imported later")
     cprint(" import 'pathtomodlist': import the modlist 'pathtomodlist'")
@@ -559,7 +559,7 @@ def print_help():
     cprint(" addinst 'inst': adds the Minecraft instance 'inst'")
     cprint(" rminst 'inst': removes the Minecraft instance 'inst'")
     cprint(" insts: lists all Minecraft instances")
-    cprint(" exit: exit DeltaMC")
+    cprint(" exit: exit MCDelta")
 
 
 def get_mod_from_json(json_data):
@@ -661,7 +661,7 @@ def is_any_version_compatible(mod):
     return False
 
 
-def cinput(terminal_text, gui_text=None, input_type='text', title="DeltaMC"):
+def cinput(terminal_text, gui_text=None, input_type='text', title="MCDelta"):
     if gui_text == None:
         gui_text = terminal_text
     if (gui):

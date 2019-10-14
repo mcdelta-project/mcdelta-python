@@ -82,9 +82,9 @@ def print_cmd_line_help():
     cprint("upgradem: upgrade multiple mods")
     cprint("upgradeall: upgrade all outdated mods for the current Minecraft instance")
     cprint("upgrades: list available mod upgrades for the current Minecraft instance")
-    cprint("update: update the DeltaMC archive")
+    cprint("update: update the MCDelta archive")
     cprint("help: display this help message")
-    cprint("version: display the DeltaMC version number")
+    cprint("version: display the MCDelta version number")
     cprint("instance: display the current instance ")
     cprint("list: list installed mods for the current Minecraft instance, or for the provided instance INST.")
     cprint("export NAME: export a modlist with the name NAME, which can be imported later")
@@ -447,7 +447,7 @@ if __name__ == "__main__":
 
     check_for_updates()
 
-    cprint("DeltaMC v"+version)
+    cprint("MCDelta v"+version)
     instance = delta_gui.instance
     if (args["instance"] != "None"):
         instance = args["instance"]

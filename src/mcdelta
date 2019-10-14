@@ -26,11 +26,11 @@ upgrade all outdated mods for the current Minecraft instance
 .IP "upgrades"
 list available mod upgrades for the current Minecraft instance
 .IP update
-update the DeltaMC archive
+update the MCDelta archive
 .IP help
 display this help message
 .IP version
-display the DeltaMC version number
+display the MCDelta version number
 .IP "instance"
 display the current instance
 .IP list
