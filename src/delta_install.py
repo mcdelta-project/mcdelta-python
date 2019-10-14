@@ -57,8 +57,8 @@ def install_mod(modname, version=None):
 
     version_number = 0
     for x in range(len(mod_data.versions)):
-        cprint(mod_data.versions[x]['Version'])
-        cprint(version)
+        #cprint(mod_data.versions[x]['Version'])
+        #cprint(version)
         if (version == mod_data.versions[x]['Version']):
             version_number = x
             break
@@ -136,7 +136,7 @@ def install_mod(modname, version=None):
         cprint("Mod not compatible with current Minecraft Version!")
         return
     url = get_url(mod_data, version)
-    cprint(modname + " is at version " + version)
+    cprint(modname + " is at version " + str(version_number))
     if (modtype == "Basemod"):
         os.chdir(execdir + "/Data/temp")
         file_name = modname + "-" + version + "-DeltaMCtemp.zip"

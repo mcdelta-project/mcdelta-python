@@ -1,10 +1,10 @@
-echo '#!/bin/sh' > deltamc
+echo '#!/bin/sh' > mcdelta
 echo "python3 `pwd`/src/deltamc.py \$@" >> deltamc
+if [ "${DELTA_HOME}" != `pwd` ]; then
+	echo "export PATH=\$PATH:`pwd`" >> ~/.bash_profile
+	echo "export PATH=\$PATH:`pwd`" >> ~/.bashrc
 
-echo "export PATH=\$PATH:`pwd`" >> ~/.bash_profile
-echo "export PATH=\$PATH:`pwd`" >> ~/.bashrc
-
-echo "export DELTA_HOME=`pwd`" >> ~/.bash_profile
-echo "export DELTA_HOME=`pwd`" >> ~/.bashrc
-
+	echo "export DELTA_HOME=`pwd`" >> ~/.bash_profile
+	echo "export DELTA_HOME=`pwd`" >> ~/.bashrc
+fi
 bash ~/.bash_profile

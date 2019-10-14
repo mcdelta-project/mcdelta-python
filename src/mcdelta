@@ -1,0 +1,53 @@
+.\" MCDelta man page
+.TH mcdelta 1 "14 Oct 2019" "v2.1.0" "MCDelta"
+.SH NAME
+mcdelta \- invoke the MCDelta Minecraft mod package manager
+.SH SYNOPSIS
+mcdelta <COMMAND> [ARGUMENT] [INSTANCE]
+.SH DESCRIPTION
+MCDelta is a package manager for Minecraft mods. It can install mods from its own library, or from CurseForge. It can handle multiple Minecraft instances. In order to specify what instance to operate on, provide the INSTANCE parameter. If it is not specified, the default instance is used.
+.SH COMMANDS
+.IP "install MOD [VERSION]"
+install the mod MOD, with version VERSION if specified, otherwise the latest compatible version
+.IP "installm MODS"
+install multiple mods
+.IP "info MOD"
+get info for the mod MOD
+.IP "remove MOD"
+remove the mod MOD
+.IP "removem MODS"
+remove multiple mods
+.IP "upgrade MOD"
+upgrade the mod MOD
+.IP upgradem
+upgrade multiple mods
+.IP "upgradeall"
+upgrade all outdated mods for the current Minecraft instance
+.IP "upgrades"
+list available mod upgrades for the current Minecraft instance
+.IP update
+update the DeltaMC archive
+.IP help
+display this help message
+.IP version
+display the DeltaMC version number
+.IP "instance"
+display the current instance
+.IP list
+list installed mods for the current Minecraft instance, or for the provided instance INST.
+.IP "export NAME"
+export a modlist with the name NAME, which can be imported later
+.IP "import MODLIST"
+import the modlist MODLIST
+.IP "defaultinst INST"
+sets default Minecraft instance to INST
+.IP "addinst INST"
+adds the Minecraft instance INST
+.IP "rminst INST"
+removes the Minecraft instance INST
+.IP insts
+lists all Minecraft instances
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Valiec2019 (valiec2019@gmail.com)

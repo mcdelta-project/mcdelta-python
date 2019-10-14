@@ -68,7 +68,31 @@ def transfer_tkinst():
 
 
 def print_usage():
-    pass
+    cprint("Usage: mcdelta <COMMAND> [ARGUMENT] [INSTANCE]")
+    cprint("See mcdelta help for command details.")
+
+def print_cmd_line_help():
+    cprint("Usage: mcdelta <COMMAND> [ARGUMENT] [INSTANCE]")
+    cprint("install MOD [VERSION]: install the mod MOD, with version VERSION if specified, otherwise the latest compatible version")
+    cprint("installm MODS: install multiple mods")
+    cprint("info MOD: get info for the mod MOD")
+    cprint("remove MOD: remove the mod MOD")
+    cprint("removem MODS: remove multiple mods")
+    cprint("upgrade MOD: upgrade the mod MOD")
+    cprint("upgradem: upgrade multiple mods")
+    cprint("upgradeall: upgrade all outdated mods for the current Minecraft instance")
+    cprint("upgrades: list available mod upgrades for the current Minecraft instance")
+    cprint("update: update the DeltaMC archive")
+    cprint("help: display this help message")
+    cprint("version: display the DeltaMC version number")
+    cprint("instance: display the current instance ")
+    cprint("list: list installed mods for the current Minecraft instance, or for the provided instance INST.")
+    cprint("export NAME: export a modlist with the name NAME, which can be imported later")
+    cprint("import MODLIST: import the modlist MODLIST")
+    cprint("defaultinst INST: sets default Minecraft instance to INST")
+    cprint("addinst INST: adds the Minecraft instance INST")
+    cprint("rminst INST: removes the Minecraft instance INST")
+    cprint("insts: lists all Minecraft instances")
 
 
 def parsecmd(command):
@@ -352,7 +376,7 @@ if __name__ == "__main__":
     elif len(sys.argv) == 2 and sys.argv[1] in valid_actions_no_args:
         action = sys.argv[1]
         if action == 'help':
-            print_usage()
+            print_cmd_line_help()
             sys.exit(0)
         else:
             args["gui"] = True
@@ -412,7 +436,7 @@ if __name__ == "__main__":
 
     transfer_tkinst()
 
-    cprint("You are running " + sys.platform)
+    #cprint("You are running " + sys.platform)
 
     update_archive(True)
 

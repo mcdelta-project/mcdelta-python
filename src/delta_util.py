@@ -72,14 +72,14 @@ def recieve_tkinst_util(data):
     tk_ready = True
 
 
-def cprint(text):  # outputs text to console pane in GUI if gui enabled, otherwise prints it
+def cprint(text, terminator="\n"):  # outputs text to console pane in GUI if gui enabled, otherwise prints it
     if (gui == True and tk_ready == True):
         tkinst.console.config(state=tk.NORMAL)
-        tkinst.console.insert(tk.END, str(text)+"\n")
+        tkinst.console.insert(tk.END, str(text)+terminator)
         tkinst.console.config(state=tk.DISABLED)
         tkinst.console.see(tk.END)
     else:
-        print(text)
+        print(text, end=terminator)
 
 
 def iprint(text):  # outputs text to info pane in GUI if gui enabled, otherwise prints it
@@ -443,14 +443,14 @@ def update_archive(start=False):
     # curse_url = "https://addons-ecs.forgesvc.net/api/v2/addon/search?&gameId=432" #this is from the Twitch/Curse API, it gets all mods on CurseForge at once
     file_name = "DeltaMC.tar.gz"
     #curse_file_name = "cursemods.json"
-    cprint("Downloading Archive...")
+    cprint("Updating archive...", "")
     # Download it.
     try:
         with open(file_name, 'wb') as out_file:
             response = requests.get(
                 'https://github.com/deltamc-project/deltamc-archive/tarball/new-syntax')
             out_file.write(response.content)
-        cprint("Done.")
+        cprint("downloaded...", "")
     except Exception as e:
         cprint("Something went wrong while downloading the archive.")
         cprint("Error: " + str(e))
@@ -463,7 +463,6 @@ def update_archive(start=False):
         else:
             return -1
     # Download it.
-    cprint("Extracting Archive...")
     tar = tarfile.open("DeltaMC.tar.gz")  # untar
     tar.extractall()
     tarlist = tar.getnames()
@@ -473,7 +472,7 @@ def update_archive(start=False):
         mod_item = get_mod_from_json(json_data)
         mod_list.append(mod_item)
 
-    cprint("Done.")
+    cprint("extracted")
     if(gui and not start):
         msgbox.showinfo(
             "Archive updated", "The DeltaMC archive has been successfully updated.", parent=tkinst)
