@@ -28,7 +28,7 @@ def recieve_tkinst_remove(data):
 
 
 def remove_mod(modname):  # behavior not guaranteed on mods installed outside of MCDelta
-    print("MOD NAME IS "+modname)
+    #print("MOD NAME IS "+modname)
     if(modname == None):
         modname = cinput("Enter mod name: ")
     a = False
